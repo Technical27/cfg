@@ -207,7 +207,7 @@ in {
 
     extraConfig = {
       pull.rebase = true;
-      credential.helper = "/home/aamaruvi/.nix-profile/bin/git-credential-libsecret";
+      credential.helper = "/etc/profiles/per-user/aamaruvi/bin/git-credential-libsecret";
     };
 
     package = pkgs.gitFull;
