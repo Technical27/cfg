@@ -11,13 +11,14 @@
       modules = [
         ./configuration.nix
         ./hardware-configuration.nix
+        cpkgs.nixosModule
         cpkgs.nixosModules.auto-cpufreq
         nixos-hardware.nixosModules.dell-xps-13-9370
         home-manager.nixosModules.home-manager {
           home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
+          home-manager.useUserPackages = false;
           home-manager.users.aamaruvi =
-            import ./home.nix "laptop";
+            import ./home.nix "laptop" cpkgs;
         }
       ];
     };
