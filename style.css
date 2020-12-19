@@ -1,0 +1,131 @@
+* {
+  /* `otf-font-awesome` is required to be installed for icons */
+  font-family: 'JetBrains Mono NerdFont';
+  font-size: 15px;
+  min-height: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  transition-duration: 0s;
+}
+
+window#waybar {
+  /* background-color: #282828; */
+  color: #ebdbb2;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+  /* border: 2px solid #8ec07c; */
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#workspaces button {
+  padding: 0 5px;
+  background-color: transparent;
+  color: #504945;
+  border-bottom: 3px solid transparent;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+#workspaces button:hover {
+  box-shadow: inherit;
+  background-color: #282828;
+  color: #ebdbb2;
+}
+
+#workspaces button.focused {
+  color: #ebdbb2;
+}
+
+#workspaces button.urgent {
+  background-color: #8ec07c;
+}
+
+#mode {
+  background-color: #ebdbb2;
+  color: #282828;
+  padding: 0 10px;
+  margin: 0 4px;
+}
+
+#workspaces {
+  padding-left: 10px;
+}
+
+#tray {
+  padding-right: 10px;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#tray,
+#idle_inhibitor,
+#window,
+#workspaces,
+#custom-nixos {
+  padding: 0 15px;
+  color: #ebdbb2;
+}
+
+@keyframes blink {
+  to {
+    background-color: #ebdbb2;
+    color: #282828;
+  }
+}
+
+#battery.critical:not(.charging) {
+  background-color: #fb4934;
+  color: #ebdbb2;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+label:focus {
+  background-color: #282828;
+}
+
+#network.disconnected {
+  background-color: #fb4934;
+}
+
+#pulseaudio.muted {
+  background-color: #fabd2f;
+  color: #282828;
+}
+
+#idle_inhibitor.activated {
+  background-color: #ebdbb2;
+  color: #282828;
+}
+
+#custom-nixos.error {
+  background-color: #fb4934;
+  color: #ebdbb2;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#custom-nixos.offline {
+  background-color: #fb4934;
+}
+
+#custom-nixos.update-available {
+  background-color: #fabd2f;
+  color: #282828;
+}

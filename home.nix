@@ -5,7 +5,6 @@ let
   mkLaptop = obj: lib.mkIf isLaptop obj;
   isDesktop = device == "desktop";
   inherit (pkgs) cpkgs;
-  # cpkgs = import <custom-pkgs> {};
 in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -18,6 +17,9 @@ in {
   in [
     ripgrep
     JBMono
+    noto-fonts-extra
+    noto-fonts-cjk
+    noto-fonts-emoji
     niv
     nodejs
     xdg_utils
@@ -98,7 +100,6 @@ in {
       coc-json
       coc-css
       coc-html
-      coc-lists
       coc-snippets
       coc-git
       coc-rust-analyzer
@@ -319,6 +320,7 @@ in {
         "XF86MonBrightnessDown" = "${brctl} 10%-";
 
         "Mod4+e" = "exec firefox";
+        "Mod4+Shift+e" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";
@@ -336,6 +338,90 @@ in {
       };
     };
   };
+
+  programs.waybar = {
+    enable = true;
+    style = builtins.readFile ./style.css;
+    settings = [{
+      layer = "top";
+      position = "top";
+      height = 30;
+      output = [ "eDP-1" ];
+      modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
+      modules-right = [ "idle_inhibitor" "custom/nixos" "network" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
+      modules = {
+        "sway/workspaces".disable-scroll = true;
+        "sway/mode".format = "<span style=\"italic\">{}</span>";
+        idle_inhibitor = {
+          format = "{icon}";
+          format-icons = {
+            activated = "";
+            deactivated = "";
+          };
+        };
+        tray.spacing = 10;
+        clock = {
+          format = "{:%I:%M %p}";
+          tooltip-format = "<big>{:%Y %B}</big>\\n<tt><small>{calendar}</small></tt>";
+          format-alt = "{:%Y-%m-%d}";
+        };
+        cpu = {
+          format = "{usage}% ";
+          tooltip = false;
+        };
+        memory.format = "{}% ";
+        temperature = {
+          critical-threshold = 80;
+          format = "{temperatureC}°C";
+        };
+        backlight = {
+          format = "{percent}% {icon}";
+          format-icons = [ "" "" ];
+        };
+        battery = {
+          states = {
+            warning = 20;
+            critical = 10;
+          };
+          format = "{capacity}% {icon}";
+          format-charging = "{capacity}% ";
+          format-plugged = "{capacity}% ";
+          format-alt = "{time} {icon}";
+          format-icons = [ ""  ""  ""  ""  "" ];
+        };
+        network = {
+          format-wifi = "{essid} ({signalStrength}%) ";
+          format-ethernet = "{ifname}: {ipaddr} ";
+          format-linked = "{ifname} (No IP) ";
+          format-disconnected = "Disconnected ⚠";
+          tooltip-format-ethernet = "{ipaddr}";
+          tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
+        };
+        pulseaudio = {
+          scroll-step = 0;
+          format = "{volume}% {icon}";
+          format-bluetooth = "{volume}% {icon}";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [ ""  ""  "" ];
+          };
+          on-click = "pavucontrol";
+        };
+        "custom/nixos" = {
+          return-type = "json";
+          interval = 600;
+          exec = "${pkgs.node}/bin/node /home/aamaruvi/git/info/index.js --bar";
+        };
+      };
+    }];
+  };
+
+
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage when a
   # new Home Manager release introduces backwards incompatible changes.

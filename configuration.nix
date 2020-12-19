@@ -22,8 +22,6 @@
    "/home".options = default_opts;
  };
 
-  boot.kernelParams = [ "msr.allow_writes=on" ];
-
   services.snapper.configs = {
     home = {
       subvolume = "/home";
@@ -76,10 +74,10 @@
   systemd.network.networks."00-wifi" = {
     name = "wlan0";
     DHCP = "yes";
-    # networkConfig = {
-    #   IPv6AcceptRA = "yes";
-    #   IPv6PrivacyExtensions = "yes";
-    # };
+    networkConfig = {
+      IPv6AcceptRA = "yes";
+      IPv6PrivacyExtensions = "yes";
+    };
   };
 
   systemd.network.netdevs."10-wg0" = {
@@ -176,34 +174,6 @@
   };
   services.upower.enable = true;
 
-  security.polkit.extraConfig = ''
-    polkit.addRule(function(action, subject) {
-      var YES = polkit.Result.YES;
-      // NOTE: there must be a comma at the end of each line except for the last:
-      var permission = {
-        // required for udisks1:
-        "org.freedesktop.udisks.filesystem-mount": YES,
-        "org.freedesktop.udisks.luks-unlock": YES,
-        "org.freedesktop.udisks.drive-eject": YES,
-        "org.freedesktop.udisks.drive-detach": YES,
-        // required for udisks2:
-        "org.freedesktop.udisks2.filesystem-mount": YES,
-        "org.freedesktop.udisks2.encrypted-unlock": YES,
-        "org.freedesktop.udisks2.eject-media": YES,
-        "org.freedesktop.udisks2.power-off-drive": YES,
-        // required for udisks2 if using udiskie from another seat (e.g. systemd):
-        "org.freedesktop.udisks2.filesystem-mount-other-seat": YES,
-        "org.freedesktop.udisks2.filesystem-unmount-others": YES,
-        "org.freedesktop.udisks2.encrypted-unlock-other-seat": YES,
-        "org.freedesktop.udisks2.eject-media-other-seat": YES,
-        "org.freedesktop.udisks2.power-off-drive-other-seat": YES
-      };
-      if (subject.isInGroup("storage")) {
-        return permission[action.id];
-      }
-    });
-  '';
-
   # Enable sound.
   sound.enable = true;
   hardware.pulseaudio = {
@@ -273,7 +243,14 @@
           # first import environment variables from the login manager
           systemctl --user import-environment
           # then start the service
-          exec systemctl --user start sway.service
+          systemctl --user start sway.service
+
+          # poll for sway
+          while test (count (pgrep sway)) -gt 1
+            sleep 5
+          end
+
+          systemctl --user stop kanshi xdg-desktop-portal-wlr
         '';
       }
     )
@@ -336,6 +313,7 @@
 
   services.tlp.enable = true;
   powerManagement.enable = true;
+  services.throttled.enable = false;
 
   environment.variables = {
     _JAVA_AWT_WM_NONREPARENTING = "1";
