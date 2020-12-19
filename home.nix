@@ -415,7 +415,7 @@ in {
         "custom/nixos" = {
           return-type = "json";
           interval = 600;
-          exec = "${pkgs.node}/bin/node /home/aamaruvi/git/info/index.js --bar";
+          exec = "${pkgs.nodejs}/bin/node /home/aamaruvi/git/info/index.js --bar";
         };
       };
     }];
