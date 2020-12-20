@@ -56,8 +56,7 @@ let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline_powerline_fonts                = 1
 let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
 
-let g:coc_snippet_next = '<TAB>'
-let g:coc_snippet_prev = '<S-TAB>'
+let g:coc_snippet_next = '<S-TAB>'
 
 function! Fzf_dev() abort
   let s:fzf_files_options =

@@ -22,6 +22,8 @@
    "/home".options = default_opts;
  };
 
+  boot.kernelParams = [ "snd_hda_intel.powersave=1" ];
+
   services.snapper.configs = {
     home = {
       subvolume = "/home";

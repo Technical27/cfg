@@ -18,7 +18,7 @@
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = false;
           home-manager.users.aamaruvi =
-            import ./home.nix "laptop" cpkgs;
+            import ./home.nix "laptop";
         }
       ];
     };

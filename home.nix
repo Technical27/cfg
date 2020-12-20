@@ -1,4 +1,4 @@
-device: cpkgsModule: { config, pkgs, lib, ... }:
+device: { config, pkgs, lib, ... }:
 
 let
   isLaptop = device == "laptop";
@@ -21,7 +21,6 @@ in {
     noto-fonts-cjk
     noto-fonts-emoji
     niv
-    nodejs
     xdg_utils
     libnotify
     tldr
@@ -65,7 +64,7 @@ in {
     let
       browser = [ "firefox.desktop" ];
       files = [ "ranger.desktop" ];
-    in {
+    in mkLaptop {
       "text/html" = browser;
       "x-scheme-handler/http" = browser;
       "x-scheme-handler/https" = browser;
@@ -248,7 +247,7 @@ in {
       make = "make -j8";
       icat = "kitty +kitten icat";
     };
-    functions.fish_greeting = "node ~/git/info/index.js";
+    functions.fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
   };
 
   gtk = mkLaptop {
@@ -339,7 +338,7 @@ in {
     };
   };
 
-  programs.waybar = {
+  programs.waybar = mkLaptop {
     enable = true;
     style = builtins.readFile ./style.css;
     settings = [{
@@ -362,7 +361,7 @@ in {
         tray.spacing = 10;
         clock = {
           format = "{:%I:%M %p}";
-          tooltip-format = "<big>{:%Y %B}</big>\\n<tt><small>{calendar}</small></tt>";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
           format-alt = "{:%Y-%m-%d}";
         };
         cpu = {
@@ -386,7 +385,7 @@ in {
           format = "{capacity}% {icon}";
           format-charging = "{capacity}% ";
           format-plugged = "{capacity}% ";
-          format-alt = "{time} {icon}";
+          format-tooltip = "{time} {icon}";
           format-icons = [ ""  ""  ""  ""  "" ];
         };
         network = {
