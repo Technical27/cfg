@@ -13,7 +13,7 @@ in {
   home.homeDirectory = toString /home/aamaruvi;
 
   home.packages = with pkgs; let
-    JBMono = nerdfonts.override { fonts = ["JetBrainsMono"]; };
+    JBMono = nerdfonts.override { fonts = [ "JetBrainsMono" ]; };
   in [
     ripgrep
     JBMono
@@ -38,6 +38,7 @@ in {
     libreoffice
     gimp
     bpytop
+    htop
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -71,6 +72,8 @@ in {
       "x-scheme-handler/msteams" = "teams.desktop";
       "inode/directory" = files;
     };
+
+  xdg.config."nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
 
   programs.neovim = {
     enable = true;
@@ -216,8 +219,6 @@ in {
   programs.fish = {
     enable = true;
     shellInit = ''
-      set XDG_DATA_DIRS "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS"
-
       set -g fish_color_autosuggestion '555'  'brblack'
       set -g fish_color_cancel -r
       set -g fish_color_command --bold
@@ -304,7 +305,7 @@ in {
           command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
         }
         {
-          command = "blueman-applet";
+          command = "${pkgs.blueman}/bin/blueman-applet";
         }
       ];
       keybindings = let
@@ -319,7 +320,8 @@ in {
         "XF86MonBrightnessDown" = "${brctl} 10%-";
 
         "Mod4+e" = "exec firefox";
-        "Mod4+Shift+e" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
+        "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
+        "Mod4+Shift+h" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";
