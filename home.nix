@@ -340,7 +340,7 @@ in {
 
   programs.waybar = mkLaptop {
     enable = true;
-    style = builtins.readFile ./style.css;
+    style = builtins.readFile ./laptop/style.css;
     settings = [{
       layer = "top";
       position = "top";

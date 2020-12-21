@@ -56,7 +56,8 @@ let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline_powerline_fonts                = 1
 let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
 
-let g:coc_snippet_next = '<S-TAB>'
+let g:coc_snippet_next = '<TAB>'
+let g:coc_snippet_prev = '<S-TAB>'
 
 function! Fzf_dev() abort
   let s:fzf_files_options =
@@ -136,11 +137,6 @@ nnoremap <C-u> :UndotreeToggle<CR>
 
 nnoremap <silent> <C-p> :call Fzf_dev()<CR>
 
-inoremap <silent><expr> <TAB>
-     \ pumvisible() ? coc#_select_confirm() :
-     \ <SID>check_back_space() ? "\<TAB>" :
-     \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <c-space> coc#refresh()
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 nnoremap <silent> K :call <SID>show_documentation()<CR>
