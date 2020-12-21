@@ -18,7 +18,5 @@
     "typescriptreact"
     "vue"
   ];
-  "cursors.nextKey" = "<C-j>";
-  "cursors.prevKey" = "<C-k>";
   "tabnine.limit" = 5;
 }

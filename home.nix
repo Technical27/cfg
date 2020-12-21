@@ -73,7 +73,7 @@ in {
       "inode/directory" = files;
     };
 
-  xdg.config."nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
+  xdg.configFile."nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
 
   programs.neovim = {
     enable = true;
