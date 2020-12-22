@@ -55,7 +55,6 @@ in {
     enable = true;
     dnssec = "allow-downgrade";
   };
-  networking.firewall.enable = true;
 
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
@@ -146,7 +145,6 @@ in {
 
   networking.wireless.iwd.enable = isLaptop;
   networking.hosts."10.200.200.1" = mkLaptop [ "yogs.tech" ];
-  networking.firewall.allowedUDPPorts = mkLaptop [ 51820 ];
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
@@ -338,6 +336,8 @@ in {
   services.fstrim.enable = isDesktop;
   programs.java.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
+  networking.firewall.enable = isDesktop;
+
   services.xserver = mkDesktop {
     enable = true;
     videoDrivers = [ "nvidia" ];
