@@ -25,6 +25,7 @@ in {
     libnotify
     tldr
     imv
+    texlive.combined.scheme-basic
 
     ranger
 
@@ -61,19 +62,21 @@ in {
   ];
 
   xdg.mimeApps.enable = true;
-  xdg.mimeApps.defaultApplications =
-    let
-      browser = [ "firefox.desktop" ];
-      files = [ "ranger.desktop" ];
-    in mkLaptop {
-      "text/html" = browser;
-      "x-scheme-handler/http" = browser;
-      "x-scheme-handler/https" = browser;
-      "x-scheme-handler/msteams" = "teams.desktop";
-      "inode/directory" = files;
-    };
+  xdg.mimeApps.defaultApplications = let
+    browser = [ "firefox.desktop" ];
+    files = [ "ranger.desktop" ];
+  in mkLaptop {
+    "text/html" = browser;
+    "x-scheme-handler/http" = browser;
+    "x-scheme-handler/https" = browser;
+    "x-scheme-handler/msteams" = "teams.desktop";
+    "inode/directory" = files;
+  };
 
-  xdg.configFile."nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
+  xdg.configFile = {
+    "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
+    "wofi/config".text = "drun-print_command=true";
+  };
 
   programs.neovim = {
     enable = true;
@@ -95,6 +98,8 @@ in {
       conjure
       cpkgs.context-vim
       vim-easymotion
+      vimtex
+      ultisnips
 
       # coc extensions
       coc-nvim
@@ -128,8 +133,12 @@ in {
     options = {
       font = "'JetBrains Mono NerdFont' 13";
       default-bg = "#282828";
+      default-fg = "#ebdbb2";
       statusbar-bg = "#282828";
       statusbar-fg = "#ebdbb2";
+      highlight-color = "#8ec07c";
+      inputbar-bg = "#282828";
+      inputbar-fg = "#ebdbb2";
       statusbar-home-tilde = true;
       window-title-home-tilde = true;
     };
@@ -267,7 +276,6 @@ in {
     extraConfig = ''
       seat seat0 xcursor_theme WhiteSur-cursors 48
       default_border none
-      for_window [title="^Firefox — Sharing Indicator$"] floating enable
     '';
     wrapperFeatures.gtk = true;
     systemdIntegration = false;
@@ -288,6 +296,7 @@ in {
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
       bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
+      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
         swayidle = "${pkgs.swayidle}/bin/swayidle";
         swaylock = "${pkgs.swaylock-effects}/bin/swaylock --daemonize --screenshots --clock --fade-in 0.2 --effect-blur 7x5";
@@ -321,7 +330,7 @@ in {
 
         "Mod4+e" = "exec firefox";
         "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
-        "Mod4+Shift+h" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
+        "Mod4+Shift+o" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";

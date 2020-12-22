@@ -48,6 +48,10 @@ set mouse=a
 set undofile
 set grepprg="rg --vimgrep"
 
+let g:tex_flavor = 'latex'
+let g:vimtex_view_method = 'zathura'
+let g:vimtex_quickfix_mode = 0
+
 let g:lion_squeeze_spaces = 1
 let g:gruvbox_italic      = 1
 
