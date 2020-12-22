@@ -5,7 +5,7 @@ let
   isDesktop = device == "desktop";
   mkLaptop = obj: lib.mkIf (isLaptop) obj;
   mkDesktop = obj: lib.mkIf (isDesktop) obj;
-{
+in {
   nix = {
     package = pkgs.nixUnstable;
     extraOptions = ''
@@ -23,24 +23,22 @@ let
       "space_cache"
       "autodefrag"
     ];
-  in lib.mkMerge [
-    mkLaptop {
-      "/".options = default_opts;
-      "/nix".options = default_opts;
-      "/var".options = default_opts;
-      "/home".options = default_opts;
-    }
-    mkDesktop {
-      "/media/hdd" = {
-        device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
-        fsType = "ext4";
-      };
-      "/media/ssd" = {
-        device = "/dev/disk/by-uuid/034782cc-bc82-4940-bfa8-be7e656fc9ad";
-        fsType = "ext4";
-      };
-    }
-  ];
+  in (mkLaptop {
+    "/".options = default_opts;
+    "/nix".options = default_opts;
+    "/var".options = default_opts;
+    "/home".options = default_opts;
+  })
+  // (mkDesktop {
+    "/media/hdd" = {
+      device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
+      fsType = "ext4";
+    };
+    "/media/ssd" = {
+      device = "/dev/disk/by-uuid/034782cc-bc82-4940-bfa8-be7e656fc9ad";
+      fsType = "ext4";
+    };
+  });
 
   swapDevices = mkDesktop [{ label = "swap"; }];
 
@@ -48,10 +46,9 @@ let
 
   boot.loader.systemd-boot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = lib.mkMerge [
-    mkLaptop [ "snd_hda_intel.powersave=1" ]
-    mkDesktop [ "intel_iommu=on" "kvm.ignore_msrs=1" "kvm_intel.nested=1" ];
-  ];
+  boot.kernelParams =
+    (mkLaptop [ "snd_hda_intel.powersave=1" ])
+    // (mkDesktop [ "intel_iommu=on" "kvm.ignore_msrs=1" "kvm_intel.nested=1" ]);
 
   systemd.network.enable = true;
   services.resolved = {
@@ -78,7 +75,7 @@ let
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
-    extraPackages = mkDesktop [
+    extraPackages = with pkgs; mkDesktop [
       vaapiVdpau
       libvdpau-va-gl
     ];
@@ -86,8 +83,8 @@ let
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true;
 
-  environment.variables = lib.mkMerge [
-    mkLaptop {
+  environment.variables =
+    (mkLaptop {
       _JAVA_AWT_WM_NONREPARENTING = "1";
       LIBVA_DRIVER_NAME = "i965";
       MOZ_ENABLE_WAYLAND = "1";
@@ -96,17 +93,16 @@ let
       QT_QPA_PLATFORM = "wayland-egl";
       QT_WAYLAND_FORCE_DPI = "physical";
       QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-    }
-    mkDesktop {
+    })
+    // (mkDesktop {
       MOZ_X11_EGL = "1";
       __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
-    }
-    {
+    })
+    // ({
       EDITOR = "nvim";
       VISUAL = "nvim";
       MOZ_USE_XINPUT2 = "1";
-    }
-  ];
+    });
 
   services.gnome3.gnome-keyring.enable = true;
   services.printing.enable = true;
@@ -135,11 +131,11 @@ let
   boot.plymouth.enable = isLaptop;
 
   programs.sway.enable = isLaptop;
+  programs.dconf.enable = isLaptop;
 
   services.pipewire.enable = isLaptop;
   services.upower.enable = isLaptop;
   services.tlp.enable = isLaptop;
-  services.dconf.enable = isLaptop;
   services.throttled.enable = false;
   services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
@@ -274,7 +270,68 @@ let
     gtkUsePortal = true;
   };
 
-  environment.systemPackages = with pkgs; mkLaptop {};
+  environment.systemPackages = with pkgs; mkLaptop [
+    wireguard
+    wireguard-tools
+
+    (
+      pkgs.writeTextFile {
+        name = "wgvpn";
+        destination = "/bin/wgvpn";
+        executable = true;
+        text = ''
+          #! ${pkgs.fish}/bin/fish
+          if test (id -u) = 0
+            echo "don't run this script as root, it will call sudo"
+            exit 1
+          end
+          switch $argv[1]
+            case up
+              if test ! -f /tmp/.wgvpn
+                sudo ip rule add not from all fwmark 51000 lookup 1000
+                touch /tmp/.wgvpn
+              else
+                echo "already up"
+                exit 1
+              end
+            case down
+              if test -f /tmp/.wgvpn
+                sudo ip rule delete not from all fwmark 51000 lookup 1000
+                rm /tmp/.wgvpn
+              else
+                echo "not up"
+                exit 1
+              end
+            case '*'
+              echo "use 'up' or 'down' to activate/deactivate the wireguard vpn"
+          end
+        '';
+      }
+    )
+
+    (
+      pkgs.writeTextFile {
+        name = "startsway";
+        destination = "/bin/startsway";
+        executable = true;
+        text = ''
+          #! ${pkgs.fish}/bin/fish
+
+          # first import environment variables from the login manager
+          systemctl --user import-environment
+          # then start the service
+          systemctl --user start sway.service
+
+          # poll for sway
+          while test (count (pgrep sway)) -gt 1
+            sleep 5
+          end
+
+          systemctl --user stop kanshi xdg-desktop-portal-wlr
+        '';
+      }
+    )
+  ];
 
   # Desktop specific things
   services.sshd.enable = isDesktop;
@@ -309,8 +366,9 @@ let
   ];
 
   boot.kernel.sysctl = mkDesktop {
+    "net.ipv6.conf.all.forwarding" = "1";
+    "net.ipv6.conf.default.forwarding" = "1";
     "net.ipv4.ip_forward" = 1;
-    "net.ipv6.ip_forward" = 1;
     "vm.swappiness" = 10;
   };
 
