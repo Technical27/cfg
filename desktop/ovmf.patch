@@ -1,0 +1,28 @@
+diff --git a/OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.c b/OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.c
+index 7991a19..5f2b405 100644
+--- a/OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.c
++++ b/OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.c
+@@ -11,9 +11,9 @@
+ #include "SmbiosPlatformDxe.h"
+ 
+ #define TYPE0_STRINGS \
+-  "EFI Development Kit II / OVMF\0"     /* Vendor */ \
+-  "0.0.0\0"                             /* BiosVersion */ \
+-  "02/06/2015\0"                        /* BiosReleaseDate */
++  "American Megatrends Inc.\0"     /* Vendor */ \
++  "1502\0"                         /* BiosVersion */ \
++  "02/21/2020\0"                   /* BiosReleaseDate */
+ //
+ // Type definition and contents of the default Type 0 SMBIOS table.
+ //
+@@ -48,8 +48,8 @@ STATIC CONST OVMF_TYPE0 mOvmfDefaultType0 = {
+              //                  UefiSpecificationSupported |
+              //                  TargetContentDistributionEnabled
+     },
+-    0,     // UINT8                     SystemBiosMajorRelease
+-    0,     // UINT8                     SystemBiosMinorRelease
++    15,    // UINT8                     SystemBiosMajorRelease
++    2,     // UINT8                     SystemBiosMinorRelease
+     0xFF,  // UINT8                     EmbeddedControllerFirmwareMajorRelease
+     0xFF   // UINT8                     EmbeddedControllerFirmwareMinorRelease
+   },

@@ -386,6 +386,8 @@ in {
   nixpkgs.overlays = mkDesktop [
     (self: super: {
       nari-pulse-profile = super.callPackage ./desktop/nari.nix {};
+    })
+    (self: super: {
       pulseaudio = super.pulseaudio.overrideAttrs (old: rec {
         _libOnly = lib.strings.hasInfix "lib" old.name;
         buildInputs =  old.buildInputs ++ lib.optional _libOnly super.nari-pulse-profile;

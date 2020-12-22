@@ -1,0 +1,30 @@
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index a3e607a544..1fcbff7b5d 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -201,8 +201,8 @@ static void pc_q35_init(MachineState *machine)
+
+     if (pcmc->smbios_defaults) {
+         /* These values are guest ABI, do not change */
+-        smbios_set_defaults("QEMU", "Standard PC (Q35 + ICH9, 2009)",
+-                            mc->name, pcmc->smbios_legacy_mode,
++        smbios_set_defaults("ASUSTeKCOMPUTERINC.", "PRIMEZ390-A",
++                            "Rev1.xx", pcmc->smbios_legacy_mode,
+                             pcmc->smbios_uuid_encoded,
+                             SMBIOS_ENTRY_POINT_21);
+     }
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index d27da03d64..85ddb2b3f5 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -7,8 +7,8 @@
+ /* Reserve RAM space for tables: add another order of magnitude. */
+ #define ACPI_BUILD_TABLE_MAX_SIZE         0x200000
+
+-#define ACPI_BUILD_APPNAME6 "BOCHS "
+-#define ACPI_BUILD_APPNAME4 "BXPC"
++#define ACPI_BUILD_APPNAME6 "ASUSPC"
++#define ACPI_BUILD_APPNAME4 "ASUS"
+
+ #define ACPI_BUILD_TABLE_FILE "etc/acpi/tables"
+ #define ACPI_BUILD_RSDP_FILE "etc/acpi/rsdp"
