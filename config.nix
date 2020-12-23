@@ -336,7 +336,16 @@ in {
   services.fstrim.enable = isDesktop;
   programs.java.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
+
   networking.firewall.enable = isDesktop;
+  systemd.network.networks."00-ethernet" = mkDesktop {
+    name = "enp1s0";
+    DHCP = "yes";
+    networkConfig = {
+      IPv6AcceptRA = "yes";
+      IPv6PrivacyExtensions = "yes";
+    };
+  };
 
   services.xserver = mkDesktop {
     enable = true;
