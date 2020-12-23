@@ -56,7 +56,7 @@ in {
     razergenie
     virt-manager
     openrgb
-    liquidctl
+    # liquidctl
     obs-studio
     olive-editor
   ];
