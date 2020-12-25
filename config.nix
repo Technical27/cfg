@@ -46,14 +46,25 @@ in {
 
   boot.loader.systemd-boot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams =
-    (mkLaptop [ "snd_hda_intel.powersave=1" ])
-    // (mkDesktop [ "intel_iommu=on" "kvm.ignore_msrs=1" "kvm_intel.nested=1" ]);
+  boot.kernelParams = []
+    ++ (lib.optionals isLaptop [
+      "snd_hda_intel.powersave=1"
+    ])
+    ++ (lib.optionals isDesktop [
+      "intel_iommu=on"
+      "kvm.ignore_msrs=1"
+      "kvm_intel.nested=1"
+    ]);
 
   systemd.network.enable = true;
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
+  };
+
+  # temp fix for systemd-resolved
+  systemd.services.systemd-resolved.environment = {
+    LD_LIBRARY_PATH = "${lib.getLib pkgs.libidn2}/lib";
   };
 
   programs.gnupg.agent.enable = true;
@@ -82,8 +93,8 @@ in {
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true;
 
-  environment.variables =
-    (mkLaptop {
+  environment.variables = lib.recursiveUpdate
+    (if isLaptop then {
       _JAVA_AWT_WM_NONREPARENTING = "1";
       LIBVA_DRIVER_NAME = "i965";
       MOZ_ENABLE_WAYLAND = "1";
@@ -92,12 +103,11 @@ in {
       QT_QPA_PLATFORM = "wayland-egl";
       QT_WAYLAND_FORCE_DPI = "physical";
       QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-    })
-    // (mkDesktop {
+    } else {
       MOZ_X11_EGL = "1";
       __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
     })
-    // ({
+    ({
       EDITOR = "nvim";
       VISUAL = "nvim";
       MOZ_USE_XINPUT2 = "1";
@@ -271,6 +281,7 @@ in {
   environment.systemPackages = with pkgs; mkLaptop [
     wireguard
     wireguard-tools
+    polkit_gnome
 
     (
       pkgs.writeTextFile {

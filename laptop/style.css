@@ -45,8 +45,7 @@ window#waybar.hidden {
 }
 
 #mode {
-  background-color: #ebdbb2;
-  color: #282828;
+  color: #458588;
   padding: 0 10px;
   margin: 0 4px;
 }
@@ -93,22 +92,16 @@ window#waybar.hidden {
   animation-direction: alternate;
 }
 
-label:focus {
-  background-color: #282828;
-}
-
 #network.disconnected {
-  background-color: #fb4934;
+  color: #fb4934;
 }
 
 #pulseaudio.muted {
-  background-color: #fabd2f;
-  color: #282828;
+  color: #fabd2f;
 }
 
 #idle_inhibitor.activated {
-  background-color: #ebdbb2;
-  color: #282828;
+  color: #8ec07c;
 }
 
 #custom-nixos.error {
@@ -122,10 +115,9 @@ label:focus {
 }
 
 #custom-nixos.offline {
-  background-color: #fb4934;
+  color: #fb4934;
 }
 
 #custom-nixos.update-available {
-  background-color: #fabd2f;
-  color: #282828;
+  color: #fabd2f;
 }
