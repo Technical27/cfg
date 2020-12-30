@@ -8,7 +8,7 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usbhid" "rtsx_pci_sdmmc" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "rtsx_pci_sdmmc" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
@@ -23,6 +23,12 @@
     { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
       fsType = "btrfs";
       options = [ "subvol=@nix" ];
+    };
+
+  fileSystems."/swap" =
+    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+      fsType = "btrfs";
+      options = [ "subvol=@swap" ];
     };
 
   fileSystems."/var" =
@@ -42,9 +48,7 @@
       fsType = "vfat";
     };
 
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/9c65c0ec-9194-4552-aabc-6fcd84d41a5b"; }
-    ];
+  swapDevices = [ ];
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   # high-resolution display

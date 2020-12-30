@@ -23,11 +23,18 @@ in {
       "space_cache"
       "autodefrag"
     ];
+    swap_opts = [
+      "noatime"
+      "nodiratime"
+      "ssd"
+      "discard=async"
+    ];
   in (mkLaptop {
     "/".options = default_opts;
     "/nix".options = default_opts;
     "/var".options = default_opts;
     "/home".options = default_opts;
+    "/swap".options = swap_opts;
   })
   // (mkDesktop {
     "/media/hdd" = {
@@ -40,7 +47,7 @@ in {
     };
   });
 
-  swapDevices = mkDesktop [{ label = "swap"; }];
+  swapDevices = mkDesktop [{ label = "swap"; }] // mkLaptop [{ device = "/swap/file"; priority = 10; }];
 
   networking.hostName = device;
 
@@ -48,13 +55,22 @@ in {
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
     ++ (lib.optionals isLaptop [
-      "snd_hda_intel.powersave=1"
+      "resume_offset=18382314"
     ])
     ++ (lib.optionals isDesktop [
       "intel_iommu=on"
       "kvm.ignore_msrs=1"
       "kvm_intel.nested=1"
     ]);
+
+  boot.kernel.sysctl = mkDesktop {
+    "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.conf.default.forwarding" = 1;
+    "net.ipv4.ip_forward" = 1;
+    "vm.swappiness" = 10;
+  } // mkLaptop {
+    "vm.swappiness" = 60;
+  };
 
   systemd.network.enable = true;
   services.resolved = {
@@ -137,6 +153,7 @@ in {
   security.apparmor.enable = true;
 
   # Laptop specific things
+  boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
   boot.plymouth.enable = isLaptop;
 
   programs.sway.enable = isLaptop;
@@ -384,13 +401,6 @@ in {
     { name = "rdtsc"; patch = ./desktop/rdtsc.patch; }
     { name = "fsync"; patch = ./desktop/fsync.patch; }
   ];
-
-  boot.kernel.sysctl = mkDesktop {
-    "net.ipv6.conf.all.forwarding" = "1";
-    "net.ipv6.conf.default.forwarding" = "1";
-    "net.ipv4.ip_forward" = 1;
-    "vm.swappiness" = 10;
-  };
 
   systemd.user.services.razer-kbd = mkDesktop {
     description = "restore openrazer effects";
