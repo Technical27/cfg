@@ -4,6 +4,7 @@ let
   isLaptop = device == "laptop";
   mkLaptop = obj: lib.mkIf isLaptop obj;
   isDesktop = device == "desktop";
+  mkDesktop = obj: lib.mkIf isDesktop obj;
   inherit (pkgs) cpkgs;
 in {
   # Let Home Manager install and manage itself.
@@ -40,6 +41,7 @@ in {
     gimp
     bpytop
     htop
+    pavucontrol
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -47,7 +49,6 @@ in {
     sway-contrib.grimshot
     wofi
     brightnessctl
-    pavucontrol
     wl-clipboard
     zoom-us
     teams
@@ -192,6 +193,13 @@ in {
     temperature.night = 4500;
   };
 
+  services.redshift = mkDesktop {
+    enable = true;
+    latitude = "33.748";
+    longitude = "-84.387";
+    temperature.night = 4500;
+  };
+
   programs.starship = {
     enable = true;
     settings = {
@@ -260,13 +268,15 @@ in {
     functions.fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
   };
 
-  gtk = mkLaptop {
+  gtk = {
     enable = true;
     iconTheme = { name = "gruvbox-dark"; package = cpkgs.gruvbox-icons; };
     # cursorTheme = { name = "WhiteSur-cursors"; package = null; };
     theme = { name = "gruvbox-dark"; package = cpkgs.gruvbox-gtk; };
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = "1";
+      gtk-cursor-theme-name = "WhiteSur-cursors";
+      gtk-cursor-theme-size = if isLaptop then 48 else 24;
     };
   };
 
@@ -345,6 +355,63 @@ in {
 
         "Escape" = "mode default";
         "Return" = "mode default";
+      };
+    };
+  };
+
+  xsession.enable = isDesktop;
+  xsession.windowManager.i3 = mkDesktop {
+    enable = true;
+    package = pkgs.i3-gaps;
+    # terminal = pkgs.kitty;
+    extraConfig = ''
+      default_border none
+    '';
+    config = {
+      fonts = [ "JetBrainsMono Nerd Font Mono" ];
+      modifier = "Mod4";
+      menu = "${pkgs.dmenu}/bin/dmenu_run";
+      gaps.inner = 10;
+      keybindings = lib.mkOptionDefault {
+        "Mod4+e" = "exec firefox";
+        "Mod4+Return" = "exec kitty";
+      };
+      modes.resize = {
+        "h" = "resize shrink width 10 px";
+        "j" = "resize shrink height 10 px";
+        "k" = "resize grow height 10 px";
+        "l" = "resize grow width 10 px";
+
+        "Shift+h" = "resize shrink width 50 px";
+        "Shift+j" = "resize shrink height 50 px";
+        "Shift+k" = "resize grow height 50 px";
+        "Shift+l" = "resize grow width 50 px";
+
+        "Escape" = "mode default";
+        "Return" = "mode default";
+      };
+      bars = [{
+        position = "top";
+      }];
+      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
+    };
+  };
+
+  services.dunst = mkDesktop {
+    enable = true;
+    settings = {
+      global = {
+        geometry = "0x0-10+38";
+        font = "13:JetBrainsMono Nerd Font Mono";
+        padding = 10;
+        horizontal_padding = 10;
+        frame_width = 5;
+        frame_color = "#8ec07c";
+      };
+      urgency_normal = {
+        background = "#282828";
+        foreground = "#ebdbb2";
+        timeout = 10;
       };
     };
   };

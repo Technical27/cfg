@@ -151,13 +151,13 @@ in {
   system.stateVersion = "20.09";
 
   security.apparmor.enable = true;
+  programs.dconf.enable = true;
 
   # Laptop specific things
   boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
   boot.plymouth.enable = isLaptop;
 
   programs.sway.enable = isLaptop;
-  programs.dconf.enable = isLaptop;
 
   services.pipewire.enable = isLaptop;
   services.upower.enable = isLaptop;
@@ -378,8 +378,8 @@ in {
   services.xserver = mkDesktop {
     enable = true;
     videoDrivers = [ "nvidia" ];
-    displayManager.sddm.enable = true;
-    desktopManager.plasma5.enable = true;
+    displayManager.defaultSession = "none+i3";
+    windowManager.i3.enable = true;
   };
 
   virtualisation.libvirtd = mkDesktop {
