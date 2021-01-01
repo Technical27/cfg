@@ -379,7 +379,13 @@ in {
     enable = true;
     videoDrivers = [ "nvidia" ];
     displayManager.defaultSession = "none+i3";
-    windowManager.i3.enable = true;
+    windowManager.i3 = {
+      enable = true;
+      package = pkgs.i3-gaps;
+      extraPackages = with pkgs; [
+        dmenu
+      ];
+    };
   };
 
   virtualisation.libvirtd = mkDesktop {
@@ -438,5 +444,5 @@ in {
     })
   ];
 
-  services.udev.packages = mkDesktop [ pkgs.nari-pulse-profile ];
+  services.udev.packages = with pkgs; mkDesktop [ nari-pulse-profile openrgb ];
 }

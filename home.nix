@@ -57,7 +57,7 @@ in {
     razergenie
     virt-manager
     openrgb
-    # liquidctl
+    cpkgs.liquidctl
     obs-studio
     olive-editor
   ];
@@ -359,11 +359,9 @@ in {
     };
   };
 
-  xsession.enable = isDesktop;
   xsession.windowManager.i3 = mkDesktop {
     enable = true;
     package = pkgs.i3-gaps;
-    # terminal = pkgs.kitty;
     extraConfig = ''
       default_border none
     '';
@@ -425,11 +423,10 @@ in {
         modules-left = "i3";
         modules-right = "cpu memory date";
         font-0 = "JetBrainsMono Nerd Font Mono:size=13;0";
-        spacing = 3;
-        padding-right = 2;
-        padding-left = 2;
-        module-margin-left = 1;
-        module-margin-right = 1;
+        padding = 2;
+        module-margin = 1;
+        background = "#282828";
+        foreground = "#ebdbb2";
       };
 
       "module/i3" = {
