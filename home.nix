@@ -480,11 +480,16 @@ in {
         cpu = {
           format = "{usage}% ";
           tooltip = false;
+          interval = 2;
         };
-        memory.format = "{}% ";
+        memory = {
+          format = "{}% ";
+          interval = 2;
+        };
         temperature = {
           critical-threshold = 80;
           format = "{temperatureC}°C";
+          interval = 5;
         };
         backlight = {
           format = "{percent}% {icon}";
@@ -508,6 +513,7 @@ in {
           format-disconnected = "Disconnected ⚠";
           tooltip-format-ethernet = "{ipaddr}";
           tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
+          interval = 5;
         };
         pulseaudio = {
           scroll-step = 0;
