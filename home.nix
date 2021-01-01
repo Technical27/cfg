@@ -390,9 +390,7 @@ in {
         "Escape" = "mode default";
         "Return" = "mode default";
       };
-      bars = [{
-        position = "top";
-      }];
+      bars = [];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
     };
   };
@@ -414,6 +412,46 @@ in {
         timeout = 10;
       };
     };
+  };
+
+  services.polybar = mkDesktop {
+    enable = true;
+    package = cpkgs.polybar;
+    config = {
+      "bar/main" = {
+        width = "100%";
+        height = 30;
+        radius = 0;
+        modules-left = "i3";
+        modules-right = "cpu memory date";
+        font-0 = "JetBrainsMono Nerd Font Mono:size=13;0";
+        spacing = 3;
+        padding-right = 2;
+        padding-left = 2;
+        module-margin-left = 1;
+        module-margin-right = 1;
+      };
+
+      "module/i3" = {
+        type = "internal/i3";
+      };
+      "module/cpu" = {
+        type = "internal/cpu";
+        label = "%percentage%% ";
+        interval = 2;
+      };
+      "module/memory" = {
+        type = "internal/memory";
+        label = "%percentage_used%% ";
+      };
+      "module/date" = {
+        type = "internal/date";
+        time = "%I:%M %p";
+        time-alt = "%Y-%m-%d";
+        label = "%time%";
+      };
+    };
+    script = "polybar main &";
   };
 
   programs.waybar = mkLaptop {
