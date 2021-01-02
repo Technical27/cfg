@@ -27,6 +27,7 @@ in {
     tldr
     imv
     texlive.combined.scheme-basic
+    tectonic
 
     ranger
 
@@ -76,7 +77,7 @@ in {
 
   xdg.configFile = {
     "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
-    "wofi/config".text = "drun-print_command=true";
+    "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
   };
 
   programs.neovim = {
@@ -359,6 +360,12 @@ in {
     };
   };
 
+  programs.rofi = mkDesktop {
+    enable = true;
+    font = "JetBrainsMono Nerd Font Mono 13";
+    terminal = "${pkgs.kitty}/bin/kitty";
+  };
+
   xsession.windowManager.i3 = mkDesktop {
     enable = true;
     package = pkgs.i3-gaps;
@@ -368,11 +375,38 @@ in {
     config = {
       fonts = [ "JetBrainsMono Nerd Font Mono" ];
       modifier = "Mod4";
-      menu = "${pkgs.dmenu}/bin/dmenu_run";
+      menu = "${pkgs.rofi}/bin/rofi -show drun";
       gaps.inner = 10;
+      startup = [
+        {
+          command =
+            "${pkgs.xautolock}/bin/xautolock -time 10 -locker \"${pkgs.i3lock}/bin/i3lock -i '~/Pictures/wallpaper.png'\" &";
+        }
+        {
+          command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
+        }
+        {
+          command = "systemctl restart --user polybar";
+        }
+        {
+          command = "i3-msg 'workspace number 1'";
+        }
+      ];
       keybindings = lib.mkOptionDefault {
         "Mod4+e" = "exec firefox";
         "Mod4+Return" = "exec kitty";
+
+        "Mod4+j" = "focus down";
+        "Mod4+k" = "focus up";
+        "Mod4+h" = "focus left";
+        "Mod4+l" = "focus right";
+
+        "Mod4+Shift+j" = "move down";
+        "Mod4+Shift+k" = "move up";
+        "Mod4+Shift+h" = "move left";
+        "Mod4+Shift+l" = "move right";
+
+        "Mod4+Shift+r" = "exec i3-nagbar -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";

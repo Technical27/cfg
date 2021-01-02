@@ -300,66 +300,12 @@ in {
     wireguard-tools
     polkit_gnome
 
-    (
-      pkgs.writeTextFile {
-        name = "wgvpn";
-        destination = "/bin/wgvpn";
-        executable = true;
-        text = ''
-          #! ${pkgs.fish}/bin/fish
-          if test (id -u) = 0
-            echo "don't run this script as root, it will call sudo"
-            exit 1
-          end
-          switch $argv[1]
-            case up
-              if test ! -f /tmp/.wgvpn
-                sudo ip rule add not from all fwmark 51000 lookup 1000
-                touch /tmp/.wgvpn
-              else
-                echo "already up"
-                exit 1
-              end
-            case down
-              if test -f /tmp/.wgvpn
-                sudo ip rule delete not from all fwmark 51000 lookup 1000
-                rm /tmp/.wgvpn
-              else
-                echo "not up"
-                exit 1
-              end
-            case '*'
-              echo "use 'up' or 'down' to activate/deactivate the wireguard vpn"
-          end
-        '';
-      }
-    )
-
-    (
-      pkgs.writeTextFile {
-        name = "startsway";
-        destination = "/bin/startsway";
-        executable = true;
-        text = ''
-          #! ${pkgs.fish}/bin/fish
-
-          # first import environment variables from the login manager
-          systemctl --user import-environment
-          # then start the service
-          systemctl --user start sway.service
-
-          # poll for sway
-          while test (count (pgrep sway)) -gt 1
-            sleep 5
-          end
-
-          systemctl --user stop kanshi xdg-desktop-portal-wlr
-        '';
-      }
-    )
+    cpkgs.wgvpn
+    cpkgs.startsway
   ];
 
   # Desktop specific things
+  security.pam.services.lightdm.enableGnomeKeyring = isDesktop;
   services.sshd.enable = isDesktop;
   services.fstrim.enable = isDesktop;
   programs.java.enable = isDesktop;
