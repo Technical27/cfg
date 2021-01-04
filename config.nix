@@ -5,7 +5,7 @@ let
   isDesktop = device == "desktop";
   mkLaptop = obj: lib.mkIf (isLaptop) obj;
   mkDesktop = obj: lib.mkIf (isDesktop) obj;
-  mkPatch = name: { inherit name; patch = ./desktop + "${name}.patch"; };
+  mkPatch = name: { inherit name; patch = ./desktop + "/${name}.patch"; };
 in {
   nix = {
     package = pkgs.nixUnstable;
