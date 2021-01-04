@@ -365,7 +365,20 @@ in {
     };
   };
 
-  nixpkgs.overlays = mkDesktop [
+  nixpkgs.overlays = [
+    (self: super: {
+      neovim-unwrapped = super.neovim-unwrapped.overrideAttrs (old: {
+        version = "0.5.0-dev";
+        src = super.fetchFromGitHub {
+          owner = "neovim";
+          repo = "neovim";
+          rev = "4cdc8b1efdc7a67d24c7193ef67839924eb7d5c0";
+          sha256 = "sha256-nGxJyH+2OBcB6rV7x3mvthUhP9fWaf5Mc0FO99SlGC8=";
+        };
+        buildInputs = old.buildInputs ++ [ super.tree-sitter ];
+      });
+    })
+  ] ++ lib.optionals isDesktop [
     (self: super: {
       nari-pulse-profile = super.callPackage ./desktop/nari.nix {};
     })
