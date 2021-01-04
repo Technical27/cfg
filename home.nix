@@ -228,7 +228,7 @@ in {
 
     extraConfig = {
       pull.rebase = true;
-      credential.helper = "/home/aamaruvi/.nix-profile/bin/git-credential-libsecret";
+      credential.helper = "${pkgs.gitFull}/bin/git-credential-libsecret";
     };
 
     package = pkgs.gitFull;
@@ -381,15 +381,19 @@ in {
         {
           command =
             "${pkgs.xautolock}/bin/xautolock -time 10 -locker \"${pkgs.i3lock}/bin/i3lock -i '~/Pictures/wallpaper.png'\" &";
+          notification = false;
         }
         {
           command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
+          notification = false;
         }
         {
           command = "systemctl restart --user polybar";
+          notification = false;
         }
         {
           command = "i3-msg 'workspace number 1'";
+          notification = false;
         }
       ];
       keybindings = lib.mkOptionDefault {
@@ -454,13 +458,14 @@ in {
         width = "100%";
         height = 30;
         radius = 0;
-        modules-left = "i3";
-        modules-right = "cpu memory date";
+        modules-left = "i3 title";
+        modules-right = "nixos cpu memory date";
         font-0 = "JetBrainsMono Nerd Font Mono:size=13;0";
-        padding = 2;
+        padding = 1;
         module-margin = 1;
         background = "#282828";
         foreground = "#ebdbb2";
+        monitor = "DP-0";
       };
 
       "module/i3" = {
@@ -474,12 +479,22 @@ in {
       "module/memory" = {
         type = "internal/memory";
         label = "%percentage_used%% ";
+        interval = 2;
       };
       "module/date" = {
         type = "internal/date";
         time = "%I:%M %p";
         time-alt = "%Y-%m-%d";
         label = "%time%";
+      };
+      "module/title" = {
+        type = "internal/xwindow";
+        label-maxlen = 100;
+      };
+      "module/nixos" = {
+        type = "custom/script";
+        exec = "${pkgs.nodejs}/bin/node /home/aamaruvi/git/info/index.js --polybar";
+        interval = 600;
       };
     };
     script = "polybar main &";
