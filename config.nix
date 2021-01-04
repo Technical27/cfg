@@ -5,6 +5,7 @@ let
   isDesktop = device == "desktop";
   mkLaptop = obj: lib.mkIf (isLaptop) obj;
   mkDesktop = obj: lib.mkIf (isDesktop) obj;
+  mkPatch = name: { inherit name; patch = ./desktop + "${name}.patch"; };
 in {
   nix = {
     package = pkgs.nixUnstable;
@@ -201,21 +202,23 @@ in {
     };
   };
 
-  services.snapper.configs = mkLaptop {
+  services.snapper.configs = let
+    timelineConfig = ''
+      TIMELINE_CREATE=yes
+      TIMELINE_CLEANUP=yes
+    '';
+  in mkLaptop {
     home = {
       subvolume = "/home";
-      extraConfig = ''
-        ALLOW_USERS=aamaruvi
-        TIMELINE_CREATE=yes
-      '';
+      extraConfig = "ALLOW_USERS=aamaruvi\n" + timelineConfig;
     };
     root = {
       subvolume = "/";
-      extraConfig = "TIMELINE_CREATE=yes";
+      extraConfig = timelineConfig;
     };
     var = {
       subvolume = "/var";
-      extraConfig = "TIMELINE_CREATE=yes";
+      extraConfig = timelineConfig;
     };
   };
 
@@ -328,9 +331,6 @@ in {
     windowManager.i3 = {
       enable = true;
       package = pkgs.i3-gaps;
-      extraPackages = with pkgs; [
-        dmenu
-      ];
     };
   };
 
@@ -349,9 +349,9 @@ in {
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
   boot.kernelPatches = mkDesktop [
-    { name = "openrgb"; patch = ./desktop/openrgb.patch; }
-    { name = "rdtsc"; patch = ./desktop/rdtsc.patch; }
-    { name = "fsync"; patch = ./desktop/fsync.patch; }
+    (mkPatch "openrgb")
+    (mkPatch "rdtsc")
+    (mkPatch "fsync")
   ];
 
   systemd.user.services.razer-kbd = mkDesktop {
