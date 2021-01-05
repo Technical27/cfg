@@ -176,19 +176,3 @@ index e727bea..3aa9ebb 100644
 
  #define ACPI_BUILD_TABLE_FILE "etc/acpi/tables"
  #define ACPI_BUILD_RSDP_FILE "etc/acpi/rsdp"
-diff --git a/pc-bios/edk2-x86_64-code.fd.bz2 b/pc-bios/edk2-x86_64-code.fd.bz2
-index e1654d4..83fd209 100644
-Binary files a/pc-bios/edk2-x86_64-code.fd.bz2 and b/pc-bios/edk2-x86_64-code.fd.bz2 differ
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 6dc1ee0..0e07745 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -1522,7 +1522,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     }
-
-     if (cpu->expose_kvm) {
--        memcpy(signature, "KVMKVMKVM\0\0\0", 12);
-+        memcpy(signature, "GenuineIntel", 12);
-         c = &cpuid_data.entries[cpuid_i++];
-         c->function = KVM_CPUID_SIGNATURE | kvm_base;
-         c->eax = KVM_CPUID_FEATURES | kvm_base;

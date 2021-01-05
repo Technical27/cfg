@@ -397,6 +397,10 @@ in {
       OVMF = super.OVMF.overrideAttrs (old: {
         patches = [ ./desktop/ovmf.patch ];
       });
+      qemu_kvm = super.qemu_kvm.overrideAttrs (old: {
+        patches = [ ./desktop/qemu.patch ] ++ old.patches;
+        enableParallelBuilding = false;
+      });
     })
   ];
 
