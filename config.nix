@@ -333,7 +333,7 @@ in {
     };
   };
 
-  security.pam.service = mkDesktop {
+  security.pam.services = mkDesktop {
     i3lock.enableGnomeKeyring = true;
     lightdm.enableGnomeKeyring = true;
   };
