@@ -308,7 +308,6 @@ in {
   ];
 
   # Desktop specific things
-  security.pam.services.lightdm.enableGnomeKeyring = isDesktop;
   services.sshd.enable = isDesktop;
   services.fstrim.enable = isDesktop;
   programs.java.enable = isDesktop;
@@ -332,6 +331,11 @@ in {
       enable = true;
       package = pkgs.i3-gaps;
     };
+  };
+
+  security.pam.service = mkDesktop {
+    i3lock.enableGnomeKeyring = true;
+    lightdm.enableGnomeKeyring = true;
   };
 
   virtualisation.libvirtd = mkDesktop {
