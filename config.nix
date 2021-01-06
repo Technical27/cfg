@@ -174,6 +174,23 @@ in {
   networking.wireless.iwd.enable = isLaptop;
   networking.hosts."10.200.200.1" = mkLaptop [ "yogs.tech" ];
 
+  systemd.user.services.auto-theme = mkLaptop {
+    description = "automatically change theme";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/theme2/main.py' /home/aamaruvi/git/theme2/shell.nix";
+    };
+  };
+
+  systemd.user.timers.auto-theme = mkLaptop {
+    description = "automatically change theme at 12";
+    timerConfig = {
+      Unit = "auto-theme.service";
+      OnCalendar = "*-*-* 12:00:00";
+    };
+    wantedBy = [ "timers.target" ];
+  };
+
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
     after = [ "network.target" "pulseaudio.service" ];
