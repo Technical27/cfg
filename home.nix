@@ -405,6 +405,12 @@ in {
         "Mod4+h" = "focus left";
         "Mod4+l" = "focus right";
 
+        "Mod4+v" = "split v";
+        "Mod4+b" = "split h";
+
+        "Mod4+s" = "";
+        "Mod4+w" = "";
+
         "Mod4+Shift+j" = "move down";
         "Mod4+Shift+k" = "move up";
         "Mod4+Shift+h" = "move left";
