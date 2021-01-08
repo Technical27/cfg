@@ -336,6 +336,9 @@ in {
         "XF86AudioLowerVolume"  = "${amixer} 10%- unmute";
         "XF86AudioMute"         = "${amixer} toggle";
 
+        "Mod4+s" = "nop";
+        "Mod4+w" = "nop";
+
         "XF86MonBrightnessUp"   = "${brctl} 10%+";
         "XF86MonBrightnessDown" = "${brctl} 10%-";
 
@@ -408,8 +411,8 @@ in {
         "Mod4+v" = "split v";
         "Mod4+b" = "split h";
 
-        "Mod4+s" = "";
-        "Mod4+w" = "";
+        "Mod4+s" = "nop";
+        "Mod4+w" = "nop";
 
         "Mod4+Shift+j" = "move down";
         "Mod4+Shift+k" = "move up";
