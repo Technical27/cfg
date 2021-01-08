@@ -151,7 +151,129 @@ in {
 
   system.stateVersion = "20.09";
 
-  security.apparmor.enable = true;
+  security.apparmor = {
+    enable = true;
+    profiles = [
+      (with pkgs; writeText "teams" ''
+        #include <tunables/global>
+        ${teams}/bin/teams {
+          #include <abstractions/audio>
+          #include <abstractions/base>
+          #include <abstractions/fonts>
+          #include <abstractions/freedesktop.org>
+          #include <abstractions/ibus>
+          #include <abstractions/nameservice>
+          #include <abstractions/user-tmp>
+          #include <abstractions/X>
+          #include <abstractions/ssl_certs>
+          #include <abstractions/private-files-strict>
+
+          @{HOME}/.config/mimeapps.list r,
+
+          owner @{HOME}/.config/teams/** rwk,
+          owner @{HOME}/.config/Microsoft/Microsoft\ Teams/** rwk,
+          owner @{HOME}/.config/Microsoft/Microsoft\ Teams rk,
+          @{HOME}/.icons/** r,
+          @{HOME}/.pki/** r,
+          owner @{HOME}/.cache/** rwk,
+
+          /dev/video* mrw,
+          /dev/snd/* mr,
+
+          ${teams}/opt/teams/*.so* mr,
+
+          /dev/** r,
+          /dev/ r,
+          owner /dev/shm/* mrw,
+
+          @{PROC}/** r,
+          owner @{PROC}/*/setgroups w,
+          owner @{PROC}/*/gid_map rw,
+          owner @{PROC}/*/uid_map rw,
+          owner @{PROC}/*/fd/** rw,
+          @{PROC}/ r,
+          /sys/** r,
+
+          /etc/machine-id r,
+
+          /nix/store/*/lib/*.so* mr,
+          /nix/store/*/lib/**/*.so* mr,
+          /nix/store/** r,
+          /run/opengl-driver/*/lib/*.so* mr,
+          /run/opengl-driver-32/*/lib/*.so* mr,
+
+          ${teams}/** r,
+          ${teams}/**/*.node mr,
+          ${teams}/bin/* ix,
+          ${teams}/opt/teams/* ix,
+          capability sys_admin,
+          capability sys_chroot,
+
+          ${xdg_utils}/bin/xdg-open ix,
+
+          /dev/null rw,
+
+          owner /tmp/** rw,
+        }
+      '')
+      (with pkgs; writeText "discord" ''
+        #include <tunables/global>
+        ${discord}/bin/Discord {
+          #include <abstractions/audio>
+          #include <abstractions/base>
+          #include <abstractions/fonts>
+          #include <abstractions/freedesktop.org>
+          #include <abstractions/ibus>
+          #include <abstractions/nameservice>
+          #include <abstractions/user-tmp>
+          #include <abstractions/X>
+          #include <abstractions/ssl_certs>
+          #include <abstractions/private-files-strict>
+
+          owner @{HOME}/.config/discord/** rwk,
+          owner @{HOME}/.config/discord rk,
+          @{HOME}/.icons/** r,
+          @{HOME}/.pki/** r,
+          owner @{HOME}/.cache/** rwk,
+
+          /dev/video* mrw,
+          /dev/snd/* mr,
+
+          ${discord}/opt/Discord/*.so* mr,
+
+          /dev/** r,
+          /dev/ r,
+          owner /dev/shm/* mrw,
+
+          @{PROC}/** r,
+          owner @{PROC}/*/setgroups w,
+          owner @{PROC}/*/gid_map rw,
+          owner @{PROC}/*/uid_map rw,
+          owner @{PROC}/*/fd/** rw,
+          @{PROC}/ r,
+          /sys/** r,
+
+          /etc/machine-id r,
+
+          /nix/store/*/lib/*.so* mr,
+          /nix/store/*/lib/**/*.so* mr,
+          /nix/store/** r,
+          /run/opengl-driver/*/lib/*.so* mr,
+          /run/opengl-driver-32/*/lib/*.so* mr,
+
+          ${discord}/** r,
+          ${discord}/**/*.node mr,
+          ${discord}/bin/* ix,
+          ${discord}/opt/Discord/* ix,
+
+          /dev/null rw,
+
+          owner /tmp/** rw,
+        }
+      '')
+    ];
+  };
+
   programs.dconf.enable = true;
 
   # Laptop specific things
@@ -186,7 +308,8 @@ in {
     description = "automatically change theme at 12";
     timerConfig = {
       Unit = "auto-theme.service";
-      OnCalendar = "*-*-* 12:00:00";
+      OnCalendar = [ "*-*-* 18:00:00" "*-*-* 06:00:00" ];
+      Persistent = true;
     };
     wantedBy = [ "timers.target" ];
   };

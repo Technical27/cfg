@@ -19,4 +19,6 @@
     "vue"
   ];
   "tabnine.limit" = 5;
+  "tabnine.priority" = 70;
+  "suggest.languageSourcePriority" = 80;
 }
