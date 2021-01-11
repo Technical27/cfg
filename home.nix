@@ -13,11 +13,9 @@ in {
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
 
-  home.packages = with pkgs; let
-    JBMono = nerdfonts.override { fonts = [ "JetBrainsMono" ]; };
-  in [
+  home.packages = with pkgs; [
     ripgrep
-    JBMono
+    nerdfonts
     noto-fonts-extra
     noto-fonts-cjk
     noto-fonts-emoji
@@ -61,6 +59,7 @@ in {
     cpkgs.liquidctl
     obs-studio
     olive-editor
+    unityhub
   ];
 
   xdg.mimeApps.enable = true;

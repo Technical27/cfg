@@ -30,7 +30,7 @@ in {
       "ssd"
       "discard=async"
     ];
-  in lib.recursiveUpdate
+  in
   (mkLaptop {
     "/".options = default_opts;
     "/nix".options = default_opts;
@@ -38,7 +38,7 @@ in {
     "/home".options = default_opts;
     "/swap".options = swap_opts;
   })
-  (mkDesktop {
+  // (mkDesktop {
     "/media/hdd" = {
       device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
       fsType = "ext4";
@@ -537,20 +537,6 @@ in {
     })
   ] ++ lib.optionals isDesktop [
     (self: super: {
-      nari-pulse-profile = super.callPackage ./desktop/nari.nix {};
-    })
-    (self: super: {
-      pulseaudio = super.pulseaudio.overrideAttrs (old: rec {
-        _libOnly = lib.strings.hasInfix "lib" old.name;
-        buildInputs =  old.buildInputs ++ lib.optional _libOnly super.nari-pulse-profile;
-        # dont modify post install for libpulseaudio
-        postInstall = if _libOnly then old.postInstall else old.postInstall + ''
-        ln -s ${self.nari-pulse-profile}/razer-nari-input.conf       $out/share/pulseaudio/alsa-mixer/paths/razer-nari-input.conf
-        ln -s ${self.nari-pulse-profile}/razer-nari-output-game.conf $out/share/pulseaudio/alsa-mixer/paths/razer-nari-output-game.conf
-        ln -s ${self.nari-pulse-profile}/razer-nari-output-chat.conf $out/share/pulseaudio/alsa-mixer/paths/razer-nari-output-chat.conf
-        ln -s ${self.nari-pulse-profile}/razer-nari-usb-audio.conf   $out/share/pulseaudio/alsa-mixer/profile-sets/razer-nari-usb-audio.conf
-        '';
-      });
       OVMF = super.OVMF.overrideAttrs (old: {
         patches = [ ./desktop/ovmf.patch ];
       });
@@ -561,5 +547,11 @@ in {
     })
   ];
 
-  services.udev.packages = with pkgs; mkDesktop [ nari-pulse-profile openrgb ];
+  services.udev.packages = mkDesktop [ pkgs.openrgb ];
+  services.udev.extraRules = mkDesktop ''
+    // The nari works with the steelseries arctis profile well
+    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051a", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
+    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051c", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
+    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051d", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
+  '';
 }
