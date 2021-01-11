@@ -30,14 +30,15 @@ in {
       "ssd"
       "discard=async"
     ];
-  in (mkLaptop {
+  in lib.recursiveUpdate
+  (mkLaptop {
     "/".options = default_opts;
     "/nix".options = default_opts;
     "/var".options = default_opts;
     "/home".options = default_opts;
     "/swap".options = swap_opts;
   })
-  // (mkDesktop {
+  (mkDesktop {
     "/media/hdd" = {
       device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
       fsType = "ext4";
@@ -48,7 +49,9 @@ in {
     };
   });
 
-  swapDevices = mkDesktop [{ label = "swap"; }] // mkLaptop [{ device = "/swap/file"; priority = 10; }];
+  swapDevices = lib.recursiveUpdate
+  (mkDesktop [{ label = "swap"; }])
+  (mkLaptop [{ device = "/swap/file"; }]);
 
   networking.hostName = device;
 
@@ -64,14 +67,15 @@ in {
       "kvm_intel.nested=1"
     ]);
 
-  boot.kernel.sysctl = mkDesktop {
+  boot.kernel.sysctl = lib.recursiveUpdate
+  (mkDesktop {
     "net.ipv6.conf.all.forwarding" = 1;
     "net.ipv6.conf.default.forwarding" = 1;
     "net.ipv4.ip_forward" = 1;
     "vm.swappiness" = 10;
-  } // mkLaptop {
+  }) (mkLaptop {
     "vm.swappiness" = 60;
-  };
+  });
 
   systemd.network.enable = true;
   services.resolved = {
@@ -92,13 +96,13 @@ in {
     allowUnfree = true;
   };
 
-  sound.enable = true;
-  hardware.pulseaudio = {
-    enable = true;
-    support32Bit = true;
-    extraModules = mkLaptop [ pkgs.pulseaudio-modules-bt ];
-    package = pkgs.pulseaudioFull;
-  };
+  # sound.enable = true;
+  # hardware.pulseaudio = {
+  #   enable = true;
+  #   support32Bit = true;
+  #   extraModules = mkLaptop [ pkgs.pulseaudio-modules-bt ];
+  #   package = pkgs.pulseaudioFull;
+  # };
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -118,7 +122,6 @@ in {
       XDG_SESSION_TYPE = "wayland";
       XDG_CURRENT_DESKTOP = "sway";
       QT_QPA_PLATFORM = "wayland-egl";
-      QT_WAYLAND_FORCE_DPI = "physical";
       QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     } else {
       MOZ_X11_EGL = "1";
@@ -276,13 +279,23 @@ in {
 
   programs.dconf.enable = true;
 
+  services.pipewire = {
+    enable = true;
+    # package = pkgs.cpkgs.pipewire;
+    pulse.enable = true;
+    alsa = {
+      enable = true;
+      support32Bit = true;
+    };
+    jack.enable = true;
+  };
+
   # Laptop specific things
   boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
   boot.plymouth.enable = isLaptop;
 
   programs.sway.enable = isLaptop;
 
-  services.pipewire.enable = isLaptop;
   services.upower.enable = isLaptop;
   services.tlp.enable = isLaptop;
   services.throttled.enable = false;
@@ -435,7 +448,7 @@ in {
       xdg-desktop-portal-wlr
       xdg-desktop-portal-gtk
     ];
-    gtkUsePortal = true;
+    gtkUsePortal = false;
   };
 
   environment.systemPackages = with pkgs; mkLaptop [

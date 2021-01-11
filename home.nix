@@ -329,12 +329,12 @@ in {
         }
       ];
       keybindings = let
-        amixer = "exec amixer -q set Master";
+        pmixer = "exec ${pkgs.pulsemixer}/bin/pulsemixer --max-volume 100";
         brctl = "exec brightnessctl set";
       in lib.mkOptionDefault {
-        "XF86AudioRaiseVolume"  = "${amixer} 10%+ unmute";
-        "XF86AudioLowerVolume"  = "${amixer} 10%- unmute";
-        "XF86AudioMute"         = "${amixer} toggle";
+        "XF86AudioRaiseVolume"  = "${pmixer} --unmute --change-volume +10";
+        "XF86AudioLowerVolume"  = "${pmixer} --unmute --change-volume -10";
+        "XF86AudioMute"         = "${pmixer} --toggle-mute";
 
         "Mod4+s" = "nop";
         "Mod4+w" = "nop";
