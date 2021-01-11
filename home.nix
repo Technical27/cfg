@@ -41,6 +41,7 @@ in {
     bpytop
     htop
     pavucontrol
+    pulsemixer
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -66,11 +67,11 @@ in {
   xdg.mimeApps.defaultApplications = let
     browser = [ "firefox.desktop" ];
     files = [ "ranger.desktop" ];
-  in mkLaptop {
+  in {
     "text/html" = browser;
     "x-scheme-handler/http" = browser;
     "x-scheme-handler/https" = browser;
-    "x-scheme-handler/msteams" = "teams.desktop";
+    "x-scheme-handler/msteams" = mkLaptop "teams.desktop";
     "inode/directory" = files;
   };
 

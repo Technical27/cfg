@@ -486,6 +486,11 @@ in {
     };
   };
 
+  services.picom = mkDesktop {
+    enable = true;
+    backend = "glx";
+  };
+
   security.pam.services = mkDesktop {
     i3lock.enableGnomeKeyring = true;
     lightdm.enableGnomeKeyring = true;
