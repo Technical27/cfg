@@ -383,7 +383,12 @@ in {
       startup = [
         {
           command =
-            "${pkgs.xautolock}/bin/xautolock -time 10 -locker \"${pkgs.i3lock}/bin/i3lock -i '~/Pictures/wallpaper.png'\" &";
+            "${pkgs.xss-lock}/bin/xss-lock --transfer-sleep-lock -- ${pkgs.i3lock}/bin/i3lock --nofork -i ~/Documents/wallpaper.png";
+          notification = false;
+        }
+        {
+          command =
+            "${pkgs.feh}/bin/feh --no-fehbg --bg-fill ~/Documents/wallpaper.png";
           notification = false;
         }
         {
@@ -396,6 +401,10 @@ in {
         }
         {
           command = "i3-msg 'workspace number 1'";
+          notification = false;
+        }
+        {
+          command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
           notification = false;
         }
       ];

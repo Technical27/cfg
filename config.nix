@@ -64,7 +64,6 @@ in {
     ++ (lib.optionals isDesktop [
       "intel_iommu=on"
       "kvm.ignore_msrs=1"
-      "kvm_intel.nested=1"
     ]);
 
   boot.kernel.sysctl = lib.recursiveUpdate
@@ -486,6 +485,10 @@ in {
     };
   };
 
+  environment.etc = mkDesktop {
+    "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
+  };
+
   services.picom = mkDesktop {
     enable = true;
     backend = "glx";
@@ -512,7 +515,7 @@ in {
 
   boot.kernelPatches = mkDesktop [
     (mkPatch "openrgb")
-    (mkPatch "rdtsc")
+    # (mkPatch "rdtsc")
     (mkPatch "fsync")
   ];
 
@@ -542,13 +545,13 @@ in {
     })
   ] ++ lib.optionals isDesktop [
     (self: super: {
-      OVMF = super.OVMF.overrideAttrs (old: {
-        patches = [ ./desktop/ovmf.patch ];
-      });
-      qemu_kvm = super.qemu_kvm.overrideAttrs (old: {
-        patches = [ ./desktop/qemu.patch ] ++ old.patches;
-        enableParallelBuilding = false;
-      });
+      # OVMF = super.OVMF.overrideAttrs (old: {
+      #   patches = [ ./desktop/ovmf.patch ];
+      # });
+      # qemu_kvm = super.qemu_kvm.overrideAttrs (old: {
+      #   patches = [ ./desktop/qemu.patch ] ++ old.patches;
+      #   enableParallelBuilding = false;
+      # });
     })
   ];
 
