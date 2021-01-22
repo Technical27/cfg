@@ -570,6 +570,19 @@ in {
         buildInputs = old.buildInputs ++ [ super.tree-sitter ];
       });
     })
+    (self: super: {
+      libusb-patched = super.libusb1.overrideAttrs (old: {
+        src = super.fetchFromGitHub {
+          owner = "libusb";
+          repo = "libusb";
+          rev = "b51c743e4210756a98f4f60c69a34745e4b27a55";
+          sha256 = "sha256-B9gFLuZB1yCpTrF/TYWWjI2ckXZnw/6zfBGxAzwzXEI=";
+        };
+      });
+    })
+    (self: super: {
+      usbmuxd = super.usbmuxd.override { libusb1 = super.libusb-patched; };
+    })
   ] ++ lib.optionals isDesktop [
     (self: super: {
       # OVMF = super.OVMF.overrideAttrs (old: {
