@@ -82,11 +82,6 @@ in {
     dnssec = "allow-downgrade";
   };
 
-  # temp fix for systemd-resolved
-  systemd.services.systemd-resolved.environment = {
-    LD_LIBRARY_PATH = "${lib.getLib pkgs.libidn2}/lib";
-  };
-
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
 
@@ -95,13 +90,6 @@ in {
     allowUnfree = true;
   };
 
-  # sound.enable = true;
-  # hardware.pulseaudio = {
-  #   enable = true;
-  #   support32Bit = true;
-  #   extraModules = mkLaptop [ pkgs.pulseaudio-modules-bt ];
-  #   package = pkgs.pulseaudioFull;
-  # };
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -140,6 +128,8 @@ in {
     reflector = true;
   };
 
+  services.usbmuxd.enable = true;
+
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/New_York";
 
@@ -156,7 +146,7 @@ in {
   security.apparmor = {
     enable = true;
     profiles = [
-      (with pkgs; writeText "teams" ''
+      (mkLaptop (with pkgs; writeText "teams" ''
         #include <tunables/global>
         ${teams}/bin/teams {
           #include <abstractions/audio>
@@ -170,28 +160,34 @@ in {
           #include <abstractions/ssl_certs>
           #include <abstractions/private-files-strict>
 
-          @{HOME}/.config/mimeapps.list r,
+          @{HOME}/{.local/share/applications,.config}/mimeapps.list r,
 
           owner @{HOME}/.config/teams/** rwk,
           owner @{HOME}/.config/Microsoft/Microsoft\ Teams/** rwk,
           owner @{HOME}/.config/Microsoft/Microsoft\ Teams rk,
-          @{HOME}/.icons/** r,
-          @{HOME}/.pki/** r,
           owner @{HOME}/.cache/** rwk,
+          @{HOME}/Downloads/** rw,
+          @{HOME}/** r,
+          @{HOME}/.pki/nssdb/** rwk,
+          @{HOME} r,
 
           /dev/video* mrw,
           /dev/snd/* mr,
 
           ${teams}/opt/teams/*.so* mr,
 
+          unix (send, receive, connect),
+
           /dev/** r,
           /dev/ r,
+          /dev/tty rw,
           owner /dev/shm/* mrw,
 
           @{PROC}/** r,
           owner @{PROC}/*/setgroups w,
           owner @{PROC}/*/gid_map rw,
           owner @{PROC}/*/uid_map rw,
+          owner @{PROC}/*/oom_score_adj rw,
           owner @{PROC}/*/fd/** rw,
           @{PROC}/ r,
           /sys/** r,
@@ -201,23 +197,48 @@ in {
           /nix/store/*/lib/*.so* mr,
           /nix/store/*/lib/**/*.so* mr,
           /nix/store/** r,
-          /run/opengl-driver/*/lib/*.so* mr,
-          /run/opengl-driver-32/*/lib/*.so* mr,
+          /run/opengl-driver{,-32}/lib/*.so* mr,
 
           ${teams}/** r,
           ${teams}/**/*.node mr,
           ${teams}/bin/* ix,
           ${teams}/opt/teams/* ix,
+          ${glibc.bin}/bin/locale ix,
+          ${bashInteractive}/bin/bash ix,
           capability sys_admin,
           capability sys_chroot,
+          capability sys_ptrace,
 
-          ${xdg_utils}/bin/xdg-open ix,
+          ${xdg_utils}/bin/* Cx -> xdg_utils,
+
+          profile xdg_utils {
+            ${bash}/bin/bash rix,
+
+            ${gnugrep}/bin/{,e,f}grep ix,
+            ${coreutils}/bin/* ix,
+            ${gnused}/bin/sed ix,
+            ${dbus}/bin/dbus-send ix,
+            ${gawk}/bin/{,g}awk ix,
+            ${xdg_utils}/bin/* ix,
+            ${cpkgs.firefox-with-extensions}/bin/firefox Ux,
+
+            @{HOME}/.config/mimeapps.list r,
+            @{HOME}/.local/share/applications/mimeapps.list r,
+            @{HOME}/.local/share/applications/ r,
+
+            /nix/store/*/lib/*.so* mr,
+            /nix/store/*/lib/**/*.so* mr,
+            /nix/store/** r,
+
+            /dev/null rw,
+            /dev/tty rw,
+          }
 
           /dev/null rw,
 
           owner /tmp/** rw,
         }
-      '')
+      ''))
       (with pkgs; writeText "discord" ''
         #include <tunables/global>
         ${discord}/bin/Discord {
@@ -260,8 +281,7 @@ in {
           /nix/store/*/lib/*.so* mr,
           /nix/store/*/lib/**/*.so* mr,
           /nix/store/** r,
-          /run/opengl-driver/*/lib/*.so* mr,
-          /run/opengl-driver-32/*/lib/*.so* mr,
+          /run/opengl-driver{,-32}/lib/*.so* mr,
 
           ${discord}/** r,
           ${discord}/**/*.node mr,
@@ -278,6 +298,8 @@ in {
 
   programs.dconf.enable = true;
 
+  security.rtkit.enable = true;
+  hardware.bluetooth.hsphfpd.enable = true;
   services.pipewire = {
     enable = true;
     # package = pkgs.cpkgs.pipewire;
@@ -287,6 +309,11 @@ in {
       support32Bit = true;
     };
     jack.enable = true;
+    sessionManagerArguments = [ "-p" "bluez5.msbc-support=true" ];
+  };
+
+  systemd.services.auto-cpufreq = {
+    path = with pkgs; [ bash coreutils ncurses ];
   };
 
   # Laptop specific things
@@ -537,8 +564,8 @@ in {
         src = super.fetchFromGitHub {
           owner = "neovim";
           repo = "neovim";
-          rev = "4cdc8b1efdc7a67d24c7193ef67839924eb7d5c0";
-          sha256 = "sha256-nGxJyH+2OBcB6rV7x3mvthUhP9fWaf5Mc0FO99SlGC8=";
+          rev = "4d1e7e5b12095b1f2634e69a22ad580b6e2ffecd";
+          sha256 = "sha256-yUbLgMNBrJgvbnKXbToOXdkx/Xt2Q7DBvnKDiCfueVc=";
         };
         buildInputs = old.buildInputs ++ [ super.tree-sitter ];
       });

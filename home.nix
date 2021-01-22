@@ -42,6 +42,7 @@ in {
     htop
     pavucontrol
     pulsemixer
+    libimobiledevice
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -266,7 +267,19 @@ in {
       make = "make -j8";
       icat = "kitty +kitten icat";
     };
-    functions.fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
+    functions = {
+      fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
+      bat = {
+        body = ''
+          if test (date +%-H) -gt 18
+            command bat --theme gruvbox $argv
+          else
+            command bat --theme gruvbox-light $argv
+          end
+        '';
+        wraps = "bat";
+      };
+    };
   };
 
   gtk = {
