@@ -1,4 +1,4 @@
-{
+pkgs: {
   "coc.preferences.formatOnSaveFiletypes" = [
     "javascript"
     "vue"
@@ -21,4 +21,8 @@
   "tabnine.limit" = 5;
   "tabnine.priority" = 70;
   "suggest.languageSourcePriority" = 80;
+  languageserver.nix = {
+    command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
+    filetypes = [ "nix" ];
+  };
 }

@@ -167,6 +167,7 @@ in {
           owner @{HOME}/.config/Microsoft/Microsoft\ Teams rk,
           owner @{HOME}/.cache/** rwk,
           @{HOME}/Downloads/** rw,
+          @{HOME}/.local/share/.org.chromium.Chromium.* rw,
           @{HOME}/** r,
           @{HOME}/.pki/nssdb/** rwk,
           @{HOME} r,
@@ -311,9 +312,27 @@ in {
     jack.enable = true;
     sessionManagerArguments = [ "-p" "bluez5.msbc-support=true" ];
   };
+  security.pam.loginLimits = [
+    {
+      domain = "aamaruvi";
+      item = "memlock";
+      type = "hard";
+      value = "128";
+    }
+    {
+      domain = "aamaruvi";
+      item = "memlock";
+      type = "soft";
+      value = "64";
+    }
+  ];
+  systemd.user.services.pipewire-pulse.serviceConfig.LimitMEMLOCK = "131072";
 
-  systemd.services.auto-cpufreq = {
-    path = with pkgs; [ bash coreutils ncurses ];
+  services.earlyoom.enable = true;
+
+  i18n.inputMethod = {
+    enabled = "ibus";
+    ibus.engines = [ pkgs.ibus-engines.m17n ];
   };
 
   # Laptop specific things
@@ -474,7 +493,7 @@ in {
       xdg-desktop-portal-wlr
       xdg-desktop-portal-gtk
     ];
-    gtkUsePortal = false;
+    gtkUsePortal = true;
   };
 
   environment.systemPackages = with pkgs; mkLaptop [
@@ -565,12 +584,13 @@ in {
         src = super.fetchFromGitHub {
           owner = "neovim";
           repo = "neovim";
-          rev = "4d1e7e5b12095b1f2634e69a22ad580b6e2ffecd";
-          sha256 = "sha256-yUbLgMNBrJgvbnKXbToOXdkx/Xt2Q7DBvnKDiCfueVc=";
+          rev = "459a6c845e87662aa9aa0d6a0a68dc8d817a0498";
+          sha256 = "sha256-mG5Xdk4+uu/nBTyawZzIwedFnvVRH8gqxvB8cHAtQGM=";
         };
         buildInputs = old.buildInputs ++ [ super.tree-sitter ];
       });
     })
+    # fix bug in usbmuxd
     (self: super: {
       libusb-patched = super.libusb1.overrideAttrs (old: {
         src = super.fetchFromGitHub {
@@ -583,6 +603,12 @@ in {
     })
     (self: super: {
       usbmuxd = super.usbmuxd.override { libusb1 = super.libusb-patched; };
+    })
+    (self: super: {
+      ibus = super.ibus.override {
+        inherit (super) wayland libxkbcommon;
+        withWayland = true;
+      };
     })
   ] ++ lib.optionals isDesktop [
     (self: super: {

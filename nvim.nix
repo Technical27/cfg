@@ -20,8 +20,6 @@ else
   set background=dark
 endif
 
-let g:bat_theme = &background == 'dark' ? 'gruvbox' : 'gruvbox-light'
-
 set number
 set hidden
 set nobackup
@@ -54,7 +52,8 @@ let g:vimtex_view_method = 'zathura'
 let g:vimtex_quickfix_mode = 0
 
 let g:lion_squeeze_spaces = 1
-let g:gruvbox_italic      = 1
+
+let g:gruvbox_italic = 1
 
 let g:airline#extensions#tabline#enabled     = 1
 let g:airline#extensions#tabline#tab_nr_type = 1
@@ -63,6 +62,10 @@ let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
 
 let g:coc_snippet_next = '<TAB>'
 let g:coc_snippet_prev = '<S-TAB>'
+
+let g:EasyMotion_smartcase = 1
+
+let g:bat_theme = &background == 'dark' ? 'gruvbox' : 'gruvbox-light'
 
 function! Fzf_dev() abort
   let s:fzf_files_options =
@@ -155,14 +158,6 @@ augroup Buffer
   autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
 
-nmap f <Plug>(coc-smartf-forward)
-nmap F <Plug>(coc-smartf-backward)
-nmap ; <Plug>(coc-smartf-repeat)
-nmap , <Plug>(coc-smartf-repeat-opposite)
-
-augroup Smartf
-  autocmd!
-  autocmd User SmartfEnter :hi link Conceal GruvboxYellow
-  autocmd User SmartfLeave :hi link Conceal GruvboxGray
-augroup end
+nmap f <Plug>(easymotion-f)
+nmap w <Plug>(easymotion-w)
 ''

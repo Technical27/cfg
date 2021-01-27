@@ -19,6 +19,8 @@ in {
     noto-fonts-extra
     noto-fonts-cjk
     noto-fonts-emoji
+    noto-fonts
+    glib
     niv
     xdg_utils
     libnotify
@@ -42,7 +44,14 @@ in {
     htop
     pavucontrol
     pulsemixer
+
+    # read files from phone
     libimobiledevice
+    ifuse
+
+    # for some reason ibus needs this.
+    # Hopefully when Input Method v2 gets implemented, this won't be needed anymore.
+    xorg.setxkbmap
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -77,7 +86,7 @@ in {
   };
 
   xdg.configFile = {
-    "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix);
+    "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
   };
 
@@ -139,6 +148,10 @@ in {
       default-fg = "#ebdbb2";
       statusbar-bg = "#282828";
       statusbar-fg = "#ebdbb2";
+      completion-bg = "#282828";
+      completion-fg = "#ebdbb2";
+      completion-group-bg = "#282828";
+      completion-group-fg = "#ebdbb2";
       highlight-color = "#8ec07c";
       inputbar-bg = "#282828";
       inputbar-fg = "#ebdbb2";
@@ -309,11 +322,14 @@ in {
         scale = "2";
         bg = "~/Pictures/wallpaper.png fill";
       };
-      input."1739:30383:DELL07E6:00_06CB:76AF_Touchpad" = {
-        tap = "enabled";
-        natural_scroll = "enabled";
-        pointer_accel = "0.3";
-        dwt = "disabled";
+      input = {
+        "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" = {
+          tap = "enabled";
+          natural_scroll = "enabled";
+          pointer_accel = "0.3";
+          dwt = "disabled";
+        };
+        "*".xkb_options = "compose:ralt";
       };
       gaps.inner = 10;
       terminal = "kitty";
@@ -331,6 +347,7 @@ in {
               timeout 300 '${swaylock}' \
               timeout 600 'swaymsg "output * dpms off"' \
                 resume 'swaymsg "output * dpms on"' \
+              timeout 1200 'systemctl suspend' \
               before-sleep '${swaylock}'
           '';
         }
@@ -342,6 +359,9 @@ in {
         }
         {
           command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        }
+        {
+          command = "ibus-daemon -drx";
         }
       ];
       keybindings = let
