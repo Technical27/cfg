@@ -340,6 +340,9 @@ in {
         {
           command = "${pkgs.blueman}/bin/blueman-applet";
         }
+        {
+          command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        }
       ];
       keybindings = let
         pmixer = "exec ${pkgs.pulsemixer}/bin/pulsemixer --max-volume 100";
@@ -442,6 +445,8 @@ in {
         "Mod4+Shift+l" = "move right";
 
         "Mod4+Shift+r" = "exec i3-nagbar -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
+
+        "Mod4+Shift+v" = "exec i3-nagbar -t warning -m 'Start Windows VM?' -b 'Yes, start' 'pkexec virsh start win10'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";
