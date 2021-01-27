@@ -523,6 +523,7 @@ in {
 
   security.pam.services = mkDesktop {
     i3lock.enableGnomeKeyring = true;
+    login.enableGnomeKeyring = true;
     lightdm.enableGnomeKeyring = true;
   };
 
