@@ -18,7 +18,6 @@ in {
     default_opts = [
       "noatime"
       "nodiratime"
-      "discard=async"
       "compress-force=zstd:5"
       "ssd"
       "space_cache"
@@ -28,7 +27,6 @@ in {
       "noatime"
       "nodiratime"
       "ssd"
-      "discard=async"
     ];
   in
   (mkLaptop {
