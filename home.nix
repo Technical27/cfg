@@ -327,7 +327,7 @@ in {
           tap = "enabled";
           natural_scroll = "enabled";
           pointer_accel = "0.3";
-          dwt = "disabled";
+          dwt = "enabled";
         };
         "*".xkb_options = "compose:ralt";
       };
@@ -347,7 +347,6 @@ in {
               timeout 300 '${swaylock}' \
               timeout 600 'swaymsg "output * dpms off"' \
                 resume 'swaymsg "output * dpms on"' \
-              timeout 1200 'systemctl suspend' \
               before-sleep '${swaylock}'
           '';
         }

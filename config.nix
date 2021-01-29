@@ -372,7 +372,7 @@ in {
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
-    after = [ "network.target" "pulseaudio.service" ];
+    after = [ "network.target" "pipewire-pulse.socket" ];
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       Type = "simple";
@@ -558,11 +558,14 @@ in {
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = mkDesktop [
+  boot.kernelPatches = lib.recursiveUpdate (mkDesktop [
     (mkPatch "openrgb")
     # (mkPatch "rdtsc")
     (mkPatch "fsync")
-  ];
+  ]) (mkLaptop [{
+    name = "fix-btusb-msbc";
+    patch = ./laptop/bt-alt-setting-1.patch;
+  }]);
 
   systemd.user.services.razer-kbd = mkDesktop {
     description = "restore openrazer effects";
