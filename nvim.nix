@@ -7,17 +7,24 @@ augroup end
 
 colorscheme gruvbox
 
+fun! g:ChangeBackground(value)
+  let &background = a:value
+  let s:bat_theme = a:value == 'dark' ? 'gruvbox' : 'gruvbox-light'
+  let $BAT_THEME = s:bat_theme
+  let g:bat_cmd = 'bat --theme '.s:bat_theme.' --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * 0.4) - 2)
+endf
+
 let s:theme_file = glob("~/.config/nvim/theme")
 
 if (filereadable(s:theme_file))
   if (readfile(s:theme_file)[0] == "dark")
-    set background=dark
+    call ChangeBackground('dark')
   else
-    set background=light
+    call ChangeBackground('light')
   endif
 else
   echo "failed to read theme file"
-  set background=dark
+  call ChangeBackground('dark')
 endif
 
 set number
@@ -65,11 +72,9 @@ let g:coc_snippet_prev = '<S-TAB>'
 
 let g:EasyMotion_smartcase = 1
 
-let g:bat_theme = &background == 'dark' ? 'gruvbox' : 'gruvbox-light'
+let g:coc_fzf_opts = ['--color=16']
 
 function! Fzf_dev() abort
-  let s:fzf_files_options =
-        \'--preview "bat --theme '.g:bat_theme.' --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * 0.4) - 2).'"'
   let s:fzf_command = 'rg --files --hidden --follow --glob "!{.git,build,node_modules,target}"'
 
   function! s:get_open_files() abort
@@ -106,7 +111,7 @@ function! Fzf_dev() abort
  call fzf#run({
        \ 'source' : <sid>files(),
        \ 'sink'   : function('s:edit_file'),
-       \ 'options': '--color 16 -m ' . s:fzf_files_options,
+       \ 'options': '--color 16 -m --preview "'.g:bat_cmd.'"',
        \ 'down'   : '40%' })
 endf
 
