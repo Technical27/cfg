@@ -162,13 +162,17 @@ in {
 
           owner @{HOME}/.config/teams/** rwk,
           owner @{HOME}/.config/Microsoft/Microsoft\ Teams/** rwk,
-          owner @{HOME}/.config/Microsoft/Microsoft\ Teams rk,
+          owner @{HOME}/.config/Microsoft/Microsoft\ Teams rwk,
           owner @{HOME}/.cache/** rwk,
           @{HOME}/Downloads/** rw,
           @{HOME}/.local/share/.org.chromium.Chromium.* rw,
           @{HOME}/** r,
           @{HOME}/.pki/nssdb/** rwk,
-          @{HOME} r,
+
+          # WHY DOES TEAMS DOWNLOAD TO HOME AND NOT DOWNLOADS
+          @{HOME}/* rw,
+
+          audit deny @{HOME}/{git,cfg,pkgs} rw,
 
           /dev/video* mrw,
           /dev/snd/* mr,
@@ -558,14 +562,18 @@ in {
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = lib.recursiveUpdate (mkDesktop [
+  # boot.kernelPatches = lib.recursiveUpdate (mkDesktop [
+  #   (mkPatch "openrgb")
+  #   # (mkPatch "rdtsc")
+  #   (mkPatch "fsync")
+  # ]) (mkLaptop [{
+  #   name = "fix-btusb-msbc";
+  #   patch = ./laptop/bt-alt-setting-1.patch;
+  # }]);
+  boot.kernelPatches = mkDesktop [
     (mkPatch "openrgb")
-    # (mkPatch "rdtsc")
     (mkPatch "fsync")
-  ]) (mkLaptop [{
-    name = "fix-btusb-msbc";
-    patch = ./laptop/bt-alt-setting-1.patch;
-  }]);
+  ];
 
   systemd.user.services.razer-kbd = mkDesktop {
     description = "restore openrazer effects";
@@ -585,8 +593,8 @@ in {
         src = super.fetchFromGitHub {
           owner = "neovim";
           repo = "neovim";
-          rev = "459a6c845e87662aa9aa0d6a0a68dc8d817a0498";
-          sha256 = "sha256-mG5Xdk4+uu/nBTyawZzIwedFnvVRH8gqxvB8cHAtQGM=";
+          rev = "cc1851c9fdd6d777338bea2272d2a02c8baa0fb1";
+          sha256 = "sha256-LDQwdodi5XG7EmteeVJU+C2DVw845QUzZFp/pvBLxRQ=";
         };
         buildInputs = old.buildInputs ++ [ super.tree-sitter ];
       });

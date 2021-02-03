@@ -7,24 +7,13 @@ augroup end
 
 colorscheme gruvbox
 
-fun! g:ChangeBackground(value)
-  let &background = a:value
-  let s:bat_theme = a:value == 'dark' ? 'gruvbox' : 'gruvbox-light'
-  let $BAT_THEME = s:bat_theme
-  let g:bat_cmd = 'bat --theme '.s:bat_theme.' --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * 0.4) - 2)
-endf
-
 let s:theme_file = glob("~/.config/nvim/theme")
 
 if (filereadable(s:theme_file))
-  if (readfile(s:theme_file)[0] == "dark")
-    call ChangeBackground('dark')
-  else
-    call ChangeBackground('light')
-  endif
+  let &background = readfile(s:theme_file)[0]
 else
   echo "failed to read theme file"
-  call ChangeBackground('dark')
+  set background=dark
 endif
 
 set number
@@ -63,6 +52,7 @@ let g:lion_squeeze_spaces = 1
 let g:gruvbox_italic = 1
 
 let g:airline#extensions#tabline#enabled     = 1
+let g:airline#extensions#nvimlsp#enabled     = 0
 let g:airline#extensions#tabline#tab_nr_type = 1
 let g:airline_powerline_fonts                = 1
 let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
@@ -76,6 +66,7 @@ let g:coc_fzf_opts = ['--color=16']
 
 function! Fzf_dev() abort
   let s:fzf_command = 'rg --files --hidden --follow --glob "!{.git,build,node_modules,target}"'
+  let s:bat_command = 'bat --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * 0.4) - 2)
 
   function! s:get_open_files() abort
     let l:buffers = map(filter(copy(getbufinfo()), 'v:val.listed'), 'v:val.name')
@@ -111,7 +102,7 @@ function! Fzf_dev() abort
  call fzf#run({
        \ 'source' : <sid>files(),
        \ 'sink'   : function('s:edit_file'),
-       \ 'options': '--color 16 -m --preview "'.g:bat_cmd.'"',
+       \ 'options': '--color 16 -m --preview "'.s:bat_command.'"',
        \ 'down'   : '40%' })
 endf
 

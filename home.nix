@@ -280,19 +280,7 @@ in {
       make = "make -j8";
       icat = "kitty +kitten icat";
     };
-    functions = {
-      fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
-      bat = {
-        body = ''
-          if test (date +%-H) -gt 18
-            command bat --theme gruvbox $argv
-          else
-            command bat --theme gruvbox-light $argv
-          end
-        '';
-        wraps = "bat";
-      };
-    };
+    functions.fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
   };
 
   gtk = {
@@ -321,6 +309,7 @@ in {
       output."eDP-1" = {
         scale = "2";
         bg = "~/Pictures/wallpaper.png fill";
+        subpixel = "rgb";
       };
       input = {
         "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" = {
