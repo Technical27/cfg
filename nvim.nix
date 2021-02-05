@@ -1,8 +1,59 @@
 # vim: set ft=vim:
 ''
+fun g:LoadColors()
+  hi! clear SignColumn
+
+  " all the treesitter highlights
+  hi! link TSAnnotation GruvboxAqua
+  hi! link TSBoolean GruvboxPurple
+  hi! link TSCharacter GruvboxPurple
+  hi! TSComment cterm=italic
+  hi! link TSComment GruvboxGrey
+  hi! link TSConstructor GruvboxOrange
+  hi! link TSConditional GruvboxRed
+  hi! link TSConstant GruvboxFg
+  hi! link TSConstBuiltin GruvboxPurple
+  hi! link TSConstMacro GruvboxPurple
+  hi! link TSError GruvboxRed
+  hi! link TSException GruvboxRed
+  hi! link TSField GruvboxFg
+  hi! link TSFloat GruvboxPurple
+  hi! link TSFunction GruvboxGreenBold
+  hi! link TSFuncBuiltin GruvboxOrange
+  hi! link TSFuncMacro GruvboxAqua
+  hi! link TSInclude GruvboxAqua
+  hi! link TSKeyword GruvboxRed
+  hi! link TSLabel GruvboxRed
+  hi! link TSMethod GruvboxGreenBold
+  hi! link TSNamespace GruvboxAqua
+  hi! link TSNone GruvboxPurple
+  hi! link TSNumber GruvboxPurple
+  hi! link TSOperator GruvboxOrange
+  hi! link TSParamter GruvboxFg
+  hi! link TSParameterReferance GruvboxFg
+  hi! link TSProperty GruvboxBlue
+  hi! link TSPunctDelimiter GruvboxFg
+  hi! link TSPunctBracket GruvboxFg
+  hi! link TSPunctSpecial GruvboxFg
+  hi! link TSRepeat GruvboxRed
+  hi! link TSString GruvboxGreen
+  hi! link TSStringRegex GruvboxYellow
+  hi! link TSStringEscape GruvboxOrange
+  hi! link TSTag GruvboxBlue
+  hi! link TSTagDelimiter GruvboxAqua
+  hi! link TSText GruvboxFg
+  hi! link TSLiteral GruvboxFg
+  hi! link TSURI GruvboxAqua
+  hi! link TSType GruvboxYellow
+  hi! link TSTypeBuiltin GruvboxYellow
+  hi! link TSVariable GruvboxFg
+  hi! TSEmphasis cterm=italic
+  hi! TSUnderline cterm=underline
+endf
+
 augroup Color
   autocmd!
-  autocmd ColorScheme * hi clear SignColumn
+  autocmd ColorScheme * call g:LoadColors()
 augroup end
 
 colorscheme gruvbox
@@ -26,7 +77,6 @@ set signcolumn=yes
 set ignorecase
 set smartcase
 set title
-set foldmethod=syntax
 set foldnestmax=10
 set nofoldenable
 set lazyredraw
@@ -41,6 +91,20 @@ set showmatch
 set mouse=a
 set undofile
 set grepprg="rg --vimgrep"
+
+" nvim-treesitter setup
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  indent = {
+    enable = true
+  },
+  highlight = {
+    enable = true
+  }
+}
+EOF
 
 let g:tex_flavor = 'latex'
 let g:vimtex_compiler_method = 'tectonic'

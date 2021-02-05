@@ -1,3 +1,5 @@
+@import './theme.css';
+
 * {
   /* `otf-font-awesome` is required to be installed for icons */
   font-family: 'JetBrains Mono NerdFont';
@@ -11,8 +13,8 @@
 }
 
 window#waybar {
-  /* background-color: #282828; */
-  color: #ebdbb2;
+  background-color: @gruvbox-bg;
+  color: @gruvbox-fg;
   transition-property: background-color;
   transition-duration: 0.5s;
   /* border: 2px solid #8ec07c; */
@@ -32,20 +34,20 @@ window#waybar.hidden {
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button:hover {
   box-shadow: inherit;
-  background-color: #282828;
-  color: #ebdbb2;
+  background-color: @gruvbox-bg;
+  color: @gruvbox-fg;
 }
 
 #workspaces button.focused {
-  color: #ebdbb2;
+  color: @gruvbox-fg;
 }
 
 #workspaces button.urgent {
-  background-color: #8ec07c;
+  background-color: @gruvbox-green;
 }
 
 #mode {
-  color: #458588;
+  color: @gruvbox-blue;
   padding: 0 10px;
   margin: 0 4px;
 }
@@ -72,19 +74,19 @@ window#waybar.hidden {
 #workspaces,
 #custom-nixos {
   padding: 0 15px;
-  color: #ebdbb2;
+  color: @gruvbox-fg;
 }
 
 @keyframes blink {
   to {
-    background-color: #ebdbb2;
-    color: #282828;
+    background-color: @gruvbox-fg;
+    color: @gruvbox-bg;
   }
 }
 
 #battery.critical:not(.charging) {
-  background-color: #fb4934;
-  color: #ebdbb2;
+  background-color: @gruvbox-red;
+  color: @gruvbox-fg;
   animation-name: blink;
   animation-duration: 0.5s;
   animation-timing-function: linear;
@@ -93,20 +95,20 @@ window#waybar.hidden {
 }
 
 #network.disconnected {
-  color: #fb4934;
+  color: @gruvbox-red;
 }
 
 #pulseaudio.muted {
-  color: #fabd2f;
+  color: @gruvbox-yellow;
 }
 
 #idle_inhibitor.activated {
-  color: #8ec07c;
+  color: @gruvbox-green;
 }
 
 #custom-nixos.error {
-  background-color: #fb4934;
-  color: #ebdbb2;
+  background-color: @gruvbox-red;
+  color: @gruvbox-fg;
   animation-name: blink;
   animation-duration: 0.5s;
   animation-timing-function: linear;
@@ -115,9 +117,9 @@ window#waybar.hidden {
 }
 
 #custom-nixos.offline {
-  color: #fb4934;
+  color: @gruvbox-red;
 }
 
 #custom-nixos.update-available {
-  color: #fabd2f;
+  color: @gruvbox-yellow;
 }

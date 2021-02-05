@@ -28,6 +28,8 @@ in {
     imv
     texlive.combined.scheme-basic
     tectonic
+    gcc
+    jq
 
     ranger
 
@@ -107,11 +109,11 @@ in {
       vim-move
       commentary
       vim-lion
-      conjure
       cpkgs.context-vim
       vim-easymotion
       vimtex
       ultisnips
+      nvim-treesitter
 
       # coc extensions
       coc-nvim
@@ -280,7 +282,7 @@ in {
       make = "make -j8";
       icat = "kitty +kitten icat";
     };
-    functions.fish_greeting = "${pkgs.nodejs}/bin/node ~/git/info/index.js";
+    functions.fish_greeting = "${cpkgs.info}/bin/info";
   };
 
   gtk = {
@@ -537,7 +539,7 @@ in {
       };
       "module/nixos" = {
         type = "custom/script";
-        exec = "${pkgs.nodejs}/bin/node /home/aamaruvi/git/info/index.js --polybar";
+        exec = "${cpkgs.info}/bin/info --polybar";
         interval = 600;
       };
     };
@@ -626,7 +628,7 @@ in {
         "custom/nixos" = {
           return-type = "json";
           interval = 600;
-          exec = "${pkgs.nodejs}/bin/node /home/aamaruvi/git/info/index.js --waybar";
+          exec = "${cpkgs.info}/bin/info --waybar";
         };
       };
     }];
