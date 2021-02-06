@@ -79,6 +79,7 @@ in {
     enable = true;
     dnssec = "allow-downgrade";
   };
+  networking.dhcpcd.enable = lib.mkForce false;
 
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
@@ -453,8 +454,8 @@ in {
   systemd.network.networks."20-wg0" = mkLaptop {
     name = "wg0";
     DHCP = "no";
-    address = ["10.200.200.2/32" "fd37:994c:6708:de39::2/128"];
-    dns = ["10.200.200.1"];
+    address = [ "10.200.200.2/32" "fd37:994c:6708:de39::2/128" ];
+    dns = [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
     routes = [
       {
         routeConfig = {
@@ -487,6 +488,7 @@ in {
         };
       }
     ];
+    networkConfig.DNSDefaultRoute = "no";
   };
 
   xdg.portal = mkLaptop {
