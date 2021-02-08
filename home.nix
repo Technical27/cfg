@@ -69,7 +69,7 @@ in {
     razergenie
     virt-manager
     openrgb
-    cpkgs.liquidctl
+    liquidctl
     obs-studio
     olive-editor
     unityhub
@@ -113,7 +113,6 @@ in {
       vim-easymotion
       vimtex
       ultisnips
-      nvim-treesitter
 
       # coc extensions
       coc-nvim

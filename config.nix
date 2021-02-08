@@ -12,6 +12,9 @@ in {
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    binaryCaches = mkLaptop [
+      "ssh://10.200.200.1"
+    ];
   };
 
   fileSystems = let
