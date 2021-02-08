@@ -13,7 +13,7 @@ in {
       experimental-features = nix-command flakes
     '';
     binaryCaches = [
-      (if isLaptop then "ssh://yogs@10.200.200.1" else "ssh://yogs@192.168.1.2")
+      (if isLaptop then "ssh-ng://nix-ssh@10.200.200.1?ssh-key=/home/aamaruvi/.ssh/id_rsa" else "ssh-ng://nix-ssh@192.168.1.2?ssh-key=/home/aamaruvi/.ssh/id_rsa")
     ];
     requireSignedBinaryCaches = false;
   };
