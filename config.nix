@@ -12,9 +12,10 @@ in {
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    binaryCaches = mkLaptop [
-      "ssh://10.200.200.1"
+    binaryCaches = [
+      (if isLaptop then "ssh://yogs10.200.200.1" else "ssh://yogs@192.168.1.2")
     ];
+    requireSignedBinaryCaches = false;
   };
 
   fileSystems = let
@@ -520,7 +521,7 @@ in {
 
   networking.firewall.enable = isDesktop;
   systemd.network.networks."00-ethernet" = mkDesktop {
-    name = "enp1s0";
+    name = "eno1";
     DHCP = "yes";
     networkConfig = {
       IPv6AcceptRA = "yes";
