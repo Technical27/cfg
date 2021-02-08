@@ -594,30 +594,10 @@ in {
 
   nixpkgs.overlays = [
     (self: super: {
-      neovim-unwrapped = super.neovim-unwrapped.overrideAttrs (old: {
-        version = "0.5.0-dev";
-        src = super.fetchFromGitHub {
-          owner = "neovim";
-          repo = "neovim";
-          rev = "cc1851c9fdd6d777338bea2272d2a02c8baa0fb1";
-          sha256 = "sha256-LDQwdodi5XG7EmteeVJU+C2DVw845QUzZFp/pvBLxRQ=";
-        };
-        buildInputs = old.buildInputs ++ [ super.tree-sitter ];
-      });
-    })
-    # fix bug in usbmuxd
-    (self: super: {
-      libusb-patched = super.libusb1.overrideAttrs (old: {
-        src = super.fetchFromGitHub {
-          owner = "libusb";
-          repo = "libusb";
-          rev = "b51c743e4210756a98f4f60c69a34745e4b27a55";
-          sha256 = "sha256-B9gFLuZB1yCpTrF/TYWWjI2ckXZnw/6zfBGxAzwzXEI=";
-        };
-      });
+      neovim-unwrapped = super.cpkgs.neovim-unwrapped;
     })
     (self: super: {
-      usbmuxd = super.usbmuxd.override { libusb1 = super.libusb-patched; };
+      usbmuxd = super.cpkgs.usbmuxd;
     })
     (self: super: {
       ibus = super.ibus.override {
