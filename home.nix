@@ -57,6 +57,7 @@ in {
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
+    libsmbios
     #sway stuff
     sway-contrib.grimshot
     wofi
