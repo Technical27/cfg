@@ -350,6 +350,7 @@ in {
 
   services.upower.enable = isLaptop;
   services.tlp.enable = isLaptop;
+  services.auto-cpufreq.enable = isLaptop;
   services.throttled.enable = false;
   services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
@@ -604,6 +605,9 @@ in {
         inherit (super) wayland libxkbcommon;
         withWayland = true;
       };
+    })
+    (self: super: {
+      auto-cpufreq = super.cpkgs.auto-cpufreq;
     })
   ] ++ lib.optionals isDesktop [
     (self: super: {
