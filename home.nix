@@ -275,6 +275,8 @@ in {
       set -g fish_color_user brgreen
       set -g fish_color_valid_path --underline
 
+      set -g fish_cursor_insert line
+      set -g fish_cursor_default block
       fish_vi_key_bindings
     '';
     interactiveShellInit = "source (jump shell fish | psub)";
