@@ -58,7 +58,7 @@ in {
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
     ++ (lib.optionals isLaptop [
       "resume_offset=18382314"
