@@ -58,7 +58,7 @@ in {
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
     ++ (lib.optionals isLaptop [
       "resume_offset=18382314"
@@ -83,7 +83,7 @@ in {
     enable = true;
     dnssec = "allow-downgrade";
   };
-  networking.dhcpcd.enable = lib.mkForce false;
+  networking.dhcpcd.denyInterfaces = [ "wg*" "wlan*" ];
 
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
