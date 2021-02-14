@@ -83,7 +83,7 @@ in {
     enable = true;
     dnssec = "allow-downgrade";
   };
-  networking.dhcpcd.denyInterfaces = [ "wg*" "wlan*" ];
+  networking.dhcpcd.denyInterfaces = [] ++ (lib.optionals isLaptop [ "wg*" "wlan*" ]) ++ (lib.optionals isDesktop [ "eno1" ]);
 
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
@@ -582,14 +582,17 @@ in {
     (mkPatch "fsync")
   ];
 
-  systemd.user.services.razer-kbd = mkDesktop {
-    description = "restore openrazer effects";
-    wants = [ "dbus.service" ];
-    after = [ "dbus.service" ];
+  systemd.user.services.rgb-restore = mkDesktop {
+    description = "restore rgb effects";
+    wants = [ "dbus.service" "openrazer-daemon.service" ];
+    after = [ "dbus.service" "openrazer-daemon.service" ];
     wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix";
+      ExecStart = [
+        "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
+        "${pkgs.openrgb}/bin/openrgb -d 1,2 -m breathing -c FF0000"
+      ];
     };
   };
 
