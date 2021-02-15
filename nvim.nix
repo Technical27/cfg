@@ -1,7 +1,55 @@
 # vim: set ft=vim:
 ''
+let g:gruvbox_sign_column = 'fg0'
+
 fun g:LoadColors()
   hi! clear SignColumn
+
+  " all the treesitter highlights
+  hi! link TSAnnotation GruvboxAqua
+  hi! link TSBoolean GruvboxPurple
+  hi! link TSCharacter GruvboxPurple
+  hi! TSComment gui=italic guifg=GruvboxGrey
+  hi! link TSConstructor GruvboxOrange
+  hi! link TSConditional GruvboxRed
+  hi! link TSConstant GruvboxPurple
+  hi! link TSConstBuiltin GruvboxOrange
+  hi! link TSConstMacro GruvboxAqua
+  hi! link TSError GruvboxRed
+  hi! link TSException GruvboxRed
+  hi! link TSField GruvboxBlue
+  hi! link TSFloat GruvboxPurple
+  hi! link TSFunction GruvboxGreenBold
+  hi! link TSFuncBuiltin GruvboxOrange
+  hi! link TSFuncMacro GruvboxAqua
+  hi! link TSInclude GruvboxAqua
+  hi! link TSKeyword GruvboxRed
+  hi! link TSLabel GruvboxRed
+  hi! link TSMethod GruvboxGreenBold
+  hi! link TSNamespace GruvboxAqua
+  hi! clear TSNone
+  hi! link TSNumber GruvboxPurple
+  hi! link TSOperator GruvboxFg1
+  hi! link TSParamter GruvboxBlue
+  hi! link TSParameterReferance TSParameter
+  hi! link TSProperty GruvboxBlue
+  hi! link TSPunctDelimiter GruvboxFg
+  hi! link TSPunctBracket GruvboxFg
+  hi! link TSPunctSpecial GruvboxFg
+  hi! link TSRepeat GruvboxRed
+  hi! link TSString GruvboxGreen
+  hi! link TSStringRegex GruvboxYellow
+  hi! link TSStringEscape GruvboxOrange
+  hi! link TSTag GruvboxRed
+  hi! link TSTagDelimiter GruvboxFg
+  hi! link TSText TSNone
+  hi! link TSLiteral GruvboxGreen
+  hi! link TSURI gui=underlined
+  hi! link TSType GruvboxYellow
+  hi! link TSTypeBuiltin GruvboxYellow
+  hi! link TSVariable GruvboxFg
+  hi! TSEmphasis gui=italic
+  hi! TSUnderline gui=underline
 endf
 
 augroup Color
@@ -44,7 +92,20 @@ set showmatch
 set mouse=a
 set undofile
 set grepprg="rg --vimgrep"
-set foldmethod=syntax
+
+" nvim-treesitter setup
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  indent = {
+    enable = true
+  },
+  highlight = {
+    enable = true
+  }
+}
+EOF
 
 let g:tex_flavor = 'latex'
 let g:vimtex_compiler_method = 'tectonic'

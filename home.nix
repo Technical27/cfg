@@ -110,10 +110,10 @@ in {
       vim-move
       commentary
       vim-lion
-      cpkgs.context-vim
       vim-easymotion
       vimtex
       ultisnips
+      nvim-treesitter
 
       # coc extensions
       coc-nvim
@@ -128,6 +128,7 @@ in {
       coc-tsserver
       coc-tabnine
       coc-eslint
+      cpkgs.vim.context-vim
     ];
     withNodeJs = true;
     withPython3 = true;
