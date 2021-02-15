@@ -44,7 +44,7 @@ fun g:LoadColors()
   hi! link TSTagDelimiter GruvboxFg
   hi! link TSText TSNone
   hi! link TSLiteral GruvboxGreen
-  hi! link TSURI gui=underlined
+  hi! TSURI gui=underline
   hi! link TSType GruvboxYellow
   hi! link TSTypeBuiltin GruvboxYellow
   hi! link TSVariable GruvboxFg
