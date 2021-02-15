@@ -132,7 +132,7 @@ in {
     ];
     withNodeJs = true;
     withPython3 = true;
-    extraConfig = import ./nvim.nix;
+    extraConfig = builtins.readFile ./init.vim;
   };
 
   programs.direnv.enable = true;

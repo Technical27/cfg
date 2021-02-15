@@ -1,5 +1,3 @@
-# vim: set ft=vim:
-''
 let g:gruvbox_sign_column = 'fg0'
 
 fun g:LoadColors()
@@ -44,7 +42,7 @@ fun g:LoadColors()
   hi! link TSTagDelimiter GruvboxFg
   hi! link TSText TSNone
   hi! link TSLiteral GruvboxGreen
-  hi! TSURI gui=underline
+  hi! TSURI gui=underline guifg=GruvboxAqua
   hi! link TSType GruvboxYellow
   hi! link TSTypeBuiltin GruvboxYellow
   hi! link TSVariable GruvboxFg
@@ -221,4 +219,3 @@ augroup end
 
 nmap f <Plug>(easymotion-f)
 nmap w <Plug>(easymotion-w)
-''
