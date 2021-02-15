@@ -588,6 +588,8 @@ in {
           critical-threshold = 80;
           format = "{temperatureC}°C";
           interval = 5;
+          # The actual cpu temperature as reported by BIOS
+          hwmon-path = "/sys/class/hwmon/hwmon5/temp1_input";
         };
         backlight = {
           format = "{percent}% {icon}";
