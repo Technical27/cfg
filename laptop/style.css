@@ -1,10 +1,4 @@
-@define-color gruvbox-bg #282828;
-@define-color gruvbox-fg #ebdbb2;
-
-@define-color gruvbox-green #8ec07c;
-@define-color gruvbox-blue #458588;
-@define-color gruvbox-red #fb4934;
-@define-color gruvbox-yellow #fabd2f;
+@import './theme.css';
 
 * {
   /* `otf-font-awesome` is required to be installed for icons */
@@ -33,14 +27,13 @@ window#waybar.hidden {
 #workspaces button {
   padding: 0 5px;
   background-color: transparent;
-  color: #504945;
+  color: @gruvbox-btn;
   border-bottom: 3px solid transparent;
 }
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
 #workspaces button:hover {
   box-shadow: inherit;
-  background-color: @gruvbox-bg;
   color: @gruvbox-fg;
 }
 

@@ -12,6 +12,9 @@ in {
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
+  home.sessionVariablesExtra = ''
+    export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS"
+  '';
 
   home.packages = with pkgs; [
     ripgrep
@@ -65,6 +68,10 @@ in {
     wl-clipboard
     zoom-us
     teams
+    cpkgs.gruvbox-dark-theme
+    cpkgs.gruvbox-dark-icons
+    cpkgs.gruvbox-light-theme
+    cpkgs.gruvbox-light-icons
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
@@ -290,11 +297,7 @@ in {
 
   gtk = {
     enable = true;
-    iconTheme = { name = "gruvbox-dark"; package = cpkgs.gruvbox-icons; };
-    # cursorTheme = { name = "WhiteSur-cursors"; package = null; };
-    theme = { name = "gruvbox-dark"; package = cpkgs.gruvbox-gtk; };
     gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = "1";
       gtk-cursor-theme-name = "WhiteSur-cursors";
       gtk-cursor-theme-size = if isLaptop then 48 else 24;
     };
