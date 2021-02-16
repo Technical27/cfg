@@ -1,4 +1,5 @@
 let g:gruvbox_sign_column = 'fg0'
+let g:gruvbox_italic = 1
 
 fun g:LoadColors()
   hi! clear SignColumn
@@ -111,8 +112,6 @@ let g:vimtex_view_method = 'zathura'
 let g:vimtex_quickfix_mode = 0
 
 let g:lion_squeeze_spaces = 1
-
-let g:gruvbox_italic = 1
 
 let g:airline#extensions#tabline#enabled     = 1
 let g:airline#extensions#nvimlsp#enabled     = 0
