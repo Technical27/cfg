@@ -504,7 +504,7 @@ in {
     ];
     gtkUsePortal = true;
   };
-  services.flatpak.enable = true;
+  services.flatpak.enable = isLaptop;
 
   environment.systemPackages = with pkgs; mkLaptop [
     wireguard
