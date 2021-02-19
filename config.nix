@@ -563,6 +563,7 @@ in {
     onBoot = "ignore";
     onShutdown = "shutdown";
   };
+  virtualisation.docker.enable = true;
 
   systemd.services.libvirtd.path = with pkgs; mkDesktop [
     kmod killall bash coreutils config.boot.kernelPackages.cpupower
