@@ -38,6 +38,7 @@ in {
 
     discord
     multimc
+    cpkgs.lunar-client
     killall
     nix-index
     neofetch
@@ -81,6 +82,7 @@ in {
     obs-studio
     olive-editor
     unityhub
+    mumble
   ];
 
   xdg.mimeApps.enable = true;
