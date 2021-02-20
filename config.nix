@@ -307,17 +307,14 @@ in {
   programs.dconf.enable = true;
 
   security.rtkit.enable = true;
-  hardware.bluetooth.hsphfpd.enable = true;
   services.pipewire = {
     enable = true;
-    # package = pkgs.cpkgs.pipewire;
     pulse.enable = true;
     alsa = {
       enable = true;
       support32Bit = true;
     };
     jack.enable = true;
-    sessionManagerArguments = [ "-p" "bluez5.msbc-support=true" ];
   };
   security.pam.loginLimits = [
     {
@@ -356,6 +353,7 @@ in {
   services.fwupd.enable = isLaptop;
 
   hardware.bluetooth.enable = isLaptop;
+  hardware.bluetooth.hsphfpd.enable = isLaptop;
 
   powerManagement.enable = isLaptop;
 
