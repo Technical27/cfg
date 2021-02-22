@@ -355,6 +355,21 @@ in {
   hardware.bluetooth.enable = isLaptop;
   hardware.bluetooth.hsphfpd.enable = isLaptop;
 
+  # temp fix for bluez
+  systemd.services.bluetooth.serviceConfig.ExecStart = let
+    inherit (lib) optional concatStringsSep escapeShellArgs;
+    cfg = config.hardware.bluetooth;
+    package = cfg.package;
+    hasDisabledPlugins = builtins.length cfg.disabledPlugins > 0;
+
+    args = [ "-f" "/etc/bluetooth/main.conf" ]
+      ++ optional hasDisabledPlugins
+      "--noplugin=${concatStringsSep "," cfg.disabledPlugins}";
+  in [
+    ""
+    "${package}/libexec/bluetooth/bluetoothd ${escapeShellArgs args}"
+  ];
+
   powerManagement.enable = isLaptop;
 
   networking.wireless.iwd.enable = isLaptop;
