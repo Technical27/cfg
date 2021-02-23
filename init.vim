@@ -207,6 +207,12 @@ inoremap <silent><expr> <c-space> coc#refresh()
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
+fun! g:ClearSearch()
+  let @/ = ""
+endf
+
+nnoremap <silent><expr> <ESC> g:ClearSearch()
+
 " I will probably never record a macro
 nnoremap q <nop>
 

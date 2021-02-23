@@ -83,7 +83,8 @@ in {
     enable = true;
     dnssec = "allow-downgrade";
   };
-  networking.dhcpcd.denyInterfaces = [] ++ (lib.optionals isLaptop [ "wg*" "wlan*" ]) ++ (lib.optionals isDesktop [ "eno1" ]);
+  networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
+  networking.dhcpcd.enable = lib.mkForce isLaptop;
 
   programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
@@ -576,7 +577,6 @@ in {
     onBoot = "ignore";
     onShutdown = "shutdown";
   };
-  virtualisation.docker.enable = true;
 
   systemd.services.libvirtd.path = with pkgs; mkDesktop [
     kmod killall bash coreutils config.boot.kernelPackages.cpupower
