@@ -234,6 +234,11 @@ in {
       nix_shell.disabled = true;
       # very slow
       haskell.disabled = true;
+
+      character = {
+        success_symbol = "[➜](bold green) ";
+        error_symbol = "[✗](bold red) ";
+      };
     };
   };
 
