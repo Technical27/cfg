@@ -12,8 +12,10 @@ in {
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    binaryCaches = [
-      (if isLaptop then "ssh-ng://nix-ssh@10.200.200.1?ssh-key=/home/aamaruvi/.ssh/id_rsa" else "ssh-ng://nix-ssh@192.168.1.2?ssh-key=/home/aamaruvi/.ssh/id_rsa")
+    binaryCaches = let
+      ip = if isLaptop then "10.200.200.1" else "192.168.1.2";
+    in [
+      "ssh-ng://nix-ssh@${ip}?ssh-key=/home/aamaruvi/.ssh/id_rsa"
     ];
     requireSignedBinaryCaches = false;
   };
@@ -33,27 +35,15 @@ in {
       "ssd"
     ];
   in
-  (mkLaptop {
+  mkLaptop {
     "/".options = default_opts;
     "/nix".options = default_opts;
     "/var".options = default_opts;
     "/home".options = default_opts;
     "/swap".options = swap_opts;
-  })
-  // (mkDesktop {
-    "/media/hdd" = {
-      device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
-      fsType = "ext4";
-    };
-    "/media/ssd" = {
-      device = "/dev/disk/by-uuid/034782cc-bc82-4940-bfa8-be7e656fc9ad";
-      fsType = "ext4";
-    };
-  });
+  };
 
-  swapDevices = lib.recursiveUpdate
-  (mkDesktop [{ label = "swap"; }])
-  (mkLaptop [{ device = "/swap/file"; }]);
+  swapDevices = [{ device = "/swap/file"; }];
 
   networking.hostName = device;
 
@@ -140,7 +130,6 @@ in {
   users.extraUsers.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
-    ++ lib.optionals isLaptop [ "input" ]
     ++ lib.optionals isDesktop [ "plugdev" ];
     shell = pkgs.fish;
   };
@@ -149,160 +138,7 @@ in {
 
   security.apparmor = {
     enable = true;
-    profiles = [
-      (mkLaptop (with pkgs; writeText "teams" ''
-        #include <tunables/global>
-        ${teams}/bin/teams {
-          #include <abstractions/audio>
-          #include <abstractions/base>
-          #include <abstractions/fonts>
-          #include <abstractions/freedesktop.org>
-          #include <abstractions/ibus>
-          #include <abstractions/nameservice>
-          #include <abstractions/user-tmp>
-          #include <abstractions/X>
-          #include <abstractions/ssl_certs>
-          #include <abstractions/private-files-strict>
-
-          @{HOME}/{.local/share/applications,.config}/mimeapps.list r,
-
-          owner @{HOME}/.config/teams/** rwk,
-          owner @{HOME}/.config/Microsoft/Microsoft\ Teams/** rwk,
-          owner @{HOME}/.config/Microsoft/Microsoft\ Teams rwk,
-          owner @{HOME}/.cache/** rwk,
-          @{HOME}/Downloads/** rw,
-          @{HOME}/.local/share/.org.chromium.Chromium.* rw,
-          @{HOME}/** r,
-          @{HOME}/.pki/nssdb/** rwk,
-
-          # WHY DOES TEAMS DOWNLOAD TO HOME AND NOT DOWNLOADS
-          @{HOME}/* rw,
-
-          audit deny @{HOME}/{git,cfg,pkgs} rw,
-
-          /dev/video* mrw,
-          /dev/snd/* mr,
-
-          ${teams}/opt/teams/*.so* mr,
-
-          unix (send, receive, connect),
-
-          /dev/** r,
-          /dev/ r,
-          /dev/tty rw,
-          owner /dev/shm/* mrw,
-
-          @{PROC}/** r,
-          owner @{PROC}/*/setgroups w,
-          owner @{PROC}/*/gid_map rw,
-          owner @{PROC}/*/uid_map rw,
-          owner @{PROC}/*/oom_score_adj rw,
-          owner @{PROC}/*/fd/** rw,
-          @{PROC}/ r,
-          /sys/** r,
-
-          /etc/machine-id r,
-
-          /nix/store/*/lib/*.so* mr,
-          /nix/store/*/lib/**/*.so* mr,
-          /nix/store/** r,
-          /run/opengl-driver{,-32}/lib/*.so* mr,
-
-          ${teams}/** r,
-          ${teams}/**/*.node mr,
-          ${teams}/bin/* ix,
-          ${teams}/opt/teams/* ix,
-          ${glibc.bin}/bin/locale ix,
-          ${bashInteractive}/bin/bash ix,
-          capability sys_admin,
-          capability sys_chroot,
-          capability sys_ptrace,
-
-          ${xdg_utils}/bin/* Cx -> xdg_utils,
-
-          profile xdg_utils {
-            ${bash}/bin/bash rix,
-
-            ${gnugrep}/bin/{,e,f}grep ix,
-            ${coreutils}/bin/* ix,
-            ${gnused}/bin/sed ix,
-            ${dbus}/bin/dbus-send ix,
-            ${gawk}/bin/{,g}awk ix,
-            ${xdg_utils}/bin/* ix,
-            ${cpkgs.firefox-with-extensions}/bin/firefox Ux,
-
-            @{HOME}/.config/mimeapps.list r,
-            @{HOME}/.local/share/applications/mimeapps.list r,
-            @{HOME}/.local/share/applications/ r,
-
-            /nix/store/*/lib/*.so* mr,
-            /nix/store/*/lib/**/*.so* mr,
-            /nix/store/** r,
-
-            /dev/null rw,
-            /dev/tty rw,
-          }
-
-          /dev/null rw,
-
-          owner /tmp/** rw,
-        }
-      ''))
-      (with pkgs; writeText "discord" ''
-        #include <tunables/global>
-        ${discord}/bin/Discord {
-          #include <abstractions/audio>
-          #include <abstractions/base>
-          #include <abstractions/fonts>
-          #include <abstractions/freedesktop.org>
-          #include <abstractions/ibus>
-          #include <abstractions/nameservice>
-          #include <abstractions/user-tmp>
-          #include <abstractions/X>
-          #include <abstractions/ssl_certs>
-          #include <abstractions/private-files-strict>
-
-          owner @{HOME}/.config/discord/** rwk,
-          owner @{HOME}/.config/discord rk,
-          @{HOME}/.icons/** r,
-          @{HOME}/.pki/** r,
-          owner @{HOME}/.cache/** rwk,
-
-          /dev/video* mrw,
-          /dev/snd/* mr,
-
-          ${discord}/opt/Discord/*.so* mr,
-
-          /dev/** r,
-          /dev/ r,
-          owner /dev/shm/* mrw,
-
-          @{PROC}/** r,
-          owner @{PROC}/*/setgroups w,
-          owner @{PROC}/*/gid_map rw,
-          owner @{PROC}/*/uid_map rw,
-          owner @{PROC}/*/fd/** rw,
-          @{PROC}/ r,
-          /sys/** r,
-
-          /etc/machine-id r,
-
-          /nix/store/*/lib/*.so* mr,
-          /nix/store/*/lib/**/*.so* mr,
-          /nix/store/** r,
-          /run/opengl-driver{,-32}/lib/*.so* mr,
-
-          ${discord}/** r,
-          ${discord}/**/*.node mr,
-          ${discord}/bin/* ix,
-          ${discord}/opt/Discord/* ix,
-
-          /dev/null rw,
-
-          owner /tmp/** rw,
-        }
-      '')
-    ];
+    profiles = import ./apparmor.nix device pkgs;
   };
 
   programs.dconf.enable = true;
@@ -624,9 +460,6 @@ in {
         withWayland = true;
       };
     })
-    (self: super: {
-      auto-cpufreq = super.cpkgs.auto-cpufreq;
-    })
   ] ++ lib.optionals isDesktop [
     (self: super: {
       # OVMF = super.OVMF.overrideAttrs (old: {
@@ -642,8 +475,6 @@ in {
   services.udev.packages = mkDesktop [ pkgs.openrgb ];
   services.udev.extraRules = mkDesktop ''
     // The nari works with the steelseries arctis profile well
-    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051a", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
     ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051c", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
-    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051d", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
   '';
 }
