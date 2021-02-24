@@ -33,9 +33,5 @@
       fsType = "ext4";
     };
 
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/d902e72c-09ea-469c-849a-de6f30bc61da"; }
-    ];
-
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
 }
