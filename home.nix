@@ -47,7 +47,6 @@ in {
     libreoffice
     gimp
     bpytop
-    htop
     pavucontrol
     pulsemixer
 

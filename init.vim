@@ -106,10 +106,10 @@ require'nvim-treesitter.configs'.setup {
 }
 EOF
 
-let g:tex_flavor = 'latex'
+let g:tex_flavor             = 'latex'
 let g:vimtex_compiler_method = 'tectonic'
-let g:vimtex_view_method = 'zathura'
-let g:vimtex_quickfix_mode = 0
+let g:vimtex_view_method     = 'zathura'
+let g:vimtex_quickfix_mode   = 0
 
 let g:lion_squeeze_spaces = 1
 
@@ -196,8 +196,8 @@ nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
-nnoremap T :bprev<CR>
-nnoremap Y :bnext<CR>
+nnoremap <silent> T :bprev<CR>
+nnoremap <silent> Y :bnext<CR>
 
 nnoremap <C-u> :UndotreeToggle<CR>
 
@@ -222,5 +222,15 @@ augroup Buffer
   autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
 
-nmap f <Plug>(easymotion-f)
+nmap <Leader>j <Plug>(easymotion-j)
+nmap <Leader>k <Plug>(easymotion-k)
+nmap f <Plug>(easymotion-s)
 nmap w <Plug>(easymotion-w)
+nmap e <Plug>(easymotion-e)
+nmap b <Plug>(easymotion-b)
+
+augroup EasyMotion
+  autocmd!
+  autocmd User EasyMotionPromptBegin silent! CocDisable
+  autocmd User EasyMotionPromptEnd silent! CocEnable
+augroup END
