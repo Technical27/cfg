@@ -207,24 +207,19 @@ inoremap <silent><expr> <c-space> coc#refresh()
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
+fun! g:ClearSearch()
+  let @/ = ""
+endf
+
 nnoremap <silent><expr> <ESC> g:ClearSearch()
 
 " I will probably never record a macro
 nnoremap q <nop>
 
-fun! g:ClearSearch()
-  let @/ = ""
-endf
-
-fun g:CursorHold()
-  call CocActionAsync('highlight')
-  call g:ClearSearch()
-endf
-
 augroup Buffer
   autocmd!
   autocmd BufWritePre * call TrimWhitespace()
-  autocmd CursorHold * silent call g:CursorHold()
+  autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
 
 nmap <Leader>j <Plug>(easymotion-j)
