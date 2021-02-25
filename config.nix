@@ -402,6 +402,7 @@ in {
 
   security.pam.services = mkDesktop {
     i3lock.enableGnomeKeyring = true;
+    i3lock-color.enableGnomeKeyring = true;
     login.enableGnomeKeyring = true;
     lightdm.enableGnomeKeyring = true;
   };
