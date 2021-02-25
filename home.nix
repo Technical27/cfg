@@ -29,7 +29,7 @@ in {
     libnotify
     tldr
     imv
-    texlive.combined.scheme-basic
+    texlive.combined.scheme-small
     tectonic
     gcc
     jq
