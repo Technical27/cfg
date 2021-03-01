@@ -127,9 +127,10 @@ let g:EasyMotion_smartcase = 1
 
 let g:coc_fzf_opts = ['--color=16']
 
-function! Fzf_dev() abort
-  let s:fzf_command = 'rg --files --hidden --follow --glob "!{.git,build,node_modules,target}"'
-  let s:bat_command = 'bat --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * 0.4) - 2)
+function! g:ListFiles() abort
+  let s:fzf_height = 0.6
+  let s:fzf_command = 'rg --files --hidden --glob "!.git"'
+  let s:bat_command = 'bat --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * s:fzf_height) - 2)
 
   function! s:get_open_files() abort
     let l:buffers = map(filter(copy(getbufinfo()), 'v:val.listed'), 'v:val.name')
@@ -162,11 +163,11 @@ function! Fzf_dev() abort
     execute 'silent e' l:file_path
   endf
 
- call fzf#run({
-       \ 'source' : <sid>files(),
-       \ 'sink'   : function('s:edit_file'),
-       \ 'options': '--color 16 -m --preview "'.s:bat_command.'"',
-       \ 'down'   : '40%' })
+  call fzf#run({
+    \ 'source' : <sid>files(),
+    \ 'sink'   : function('s:edit_file'),
+    \ 'window' : { 'width': 0.9, 'height': s:fzf_height, 'highlight': 'Normal' },
+    \ 'options': '--color 16 -m --preview "'.s:bat_command.'"'})
 endf
 
 function! s:check_back_space() abort
@@ -202,7 +203,7 @@ nnoremap <silent> Y :bnext<CR>
 
 nnoremap <C-u> :UndotreeToggle<CR>
 
-nnoremap <silent> <C-p> :call Fzf_dev()<CR>
+nnoremap <C-p> :call g:ListFiles()<CR>
 
 inoremap <silent><expr> <c-space> coc#refresh()
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
