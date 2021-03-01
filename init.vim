@@ -236,3 +236,9 @@ augroup EasyMotion
   autocmd User EasyMotionPromptBegin silent! CocDisable
   autocmd User EasyMotionPromptEnd silent! CocEnable
 augroup END
+
+augroup Goyo
+  autocmd!
+  autocmd User GoyoEnter Limelight
+  autocmd User GoyoLeave Limelight!
+augroup END

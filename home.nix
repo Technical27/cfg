@@ -122,6 +122,8 @@ in {
       vimtex
       ultisnips
       nvim-treesitter
+      goyo-vim
+      limelight-vim
 
       # coc extensions
       coc-nvim
