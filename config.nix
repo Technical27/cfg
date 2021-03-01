@@ -453,9 +453,6 @@ in {
       neovim-unwrapped = super.cpkgs.neovim-unwrapped;
     })
     (self: super: {
-      usbmuxd = super.cpkgs.usbmuxd;
-    })
-    (self: super: {
       ibus = super.ibus.override {
         inherit (super) wayland libxkbcommon;
         withWayland = true;
