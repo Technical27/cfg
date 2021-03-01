@@ -25,4 +25,7 @@ pkgs: {
     command = "${pkgs.rnix-lsp}/bin/rnix-lsp";
     filetypes = [ "nix" ];
   };
+
+  "rust-analyzer.cargo.loadOutDirsFromCheck" = true;
+  "rust-analyzer.procMacro.enable" = true;
 }
