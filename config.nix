@@ -458,6 +458,12 @@ in {
         withWayland = true;
       };
     })
+    # temp fix for waybar
+    (self: super: {
+      waybar = super.waybar.overrideAttrs (old: {
+        patches = [ ./laptop/waybar.patch ];
+      });
+    })
   ] ++ lib.optionals isDesktop [
     (self: super: {
       # OVMF = super.OVMF.overrideAttrs (old: {
