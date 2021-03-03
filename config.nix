@@ -18,6 +18,10 @@ in {
       "ssh-ng://nix-ssh@${ip}?ssh-key=/home/aamaruvi/.ssh/id_rsa"
     ];
     requireSignedBinaryCaches = false;
+    gc = {
+      dates = "weekly";
+      automatic = true;
+    };
   };
 
   fileSystems = let
