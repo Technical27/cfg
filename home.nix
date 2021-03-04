@@ -84,6 +84,7 @@ in {
     olive-editor
     unityhub
     mumble
+    openscad
   ];
 
   xdg.mimeApps.enable = true;
