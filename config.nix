@@ -156,6 +156,10 @@ in {
       support32Bit = true;
     };
     jack.enable = true;
+    media-session.config.bluez-monitor.properties = {
+      "bluez5.msbc-support" = true;
+      "bluez5.sbc-xq-support" = true;
+    };
   };
   security.pam.loginLimits = [
     {

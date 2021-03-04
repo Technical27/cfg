@@ -49,6 +49,8 @@ in {
     bpytop
     pavucontrol
     pulsemixer
+    pulseeffects-pw
+    (cadence.override { libjack2 = pipewire.jack; })
 
     # read files from phone
     libimobiledevice
@@ -82,6 +84,7 @@ in {
     olive-editor
     unityhub
     mumble
+    openscad
   ];
 
   xdg.mimeApps.enable = true;
