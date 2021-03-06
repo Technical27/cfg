@@ -156,7 +156,7 @@ in {
       support32Bit = true;
     };
     jack.enable = true;
-    media-session.config.bluez-monitor.properties = {
+    media-session.config.bluez-monitor.properties = mkLaptop {
       "bluez5.msbc-support" = true;
       "bluez5.sbc-xq-support" = true;
     };
@@ -210,7 +210,7 @@ in {
     args = [ "-f" "/etc/bluetooth/main.conf" ]
       ++ optional hasDisabledPlugins
       "--noplugin=${concatStringsSep "," cfg.disabledPlugins}";
-  in [
+  in mkLaptop [
     ""
     "${package}/libexec/bluetooth/bluetoothd ${escapeShellArgs args}"
   ];
