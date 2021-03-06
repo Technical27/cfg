@@ -85,6 +85,7 @@ in {
     unityhub
     mumble
     openscad
+    (freecad.override { spaceNavSupport = false; })
   ];
 
   xdg.mimeApps.enable = true;
