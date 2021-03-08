@@ -51,6 +51,8 @@ in {
     pulsemixer
     pulseeffects-pw
     (cadence.override { libjack2 = pipewire.jack; })
+    openscad
+    freecad
 
     # read files from phone
     libimobiledevice
@@ -84,8 +86,6 @@ in {
     olive-editor
     unityhub
     mumble
-    openscad
-    (freecad.override { spaceNavSupport = false; })
   ];
 
   xdg.mimeApps.enable = true;
