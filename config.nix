@@ -458,9 +458,9 @@ in {
 
   nixpkgs.overlays = [
     (self: super: {
-      freecad = super.freecad.overrideAttrs (old: {
+      freecad = (super.freecad.overrideAttrs (old: {
         buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
-      }).override { spaceNavSupport = false; };
+      })).override { spaceNavSupport = false; };
     })
     (self: super: {
       neovim-unwrapped = super.cpkgs.neovim-unwrapped;
