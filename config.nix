@@ -224,7 +224,7 @@ in {
     description = "automatically change theme";
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/theme2/main.py' /home/aamaruvi/git/theme2/shell.nix";
+      ExecStart = "${cpkgs.theme}/bin/theme";
     };
   };
 
