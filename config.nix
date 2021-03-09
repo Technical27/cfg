@@ -224,8 +224,10 @@ in {
     description = "automatically change theme";
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${cpkgs.theme}/bin/theme";
+      ExecStart = "${pkgs.cpkgs.theme}/bin/theme";
     };
+    path = [ pkgs.glib ];
+    environment.XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}";
   };
 
   systemd.user.timers.auto-theme = mkLaptop {
