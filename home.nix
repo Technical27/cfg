@@ -115,11 +115,10 @@ in {
       gruvbox-community
       undotree
       vim-fugitive
+      vim-surround
       vim-snippets
       vim-lastplace
-      vim-sensible
       lexima-vim
-      vim-move
       commentary
       vim-lion
       vim-easymotion
