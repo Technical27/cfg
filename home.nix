@@ -434,11 +434,7 @@ in {
           notification = false;
         }
         {
-          command = "systemctl restart --user polybar";
-          notification = false;
-        }
-        {
-          command = "i3-msg 'workspace number 1'";
+          command = "${cpkgs.polybar}/bin/polybar main";
           notification = false;
         }
         {
@@ -555,8 +551,8 @@ in {
         interval = 600;
       };
     };
-    script = "polybar main &";
   };
+  systemd.user.services.polybar = lib.mkForce {};
 
   programs.waybar = mkLaptop {
     enable = true;
