@@ -53,14 +53,9 @@ in {
 
   boot.loader.systemd-boot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = []
-    ++ (lib.optionals isLaptop [
-      "resume_offset=18382314"
-    ])
-    ++ (lib.optionals isDesktop [
-      "intel_iommu=on"
-      "kvm.ignore_msrs=1"
-    ]);
+  boot.kernelParams = mkLaptop [
+    "resume_offset=18382314"
+  ];
 
   boot.kernel.sysctl = lib.recursiveUpdate
   (mkDesktop {
@@ -404,28 +399,8 @@ in {
     lightdm.enableGnomeKeyring = true;
   };
 
-  virtualisation.libvirtd = mkDesktop {
-    enable = true;
-    qemuOvmf = true;
-    qemuPackage = pkgs.qemu_kvm;
-    onBoot = "ignore";
-    onShutdown = "shutdown";
-  };
-
-  systemd.services.libvirtd.path = with pkgs; mkDesktop [
-    kmod killall bash coreutils config.boot.kernelPackages.cpupower
-  ];
-
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  # boot.kernelPatches = lib.recursiveUpdate (mkDesktop [
-  #   (mkPatch "openrgb")
-  #   # (mkPatch "rdtsc")
-  #   (mkPatch "fsync")
-  # ]) (mkLaptop [{
-  #   name = "fix-btusb-msbc";
-  #   patch = ./laptop/bt-alt-setting-1.patch;
-  # }]);
   boot.kernelPatches = mkDesktop [
     (mkPatch "openrgb")
     (mkPatch "fsync")
@@ -465,16 +440,6 @@ in {
       waybar = super.waybar.overrideAttrs (old: {
         patches = [ ./laptop/waybar.patch ];
       });
-    })
-  ] ++ lib.optionals isDesktop [
-    (self: super: {
-      # OVMF = super.OVMF.overrideAttrs (old: {
-      #   patches = [ ./desktop/ovmf.patch ];
-      # });
-      # qemu_kvm = super.qemu_kvm.overrideAttrs (old: {
-      #   patches = [ ./desktop/qemu.patch ] ++ old.patches;
-      #   enableParallelBuilding = false;
-      # });
     })
   ];
 
