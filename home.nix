@@ -490,7 +490,7 @@ in {
     enable = true;
     settings = {
       global = {
-        geometry = "0x0-10+38";
+        geometry = "0x20-10+38";
         font = "13:JetBrainsMono Nerd Font Mono";
         padding = 10;
         horizontal_padding = 10;
