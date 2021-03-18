@@ -197,7 +197,7 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-nmap <silent> gc <Plug>(coc-rename)
+nmap <silent> gw <Plug>(coc-rename)
 
 nnoremap <silent> T :bprev<CR>
 nnoremap <silent> Y :bnext<CR>
