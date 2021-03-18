@@ -107,7 +107,7 @@ in {
 
   programs.neovim = {
     enable = true;
-    package = pkgs.cpkgs.neovim-nightly;
+    package = pkgs.neovim-nightly;
     plugins = with pkgs.vimPlugins; [
       vim-airline
       vim-devicons
