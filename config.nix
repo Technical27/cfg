@@ -427,9 +427,6 @@ in {
       })).override { spaceNavSupport = false; };
     })
     (self: super: {
-      neovim-unwrapped = super.cpkgs.neovim-unwrapped;
-    })
-    (self: super: {
       ibus = super.ibus.override {
         inherit (super) wayland libxkbcommon;
         withWayland = true;

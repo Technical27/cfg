@@ -4,11 +4,13 @@
     nixos-hardware.url = "github:nixos/nixos-hardware";
     cpkgs.url = "github:technical27/pkgs";
     home-manager.url = "github:nix-community/home-manager";
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
   };
-  outputs = { self, nixpkgs, cpkgs, nixos-hardware, home-manager }: let
+  outputs = { self, nixpkgs, cpkgs, nixos-hardware, home-manager, neovim-nightly-overlay }: let
     mkSystem = device: extraModules: (nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
+        ({ nixpkgs.overlays = [ neovim-nightly-overlay.overlay ]; })
         (./. + "/${device}/hardware-configuration.nix")
         (import ./config.nix device)
         cpkgs.nixosModule

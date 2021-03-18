@@ -107,6 +107,7 @@ in {
 
   programs.neovim = {
     enable = true;
+    package = pkgs.cpkgs.neovim-nightly;
     plugins = with pkgs.vimPlugins; [
       vim-airline
       vim-devicons
@@ -367,18 +368,18 @@ in {
         }
       ];
       keybindings = let
-        pmixer = "exec ${pkgs.pulsemixer}/bin/pulsemixer --max-volume 100";
-        brctl = "exec brightnessctl set";
+        pmixer = str: "exec ${pkgs.pulsemixer}/bin/pulsemixer --max-volume 100 ${str}";
+        brctl = str: "exec brightnessctl set ${str}";
       in lib.mkOptionDefault {
-        "XF86AudioRaiseVolume"  = "${pmixer} --unmute --change-volume +10";
-        "XF86AudioLowerVolume"  = "${pmixer} --unmute --change-volume -10";
-        "XF86AudioMute"         = "${pmixer} --toggle-mute";
+        "XF86AudioRaiseVolume"  = pmixer "--unmute --change-volume +10";
+        "XF86AudioLowerVolume"  = pmixer "--unmute --change-volume -10";
+        "XF86AudioMute"         = pmixer "--toggle-mute";
 
         "Mod4+s" = "nop";
         "Mod4+w" = "nop";
 
-        "XF86MonBrightnessUp"   = "${brctl} 10%+";
-        "XF86MonBrightnessDown" = "${brctl} 10%-";
+        "XF86MonBrightnessUp"   = brctl "10%+";
+        "XF86MonBrightnessDown" = brctl "10%-";
 
         "Mod4+e" = "exec firefox";
         "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
