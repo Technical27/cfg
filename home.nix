@@ -77,7 +77,7 @@ in {
     cpkgs.gruvbox-light-theme
     cpkgs.gruvbox-light-icons
   ] ++ lib.optionals isDesktop [
-    lutris
+    (lutris.override { steamSupport = false; })
     razergenie
     virt-manager
     openrgb
