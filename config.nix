@@ -53,9 +53,15 @@ in {
 
   boot.loader.systemd-boot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = mkLaptop [
+  boot.kernelParams = []
+  ++ (lib.optionals isLaptop [
     "resume_offset=18382314"
-  ];
+  ])
+  ++ (lib.optionals isDesktop [
+    "intel_iommu=on"
+    "kvm.ignore_msrs=1"
+    "kvm_intel.nested=1"
+  ]);
 
   boot.kernel.sysctl = lib.recursiveUpdate
   (mkDesktop {
@@ -362,6 +368,19 @@ in {
   services.fstrim.enable = isDesktop;
   programs.java.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
+
+  virtualisation.libvirtd = mkDesktop {
+    enable = true;
+    qemuOvmf = true;
+    qemuPackage = pkgs.qemu_kvm;
+    onBoot = "ignore";
+    onShutdown = "shutdown";
+  };
+
+  systemd.services.libvirtd.path = with pkgs; mkDesktop [
+    kmod killall bash coreutils config.boot.kernelPackages.cpupower
+  ];
+
 
   networking.firewall.enable = isDesktop;
   systemd.network.networks."00-ethernet" = mkDesktop {

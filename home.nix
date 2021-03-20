@@ -86,6 +86,7 @@ in {
     olive-editor
     unityhub
     mumble
+    libguestfs
   ];
 
   xdg.mimeApps.enable = true;
