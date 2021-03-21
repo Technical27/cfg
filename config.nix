@@ -382,7 +382,10 @@ in {
   ];
 
 
-  networking.firewall.enable = isDesktop;
+  networking.firewall = mkDesktop {
+    enable = true;
+    allowedTCPPorts = [ 22 ];
+  };
   systemd.network.networks."00-ethernet" = mkDesktop {
     name = "eno1";
     DHCP = "yes";
@@ -434,7 +437,7 @@ in {
       Type = "oneshot";
       ExecStart = [
         "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
-        "${pkgs.openrgb}/bin/openrgb -d 1,2 -m breathing -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 1 -d 2 -m breathing -c FF0000"
       ];
     };
   };
