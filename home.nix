@@ -563,7 +563,6 @@ in {
       layer = "top";
       position = "top";
       height = 30;
-      output = [ "eDP-1" ];
       modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
       modules-right = [ "idle_inhibitor" "custom/nixos" "network" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
       modules = {
