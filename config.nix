@@ -437,7 +437,8 @@ in {
       Type = "oneshot";
       ExecStart = [
         "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
-        "${pkgs.openrgb}/bin/openrgb -d 1 -d 2 -m breathing -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 2 -m breathing -c FF0000"
       ];
     };
   };
@@ -458,6 +459,15 @@ in {
     (self: super: {
       waybar = super.waybar.overrideAttrs (old: {
         patches = [ ./laptop/waybar.patch ];
+      });
+    })
+    (self: super: {
+      discord = super.discord.overrideAttrs (old: rec {
+        version = "0.0.14";
+        src = super.fetchurl {
+          url = "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
+          sha256 = "1rq490fdl5pinhxk8lkfcfmfq7apj79jzf3m14yql1rc9gpilrf2";
+        };
       });
     })
   ];
