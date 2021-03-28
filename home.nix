@@ -558,6 +558,7 @@ in {
 
   programs.waybar = mkLaptop {
     enable = true;
+    package = pkgs.cpkgs.waybar;
     style = builtins.readFile ./laptop/style.css;
     settings = [{
       layer = "top";

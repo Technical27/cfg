@@ -455,12 +455,6 @@ in {
         withWayland = true;
       };
     })
-    # temp fix for waybar
-    (self: super: {
-      waybar = super.waybar.overrideAttrs (old: {
-        patches = [ ./laptop/waybar.patch ];
-      });
-    })
     (self: super: {
       discord = super.discord.overrideAttrs (old: rec {
         version = "0.0.14";
