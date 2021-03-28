@@ -42,7 +42,6 @@ in {
     killall
     nix-index
     neofetch
-    cpkgs.steam
     jump
     libreoffice
     gimp

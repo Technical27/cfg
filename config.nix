@@ -97,6 +97,8 @@ in {
       libvdpau-va-gl
     ];
   };
+  programs.steam.enable = true;
+
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true;
 
