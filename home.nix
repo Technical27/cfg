@@ -143,7 +143,7 @@ in {
       coc-tsserver
       coc-tabnine
       coc-eslint
-      cpkgs.vim.context-vim
+      nvim-treesitter-context
     ];
     withNodeJs = true;
     withPython3 = true;
