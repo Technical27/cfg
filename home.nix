@@ -339,7 +339,7 @@ in {
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
+      bars = [{ command = "${pkgs.cpkgs.waybar}/bin/waybar"; }];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
         swayidle = "${pkgs.swayidle}/bin/swayidle";
