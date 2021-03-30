@@ -328,10 +328,12 @@ in {
     systemdIntegration = false;
 
     config = {
-      output."eDP-1" = {
-        scale = "2";
-        bg = "~/Pictures/wallpaper.png fill";
-        subpixel = "rgb";
+      output = {
+        "eDP-1" = {
+          scale = "2";
+          subpixel = "rgb";
+        };
+        "*".bg = "~/Pictures/wallpaper.png fill";
       };
       input = {
         "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" = {
@@ -346,7 +348,7 @@ in {
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [{ command = "${pkgs.cpkgs.waybar}/bin/waybar"; }];
+      bars = [{ command = "${cpkgs.waybar}/bin/waybar"; }];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
         swayidle = "${pkgs.swayidle}/bin/swayidle";
@@ -564,7 +566,7 @@ in {
 
   programs.waybar = mkLaptop {
     enable = true;
-    package = pkgs.cpkgs.waybar;
+    package = cpkgs.waybar;
     style = builtins.readFile ./laptop/style.css;
     settings = [{
       layer = "top";
