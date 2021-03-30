@@ -216,7 +216,7 @@ in {
       Type = "oneshot";
       ExecStart = "${pkgs.cpkgs.theme}/bin/theme";
     };
-    path = [ pkgs.glib ];
+    path = with pkgs; [ glib sway ];
     environment.XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}";
   };
 
@@ -232,12 +232,11 @@ in {
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
-    after = [ "network.target" "pipewire-pulse.socket" ];
-    wantedBy = [ "graphical-session.target" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
     };
+    wantedBy = [ "graphical-session.target" ];
   };
 
   systemd.user.services.sway = mkLaptop {

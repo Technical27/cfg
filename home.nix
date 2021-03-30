@@ -53,6 +53,9 @@ in {
     openscad
     freecad
 
+    # set thermal modes
+    libsmbios
+
     # read files from phone
     libimobiledevice
     ifuse
@@ -103,6 +106,10 @@ in {
   xdg.configFile = {
     "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
+    "kitty/gruvbox-dark.conf" = mkLaptop { source = ./laptop/gruvbox-dark.conf; };
+    "kitty/gruvbox-light.conf" = mkLaptop { source = ./laptop/gruvbox-light.conf; };
+    "waybar/gruvbox-dark.css" = mkLaptop { source = ./laptop/gruvbox-dark.css; };
+    "waybar/gruvbox-light.css" = mkLaptop { source = ./laptop/gruvbox-light.css; };
   };
 
   programs.neovim = {
