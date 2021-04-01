@@ -51,7 +51,7 @@ in {
     pulseeffects-pw
     (cadence.override { libjack2 = pipewire.jack; })
     openscad
-    freecad
+    # freecad
 
     # set thermal modes
     libsmbios
