@@ -427,6 +427,8 @@ in {
   boot.kernelPatches = mkDesktop [
     (mkPatch "openrgb")
     (mkPatch "fsync")
+    (mkPatch "futex2")
+    (mkPatch "winesync")
   ];
 
   systemd.user.services.rgb-restore = mkDesktop {
