@@ -39,6 +39,8 @@ in {
     discord
     multimc
     cpkgs.lunar-client
+    cpkgs.mangohud
+    cpkgs.mangohud_32
     killall
     nix-index
     neofetch
