@@ -106,10 +106,12 @@ in {
   xdg.configFile = {
     "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
-    "kitty/gruvbox-dark.conf" = mkLaptop { source = ./laptop/gruvbox-dark.conf; };
-    "kitty/gruvbox-light.conf" = mkLaptop { source = ./laptop/gruvbox-light.conf; };
-    "waybar/gruvbox-dark.css" = mkLaptop { source = ./laptop/gruvbox-dark.css; };
-    "waybar/gruvbox-light.css" = mkLaptop { source = ./laptop/gruvbox-light.css; };
+    "kitty/gruvbox-dark.conf" = mkLaptop { source = ./laptop/kitty/gruvbox-dark.conf; };
+    "kitty/gruvbox-light.conf" = mkLaptop { source = ./laptop/kitty/gruvbox-light.conf; };
+    "waybar/gruvbox-dark.css" = mkLaptop { source = ./laptop/waybar/gruvbox-dark.css; };
+    "waybar/gruvbox-light.css" = mkLaptop { source = ./laptop/waybar/gruvbox-light.css; };
+    "zathura/gruvbox-dark.conf".source = ./laptop/zathura/gruvbox-dark.conf;
+    "zathura/gruvbox-light.conf".source = ./laptop/zathura/gruvbox-light.conf;
   };
 
   programs.neovim = {
@@ -168,20 +170,10 @@ in {
     enable = true;
     options = {
       font = "'JetBrains Mono NerdFont' 13";
-      default-bg = "#282828";
-      default-fg = "#ebdbb2";
-      statusbar-bg = "#282828";
-      statusbar-fg = "#ebdbb2";
-      completion-bg = "#282828";
-      completion-fg = "#ebdbb2";
-      completion-group-bg = "#282828";
-      completion-group-fg = "#ebdbb2";
-      highlight-color = "#8ec07c";
-      inputbar-bg = "#282828";
-      inputbar-fg = "#ebdbb2";
       statusbar-home-tilde = true;
       window-title-home-tilde = true;
     };
+    extraConfig = "include style.conf";
   };
 
   programs.mako = mkLaptop {
@@ -567,7 +559,7 @@ in {
   programs.waybar = mkLaptop {
     enable = true;
     package = cpkgs.waybar;
-    style = builtins.readFile ./laptop/style.css;
+    style = builtins.readFile ./laptop/waybar/style.css;
     settings = [{
       layer = "top";
       position = "top";
