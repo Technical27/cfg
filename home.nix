@@ -107,13 +107,14 @@ in {
 
   xdg.configFile = {
     "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
+    "kitty/gruvbox-dark.conf".source = ./themes/kitty/gruvbox-dark.conf;
+    "kitty/gruvbox-light.conf".source = ./themes/kitty/gruvbox-light.conf;
+    "zathura/gruvbox-dark.conf".source = ./themes/zathura/gruvbox-dark.conf;
+    "zathura/gruvbox-light.conf".source = ./themes/zathura/gruvbox-light.conf;
+
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
-    "kitty/gruvbox-dark.conf" = mkLaptop { source = ./laptop/kitty/gruvbox-dark.conf; };
-    "kitty/gruvbox-light.conf" = mkLaptop { source = ./laptop/kitty/gruvbox-light.conf; };
-    "waybar/gruvbox-dark.css" = mkLaptop { source = ./laptop/waybar/gruvbox-dark.css; };
-    "waybar/gruvbox-light.css" = mkLaptop { source = ./laptop/waybar/gruvbox-light.css; };
-    "zathura/gruvbox-dark.conf".source = ./laptop/zathura/gruvbox-dark.conf;
-    "zathura/gruvbox-light.conf".source = ./laptop/zathura/gruvbox-light.conf;
+    "waybar/gruvbox-dark.css" = mkLaptop { source = ./themes/waybar/gruvbox-dark.css; };
+    "waybar/gruvbox-light.css" = mkLaptop { source = ./themes/waybar/gruvbox-light.css; };
   };
 
   programs.neovim = {
@@ -219,14 +220,7 @@ in {
     };
   };
 
-  services.gammastep = mkLaptop {
-    enable = true;
-    latitude = "33.748";
-    longitude = "-84.387";
-    temperature.night = 4500;
-  };
-
-  services.redshift = mkDesktop {
+  services."${if isLaptop then "gammastep" else "redshift"}" = {
     enable = true;
     latitude = "33.748";
     longitude = "-84.387";
@@ -467,8 +461,6 @@ in {
         "Mod4+Shift+l" = "move right";
 
         "Mod4+Shift+r" = "exec i3-nagbar -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
-
-        "Mod4+Shift+v" = "exec i3-nagbar -t warning -m 'Start Windows VM?' -b 'Yes, start' 'pkexec virsh start win10'";
       };
       modes.resize = {
         "h" = "resize shrink width 10 px";
@@ -561,7 +553,7 @@ in {
   programs.waybar = mkLaptop {
     enable = true;
     package = cpkgs.waybar;
-    style = builtins.readFile ./laptop/waybar/style.css;
+    style = builtins.readFile ./themes/waybar/style.css;
     settings = [{
       layer = "top";
       position = "top";
