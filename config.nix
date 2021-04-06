@@ -459,12 +459,13 @@ in {
       };
     })
     (self: super: {
-      discord = super.discord.overrideAttrs (old: rec {
+      gnome3.tracker = super.gnome3.tracker.overrideAttrs (old: rec {
         version = "0.0.14";
         src = super.fetchurl {
-          url = "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
-          sha256 = "1rq490fdl5pinhxk8lkfcfmfq7apj79jzf3m14yql1rc9gpilrf2";
+          url = "mirror://gnome/sources/${old.pname}/${lib.versions.majorMinor old.version}/${old.pname}-${old.version}.tar.xz";
+          sha256 = "sha256-Q3bi6YRUBm9E96JC5FuZs7/kwDtn+rGauw7Vhsp0iuc=";
         };
+        doCheck = false;
       });
     })
   ];
