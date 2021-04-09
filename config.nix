@@ -461,12 +461,8 @@ in {
     (self: super: {
       gnome3 = super.gnome3.overrideScope' (self: super: {
         tracker = self.tracker.overrideAttrs (old: rec {
-          version = "0.0.14";
-          src = super.fetchurl {
-            url = "mirror://gnome/sources/${old.pname}/${lib.versions.majorMinor old.version}/${old.pname}-${old.version}.tar.xz";
-            sha256 = "sha256-Q3bi6YRUBm9E96JC5FuZs7/kwDtn+rGauw7Vhsp0iuc=";
-          };
-          doCheck = false;
+          doCheck = !super.stdenv.isi686;
+          enableParallellBuilding = !super.stdenv.isi686;
         });
       });
     })
