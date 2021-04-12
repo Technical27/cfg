@@ -470,7 +470,7 @@ in {
         cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
           name = "${old.pname}-${version}-vendor.tar.gz";
           inherit src;
-          outputHash = "sha256-7QxQ97+gI169gfC0SjeQ7oX53QwEYVYxZ7Gv6lDp18g=";
+          outputHash = "sha256-qYm4Qk+4hwQtQr4cjSxzxX7w7P6IrHqet5IZ6C0n9tk=";
         });
       });
     })
