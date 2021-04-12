@@ -468,7 +468,7 @@ in {
           sha256 = "0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
         };
         cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
-          name = "${old.pname}-${version}-vendor";
+          name = "${old.pname}-${version}-vendor.tar.gz";
           inherit src;
           outputHash = "sha256-7QxQ97+gI169gfC0SjeQ7oX53QwEYVYxZ7Gv6lDp18g=";
         });
