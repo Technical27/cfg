@@ -465,9 +465,9 @@ in {
           owner = "nix-community";
           repo = old.pname;
           rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
-          sha256 = "sha256:0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
+          sha256 = "0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
         };
-        cargoSha256 = "sha256:1ngn4wnyh6cjnyg7mb48zvng0zn5fcn8s75y88nh91xq9x1bi2d9";
+        cargoSha256 = "0000000000000000000000000000000000000000000000000000";
       });
     })
   ];
