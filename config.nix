@@ -470,7 +470,7 @@ in {
         cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
           name = "${old.pname}-${version}-vendor";
           inherit src;
-          outputHash = "0000000000000000000000000000000000000000000000000000";
+          outputHash = "sha256-7QxQ97+gI169gfC0SjeQ7oX53QwEYVYxZ7Gv6lDp18g=";
         });
       });
     })
