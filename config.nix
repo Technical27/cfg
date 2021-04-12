@@ -460,7 +460,7 @@ in {
     })
     (self: super: {
       lorri = super.lorri.overrideAttrs (old: {
-        src = fetchFromGitHub {
+        src = super.fetchFromGitHub {
           owner = "nix-community";
           repo = old.pname;
           rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
