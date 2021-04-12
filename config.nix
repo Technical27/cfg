@@ -459,7 +459,7 @@ in {
       };
     })
     (self: super: {
-      lorri = super.lorri.overrideAttrs (old: {
+      lorri = super.lorri.overrideAttrs (old: rec {
         version = "1.4.0";
         src = super.fetchFromGitHub {
           owner = "nix-community";
@@ -467,7 +467,11 @@ in {
           rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
           sha256 = "0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
         };
-        cargoSha256 = "0000000000000000000000000000000000000000000000000000";
+        cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
+          name = "${old.pname}-${version}-vendor";
+          inherit src;
+          outputHash = "0000000000000000000000000000000000000000000000000000";
+        });
       });
     })
   ];
