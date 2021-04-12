@@ -450,7 +450,7 @@ in {
     (self: super: {
       freecad = (super.freecad.overrideAttrs (old: {
         buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
-      })).override { spaceNavSupport = false; };
+      }));
     })
     (self: super: {
       ibus = super.ibus.override {
@@ -459,11 +459,14 @@ in {
       };
     })
     (self: super: {
-      gnome3 = super.gnome3.overrideScope' (self: super: {
-        tracker = self.tracker.overrideAttrs (old: rec {
-          doCheck = !super.stdenv.isi686;
-          enableParallellBuilding = !super.stdenv.isi686;
-        });
+      lorri = super.lorri.overrideAttrs (old: {
+        src = fetchFromGitHub {
+          owner = "nix-community";
+          repo = old.pname;
+          rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
+          sha256 = "sha256:0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
+        };
+        cargoSha256 = "sha256:1ngn4wnyh6cjnyg7mb48zvng0zn5fcn8s75y88nh91xq9x1bi2d9";
       });
     })
   ];
