@@ -185,8 +185,8 @@ in {
   services.earlyoom.enable = true;
 
   i18n.inputMethod = {
-    enabled = "ibus";
-    ibus.engines = [ pkgs.ibus-engines.m17n ];
+    enabled = "fcitx5";
+    fcitx5.addons = [ pkgs.cpkgs.fcitx5-m17n ];
   };
 
   # Laptop specific things
@@ -345,15 +345,15 @@ in {
     networkConfig.DNSDefaultRoute = "no";
   };
 
-  xdg.portal = mkLaptop {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-wlr
-      xdg-desktop-portal-gtk
-    ];
-    gtkUsePortal = true;
-  };
-  services.flatpak.enable = isLaptop;
+  # xdg.portal = mkLaptop {
+  #   enable = true;
+  #   extraPortals = with pkgs; [
+  #     xdg-desktop-portal-wlr
+  #     xdg-desktop-portal-gtk
+  #   ];
+  #   gtkUsePortal = true;
+  # };
+  # services.flatpak.enable = isLaptop;
 
   environment.systemPackages = with pkgs; mkLaptop [
     wireguard
@@ -452,28 +452,28 @@ in {
         buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
       }));
     })
-    (self: super: {
-      ibus = super.ibus.override {
-        inherit (super) wayland libxkbcommon;
-        withWayland = true;
-      };
-    })
-    (self: super: {
-      lorri = super.lorri.overrideAttrs (old: rec {
-        version = "1.4.0";
-        src = super.fetchFromGitHub {
-          owner = "nix-community";
-          repo = old.pname;
-          rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
-          sha256 = "0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
-        };
-        cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
-          name = "${old.pname}-${version}-vendor.tar.gz";
-          inherit src;
-          outputHash = "sha256-qYm4Qk+4hwQtQr4cjSxzxX7w7P6IrHqet5IZ6C0n9tk=";
-        });
-      });
-    })
+    # (self: super: {
+    #   ibus = super.ibus.override {
+    #     inherit (super) wayland libxkbcommon;
+    #     withWayland = true;
+    #   };
+    # })
+    # (self: super: {
+    #   lorri = super.lorri.overrideAttrs (old: rec {
+    #     version = "1.4.0";
+    #     src = super.fetchFromGitHub {
+    #       owner = "nix-community";
+    #       repo = old.pname;
+    #       rev = "fee4ffac9ee16fc921d413789cc059b043f2db3d";
+    #       sha256 = "0ix0k85ywlvkxsampajkq521d290gb0n60qwhnk6j0sc55yn558h";
+    #     };
+    #     cargoDeps = old.cargoDeps.overrideAttrs (super.lib.const {
+    #       name = "${old.pname}-${version}-vendor.tar.gz";
+    #       inherit src;
+    #       outputHash = "sha256-qYm4Qk+4hwQtQr4cjSxzxX7w7P6IrHqet5IZ6C0n9tk=";
+    #     });
+    #   });
+    # })
   ];
 
   services.udev.packages = mkDesktop [ pkgs.openrgb ];

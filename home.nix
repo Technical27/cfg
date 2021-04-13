@@ -61,10 +61,6 @@ in {
     # read files from phone
     libimobiledevice
     ifuse
-
-    # for some reason ibus needs this.
-    # Hopefully when Input Method v2 gets implemented, this won't be needed anymore.
-    xorg.setxkbmap
     # get libreoffice spellchecking
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
@@ -361,7 +357,7 @@ in {
           command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
         }
         {
-          command = "ibus-daemon -drx";
+          command = "fcitx5";
         }
       ];
       keybindings = let
