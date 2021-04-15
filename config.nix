@@ -424,12 +424,12 @@ in {
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = mkDesktop [
-    (mkPatch "openrgb")
-    (mkPatch "fsync")
-    (mkPatch "futex2")
-    (mkPatch "winesync")
-  ];
+  boot.kernelPatches = mkDesktop (builtins.map mkPatch [
+    "openrgb"
+    "fsync"
+    "futex2"
+    "winesync"
+  ]);
 
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";
