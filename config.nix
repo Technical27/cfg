@@ -106,17 +106,12 @@ in {
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableAllFirmware = true;
 
-  environment.variables = lib.recursiveUpdate
-    (if isLaptop then {
-    } else {
-      MOZ_X11_EGL = "1";
-      __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
-    })
-    ({
-      EDITOR = "nvim";
-      VISUAL = "nvim";
-      MOZ_USE_XINPUT2 = "1";
-    });
+  environment.variables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+    MOZ_USE_XINPUT2 = "1";
+    MOZ_X11_EGL = "1";
+  };
 
   services.gnome3.gnome-keyring.enable = true;
   services.printing.enable = true;
@@ -203,6 +198,8 @@ in {
   systemd.user.services.telephony_client.enable = false;
 
   powerManagement.enable = isLaptop;
+
+  programs.sway.enable = isLaptop;
 
   networking.wireless.iwd.enable = isLaptop;
   networking.hosts."10.200.200.1" = mkLaptop [ "yogs.tech" ];
@@ -358,7 +355,6 @@ in {
     polkit_gnome
 
     cpkgs.wgvpn
-    cpkgs.startsway
   ];
 
   # Desktop specific things

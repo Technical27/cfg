@@ -53,7 +53,7 @@ in {
     pulseeffects-pw
     (cadence.override { libjack2 = pipewire.jack; })
     openscad
-    # freecad
+    freecad
 
     # set thermal modes
     libsmbios
@@ -348,7 +348,7 @@ in {
       bars = [{ command = "${cpkgs.waybar}/bin/waybar"; }];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
-        swaylock = "swaylock --daemonize --screenshots --clock --fade-in 0.2 --effect-blur 7x5";
+        swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
       in [
         {
           command = ''
@@ -376,7 +376,7 @@ in {
         }
       ];
       keybindings = let
-        pmixer = str: "exec ${pkgs.pulsemixer}/bin/pulsemixer --max-volume 100 ${str}";
+        pmixer = str: "exec pulsemixer --max-volume 100 ${str}";
         brctl = str: "exec brightnessctl set ${str}";
       in lib.mkOptionDefault {
         "XF86AudioRaiseVolume"  = pmixer "--unmute --change-volume +10";
@@ -413,7 +413,7 @@ in {
   programs.rofi = mkDesktop {
     enable = true;
     font = "JetBrainsMono Nerd Font Mono 13";
-    terminal = "${pkgs.kitty}/bin/kitty";
+    terminal = "kitty";
   };
 
   xsession.windowManager.i3 = mkDesktop {
@@ -425,7 +425,7 @@ in {
     config = {
       fonts = [ "JetBrainsMono Nerd Font Mono" ];
       modifier = "Mod4";
-      menu = "${pkgs.rofi}/bin/rofi -show drun";
+      menu = "rofi -show drun";
       gaps.inner = 10;
       startup = [
         {
