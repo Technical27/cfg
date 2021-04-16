@@ -89,6 +89,7 @@ in {
     unityhub
     mumble
     libguestfs
+    scrot
   ];
 
   xdg.mimeApps.enable = true;
@@ -488,7 +489,10 @@ in {
         "Return" = "mode default";
       };
       bars = [];
-      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
+      floating.criteria = [
+        { title = "^Firefox — Sharing Indicator$"; }
+        { instance = "origin.exe"; }
+      ];
     };
   };
 
