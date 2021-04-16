@@ -67,6 +67,8 @@ in {
     libsmbios
     #sway stuff
     sway-contrib.grimshot
+    swaylock-effects
+    swayidle
     wofi
     brightnessctl
     wl-clipboard
@@ -302,14 +304,25 @@ in {
   };
 
   wayland.windowManager.sway = mkLaptop {
-    package = lib.mkForce null;
     enable = true;
+    extraSessionCommands = ''
+      export _JAVA_AWT_WM_NONREPARENTING=1
+      export LIBVA_DRIVER_NAME=i965
+      export MOZ_ENABLE_WAYLAND=1
+      export XDG_SESSION_TYPE=wayland
+      export XDG_CURRENT_DESKTOP=sway
+      export QT_QPA_PLATFORM=wayland-egl
+      export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+    '';
     extraConfig = ''
       seat seat0 xcursor_theme WhiteSur-cursors 48
       default_border none
     '';
-    wrapperFeatures.gtk = true;
-    systemdIntegration = false;
+    wrapperFeatures = {
+      base = true;
+      gtk = true;
+    };
+    systemdIntegration = true;
 
     config = {
       output = {
@@ -335,12 +348,11 @@ in {
       bars = [{ command = "${cpkgs.waybar}/bin/waybar"; }];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
-        swayidle = "${pkgs.swayidle}/bin/swayidle";
-        swaylock = "${pkgs.swaylock-effects}/bin/swaylock --daemonize --screenshots --clock --fade-in 0.2 --effect-blur 7x5";
+        swaylock = "swaylock --daemonize --screenshots --clock --fade-in 0.2 --effect-blur 7x5";
       in [
         {
           command = ''
-            ${swayidle} -w \
+            swayidle -w \
               timeout 300 '${swaylock}' \
               timeout 600 'swaymsg "output * dpms off"' \
                 resume 'swaymsg "output * dpms on"' \
@@ -358,6 +370,9 @@ in {
         }
         {
           command = "fcitx5";
+        }
+        {
+          command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
         }
       ];
       keybindings = let

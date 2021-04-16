@@ -79,9 +79,13 @@ in {
     dnssec = "allow-downgrade";
   };
   networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
+  systemd.services.dhcpcd.enable = !isLaptop;
   networking.dhcpcd.enable = lib.mkForce isLaptop;
 
-  programs.gnupg.agent.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    pinentryFlavor = "curses";
+  };
   programs.fish.enable = true;
 
   nixpkgs.config = {
@@ -104,13 +108,6 @@ in {
 
   environment.variables = lib.recursiveUpdate
     (if isLaptop then {
-      _JAVA_AWT_WM_NONREPARENTING = "1";
-      LIBVA_DRIVER_NAME = "i965";
-      MOZ_ENABLE_WAYLAND = "1";
-      XDG_SESSION_TYPE = "wayland";
-      XDG_CURRENT_DESKTOP = "sway";
-      QT_QPA_PLATFORM = "wayland-egl";
-      QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
     } else {
       MOZ_X11_EGL = "1";
       __GL_SHADER_DISK_CACHE_SKIP_CLEANUP = "1";
@@ -193,8 +190,6 @@ in {
   boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
   boot.plymouth.enable = isLaptop;
 
-  programs.sway.enable = isLaptop;
-
   services.upower.enable = isLaptop;
   services.tlp.enable = isLaptop;
   services.auto-cpufreq.enable = isLaptop;
@@ -204,6 +199,8 @@ in {
 
   hardware.bluetooth.enable = isLaptop;
   hardware.bluetooth.hsphfpd.enable = isLaptop;
+  # This is an example service that always fails
+  systemd.user.services.telephony_client.enable = false;
 
   powerManagement.enable = isLaptop;
 
@@ -239,23 +236,23 @@ in {
     wantedBy = [ "graphical-session.target" ];
   };
 
-  systemd.user.services.sway = mkLaptop {
-    description = "Sway - Wayland window manager";
-    documentation = [ "man:sway(5)" ];
-    bindsTo = [ "graphical-session.target" ];
-    wants = [ "graphical-session-pre.target" "dbus.service" ];
-    after = [ "graphical-session-pre.target" "dbus.service" ];
-    # We explicitly unset PATH here, as we want it to be set by
-    # systemctl --user import-environment in startsway
-    environment.PATH = lib.mkForce null;
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.sway}/bin/sway";
-      Restart = "on-failure";
-      RestartSec = 1;
-      TimeoutStopSec = 10;
-    };
-  };
+  # systemd.user.services.sway = mkLaptop {
+  #   description = "Sway - Wayland window manager";
+  #   documentation = [ "man:sway(5)" ];
+  #   bindsTo = [ "graphical-session.target" ];
+  #   wants = [ "graphical-session-pre.target" "dbus.service" ];
+  #   after = [ "graphical-session-pre.target" "dbus.service" ];
+  #   # We explicitly unset PATH here, as we want it to be set by
+  #   # systemctl --user import-environment in startsway
+  #   environment.PATH = lib.mkForce null;
+  #   serviceConfig = {
+  #     Type = "simple";
+  #     ExecStart = "${pkgs.sway}/bin/sway";
+  #     Restart = "on-failure";
+  #     RestartSec = 1;
+  #     TimeoutStopSec = 10;
+  #   };
+  # };
 
   services.snapper.configs = let
     timelineConfig = ''
@@ -345,15 +342,15 @@ in {
     networkConfig.DNSDefaultRoute = "no";
   };
 
-  # xdg.portal = mkLaptop {
-  #   enable = true;
-  #   extraPortals = with pkgs; [
-  #     xdg-desktop-portal-wlr
-  #     xdg-desktop-portal-gtk
-  #   ];
-  #   gtkUsePortal = true;
-  # };
-  # services.flatpak.enable = isLaptop;
+  xdg.portal = mkLaptop {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-wlr
+      xdg-desktop-portal-gtk
+    ];
+    gtkUsePortal = true;
+  };
+  services.flatpak.enable = isLaptop;
 
   environment.systemPackages = with pkgs; mkLaptop [
     wireguard
