@@ -376,9 +376,9 @@ in {
   ];
 
 
-  networking.firewall = mkDesktop {
-    enable = true;
-    allowedTCPPorts = [ 22 ];
+  networking.firewall = {
+    enable = !isLaptop;
+    allowedTCPPorts = mkDesktop [ 22 ];
   };
   systemd.network.networks."00-ethernet" = mkDesktop {
     name = "eno1";
