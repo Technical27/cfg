@@ -38,7 +38,7 @@ in {
 
     discord
     multimc
-    cpkgs.lunar-client
+    lunar-client
     cpkgs.mangohud
     cpkgs.mangohud_32
     killall
