@@ -446,6 +446,9 @@ in {
         buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
       }));
     })
+    (self: super: {
+      mako = super.cpkgs.mako;
+    })
   ];
 
   services.udev.packages = mkDesktop [ pkgs.openrgb ];

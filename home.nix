@@ -114,6 +114,8 @@ in {
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
     "waybar/gruvbox-dark.css" = mkLaptop { source = ./themes/waybar/gruvbox-dark.css; };
     "waybar/gruvbox-light.css" = mkLaptop { source = ./themes/waybar/gruvbox-light.css; };
+    "mako/gruvbox-dark.conf" = mkLaptop { source = ./themes/mako/gruvbox-dark.conf; };
+    "mako/gruvbox-light.conf" = mkLaptop { source = ./themes/mako/gruvbox-light.conf; };
   };
 
   programs.neovim = {
@@ -180,11 +182,11 @@ in {
 
   programs.mako = mkLaptop {
     enable = true;
-    textColor = "#ebdbb2";
-    backgroundColor = "#282828";
     borderSize = 5;
-    borderColor = "#8ec07c";
     defaultTimeout = 10000;
+    extraConfig = ''
+      include=style.conf
+    '';
   };
 
   xsession.preferStatusNotifierItems = true;
@@ -506,6 +508,7 @@ in {
         horizontal_padding = 10;
         frame_width = 5;
         frame_color = "#8ec07c";
+        max_icon_size = 64;
       };
       urgency_normal = {
         background = "#282828";
