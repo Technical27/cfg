@@ -230,12 +230,8 @@ in {
 
   programs.starship = {
     enable = true;
-    settings = {
-      # annoying
-      nix_shell.disabled = true;
-      # very slow
-      haskell.disabled = true;
-    };
+    # annoying
+    settings.nix_shell.disabled = true;
   };
 
   programs.kitty = with import ./kitty.nix; {
