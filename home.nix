@@ -420,7 +420,19 @@ in {
     enable = true;
     package = pkgs.i3-gaps;
     extraConfig = ''
-      default_border none
+    default_border none
+
+    workspace 1 output primary
+    workspace 2 output primary
+    workspace 3 output primary
+    workspace 4 output primary
+    workspace 5 output primary
+
+    workspace 6 output HDMI-0
+    workspace 7 output HDMI-0
+    workspace 8 output HDMI-0
+    workspace 9 output HDMI-0
+    workspace 10 output HDMI-0
     '';
     config = {
       fonts = [ "JetBrainsMono Nerd Font Mono" ];
