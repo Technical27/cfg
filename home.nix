@@ -83,7 +83,8 @@ in {
     razergenie
     virt-manager
     openrgb
-    liquidctl
+    # currently broken
+    # liquidctl
     obs-studio
     olive-editor
     unityhub
