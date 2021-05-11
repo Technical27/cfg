@@ -57,6 +57,7 @@ in {
   ++ (lib.optionals isLaptop [
     "resume_offset=18382314"
     "i915.enable_guc=2"
+    "mem_sleep_default=s2idle"
   ])
   ++ (lib.optionals isDesktop [
     "intel_iommu=on"
