@@ -58,11 +58,6 @@ in {
     "resume_offset=18382314"
     "i915.enable_guc=2"
     "mem_sleep_default=s2idle"
-  ])
-  ++ (lib.optionals isDesktop [
-    "intel_iommu=on"
-    "kvm.ignore_msrs=1"
-    "kvm_intel.nested=1"
   ]);
 
   boot.kernel.sysctl = lib.recursiveUpdate
@@ -365,19 +360,6 @@ in {
   programs.java.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
 
-  virtualisation.libvirtd = mkDesktop {
-    enable = true;
-    qemuOvmf = true;
-    qemuPackage = pkgs.qemu_kvm;
-    onBoot = "ignore";
-    onShutdown = "shutdown";
-  };
-
-  systemd.services.libvirtd.path = with pkgs; mkDesktop [
-    kmod killall bash coreutils config.boot.kernelPackages.cpupower
-  ];
-
-
   networking.firewall = {
     enable = !isLaptop;
     allowedTCPPorts = mkDesktop [ 22 ];
@@ -450,11 +432,19 @@ in {
     (self: super: {
       mako = super.cpkgs.mako;
     })
+    (self: super: {
+      lutris = super.lutris.override { steamSupport = false; };
+    })
+    (self: super: {
+      cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
+    })
   ];
 
-  services.udev.packages = mkDesktop [ pkgs.openrgb ];
-  services.udev.extraRules = mkDesktop ''
-    // The nari works with the steelseries arctis profile well
-    ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051c", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
-  '';
+  services.udev = mkDesktop {
+    packages = [ pkgs.openrgb ];
+    extraRules = ''
+      // The nari works with the steelseries arctis profile well
+      ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051c", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
+    '';
+  };
 }

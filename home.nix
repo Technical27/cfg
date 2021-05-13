@@ -51,7 +51,7 @@ in {
     pavucontrol
     pulsemixer
     pulseeffects-pw
-    (cadence.override { libjack2 = pipewire.jack; })
+    cadence
     openscad
     freecad
 
@@ -79,7 +79,7 @@ in {
     cpkgs.gruvbox-light-theme
     cpkgs.gruvbox-light-icons
   ] ++ lib.optionals isDesktop [
-    (lutris.override { steamSupport = false; })
+    lutris
     razergenie
     virt-manager
     openrgb

@@ -8,7 +8,7 @@ fun g:LoadColors()
   hi! link TSAnnotation GruvboxAqua
   hi! link TSBoolean GruvboxPurple
   hi! link TSCharacter GruvboxPurple
-  hi! TSComment gui=italic guifg=GruvboxGrey
+  hi! TSComment gui=italic guifg=GruvboxGray
   hi! link TSConstructor GruvboxOrange
   hi! link TSConditional GruvboxRed
   hi! link TSConstant GruvboxPurple
