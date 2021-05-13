@@ -435,7 +435,6 @@ in {
     workspace 10 output HDMI-0
     '';
     config = {
-      fonts = [ "JetBrainsMono Nerd Font Mono" ];
       modifier = "Mod4";
       menu = "rofi -show drun";
       gaps.inner = 10;

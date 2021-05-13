@@ -110,7 +110,7 @@ in {
     MOZ_X11_EGL = "1";
   };
 
-  services.gnome3.gnome-keyring.enable = true;
+  services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
   services.avahi = {
     enable = true;
