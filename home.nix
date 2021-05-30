@@ -338,7 +338,8 @@ in {
           pointer_accel = "0.3";
           dwt = "enabled";
         };
-        "*".xkb_options = "compose:ralt";
+        # this will take some getting used too...
+        "1:1:AT_Translated_Set_2_keyboard".xkb_options = "compose:ralt,caps:swapescape";
       };
       gaps.inner = 10;
       terminal = "kitty";

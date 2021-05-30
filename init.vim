@@ -96,7 +96,7 @@ set grepprg="rg --vimgrep"
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
 lua <<EOF
-require'nvim-treesitter.configs'.setup {
+require 'nvim-treesitter.configs'.setup {
   indent = {
     enable = true
   },
@@ -125,7 +125,7 @@ let g:coc_snippet_prev = '<S-TAB>'
 
 let g:EasyMotion_smartcase = 1
 
-let g:coc_fzf_opts = ['--color=16']
+let g:coc_fzf_opts = [ '--color=16' ]
 
 function! g:ListFiles() abort
   let s:fzf_height = 0.6
@@ -211,7 +211,9 @@ inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 fun! g:ClearSearch()
+  let l:save = winsaveview()
   let @/ = ""
+  call winrestview(l:save)
 endf
 
 nnoremap <silent><expr> <ESC> g:ClearSearch()
