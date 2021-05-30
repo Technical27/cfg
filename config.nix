@@ -9,13 +9,21 @@ let
 in {
   nix = {
     package = pkgs.nixUnstable;
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "yogs.tech";
+        system = "x86_64-linux";
+        sshKey = "/home/aamaruvi/.ssh/id_rsa";
+        sshUser = "nix-ssh";
+        maxJobs = 8;
+      }
+    ];
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    binaryCaches = let
-      ip = if isLaptop then "10.200.200.1" else "192.168.1.2";
-    in [
-      "ssh-ng://nix-ssh@${ip}?ssh-key=/home/aamaruvi/.ssh/id_rsa"
+    binaryCaches = [
+      "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
     ];
     requireSignedBinaryCaches = false;
     gc = {
@@ -134,7 +142,7 @@ in {
 
   security.apparmor = {
     enable = true;
-    profiles = import ./apparmor.nix device pkgs;
+    # profiles = import ./apparmor.nix device pkgs;
   };
 
   programs.dconf.enable = true;
@@ -200,6 +208,7 @@ in {
 
   networking.wireless.iwd.enable = isLaptop;
   networking.hosts."10.200.200.1" = mkLaptop [ "yogs.tech" ];
+  networking.hosts."192.168.1.2" = mkDesktop [ "yogs.tech" ];
 
   systemd.user.services.auto-theme = mkLaptop {
     description = "automatically change theme";
@@ -390,6 +399,9 @@ in {
   services.picom = mkDesktop {
     enable = true;
     backend = "glx";
+    settings = {
+      unredir-if-possible = false;
+    };
   };
 
   security.pam.services = mkDesktop {

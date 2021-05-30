@@ -3,7 +3,7 @@ device: pkgs:
 let
   isLaptop = device == "laptop";
   mkLaptop = obj: pkgs.lib.mkIf (isLaptop) obj;
-in with pkgs;[
+in with pkgs; [
   (mkLaptop (writeText "teams" ''
     #include <tunables/global>
     ${teams}/bin/teams {
