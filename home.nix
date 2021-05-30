@@ -110,6 +110,8 @@ in {
     "kitty/gruvbox-light.conf".source = ./themes/kitty/gruvbox-light.conf;
     "zathura/gruvbox-dark.conf".source = ./themes/zathura/gruvbox-dark.conf;
     "zathura/gruvbox-light.conf".source = ./themes/zathura/gruvbox-light.conf;
+    "bpytop/gruvbox-dark.theme".source = ./themes/bpytop/gruvbox-dark.theme;
+    "bpytop/gruvbox-light.theme".source = ./themes/bpytop/gruvbox-light.theme;
 
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
     "waybar/gruvbox-dark.css" = mkLaptop { source = ./themes/waybar/gruvbox-dark.css; };
