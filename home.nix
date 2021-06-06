@@ -38,7 +38,7 @@ in {
 
     discord
     multimc
-    lunar-client
+    cpkgs.lunar-client
     mangohud
     killall
     nix-index

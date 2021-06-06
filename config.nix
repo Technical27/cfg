@@ -9,16 +9,6 @@ let
 in {
   nix = {
     package = pkgs.nixUnstable;
-    distributedBuilds = true;
-    buildMachines = [
-      {
-        hostName = "yogs.tech";
-        system = "x86_64-linux";
-        sshKey = "/home/aamaruvi/.ssh/id_rsa";
-        sshUser = "nix-ssh";
-        maxJobs = 8;
-      }
-    ];
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
@@ -390,6 +380,7 @@ in {
       enable = true;
       package = pkgs.i3-gaps;
     };
+    libinput.enable = true;
   };
 
   environment.etc = mkDesktop {
