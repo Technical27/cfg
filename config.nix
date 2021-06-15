@@ -380,11 +380,11 @@ in {
       enable = true;
       package = pkgs.i3-gaps;
     };
-    libinput.enable = true;
   };
 
   environment.etc = mkDesktop {
     "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
+    "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
   };
 
   services.picom = mkDesktop {

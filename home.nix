@@ -33,12 +33,23 @@ in {
     tectonic
     gcc
     jq
+    file
+    unzip
+    zip
+
+    atom
 
     ranger
 
     discord
+
     multimc
     cpkgs.lunar-client
+    cpkgs.badlion-client
+
+    cpkgs.grapejuice
+    cpkgs.rbxfpsunlocker
+
     mangohud
     killall
     nix-index
@@ -82,8 +93,7 @@ in {
     razergenie
     virt-manager
     openrgb
-    # currently broken
-    # liquidctl
+    liquidctl
     obs-studio
     olive-editor
     unityhub
@@ -461,6 +471,10 @@ in {
         }
         {
           command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+          notification = false;
+        }
+        {
+          command = "${pkgs.setxkbmap}/bin/setxkbmap -option 'caps:swapescape'";
           notification = false;
         }
       ];
