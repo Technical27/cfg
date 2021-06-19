@@ -63,7 +63,7 @@ let s:theme_file = glob("~/.config/nvim/theme")
 if (filereadable(s:theme_file))
   let &background = readfile(s:theme_file)[0]
 else
-  echo "failed to read theme file"
+  echom "failed to read theme file"
   set background=dark
 endif
 
@@ -91,20 +91,14 @@ set showmatch
 set mouse=a
 set undofile
 set grepprg="rg --vimgrep"
+set noshowmode
+set autoindent
 
 " nvim-treesitter setup
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
-lua <<EOF
-require 'nvim-treesitter.configs'.setup {
-  indent = {
-    enable = true
-  },
-  highlight = {
-    enable = true
-  }
-}
-EOF
+
+source late.lua
 
 let g:tex_flavor             = 'latex'
 let g:vimtex_compiler_method = 'tectonic'
@@ -114,61 +108,18 @@ let g:vimtex_fold_enabled    = 1
 
 let g:lion_squeeze_spaces = 1
 
-let g:airline#extensions#tabline#enabled     = 1
-let g:airline#extensions#nvimlsp#enabled     = 0
-let g:airline#extensions#tabline#tab_nr_type = 1
-let g:airline_powerline_fonts                = 1
-let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
+" let g:airline#extensions#tabline#enabled     = 1
+" let g:airline#extensions#nvimlsp#enabled     = 0
+" let g:airline#extensions#tabline#tab_nr_type = 1
+" let g:airline_powerline_fonts                = 1
+" let g:airline#extensions#tabline#formatter   = 'unique_tail_improved'
 
 let g:coc_snippet_next = '<TAB>'
 let g:coc_snippet_prev = '<S-TAB>'
 
 let g:EasyMotion_smartcase = 1
 
-let g:coc_fzf_opts = [ '--color=16' ]
-
-function! g:ListFiles() abort
-  let s:fzf_height = 0.6
-  let s:fzf_command = 'rg --files --hidden --glob "!.git"'
-  let s:bat_command = 'bat --style=numbers,changes --color always {2..-1} | head -'.float2nr((&lines * s:fzf_height) - 2)
-
-  function! s:get_open_files() abort
-    let l:buffers = map(filter(copy(getbufinfo()), 'v:val.listed'), 'v:val.name')
-    let l:len = len(fnamemodify(".", ":p"))
-    return map(l:buffers, 'v:val[l:len:]')
-  endf
-
-  function! s:files() abort
-    let l:buffers = s:get_open_files()
-    let l:files = filter(split(system(s:fzf_command), '\n'), 'index(l:buffers, v:val) == -1')
-    return s:prepend_icon(l:files)
-  endf
-
-  function! s:prepend_icon(candidates) abort
-    let l:result = []
-    for l:candidate in a:candidates
-      if filereadable(l:candidate)
-        let l:filename = fnamemodify(l:candidate, ':p:t')
-        let l:icon = WebDevIconsGetFileTypeSymbol(l:filename, isdirectory(l:filename))
-        call add(l:result, printf('%s %s', l:icon, l:candidate))
-      endif
-    endfor
-
-    return l:result
-  endf
-
-  function! s:edit_file(item) abort
-    let l:pos = stridx(a:item, ' ')
-    let l:file_path = a:item[pos+1:-1]
-    execute 'silent e' l:file_path
-  endf
-
-  call fzf#run({
-    \ 'source' : <sid>files(),
-    \ 'sink'   : function('s:edit_file'),
-    \ 'window' : { 'width': 0.9, 'height': s:fzf_height, 'highlight': 'Normal' },
-    \ 'options': '--color 16 -m --preview "'.s:bat_command.'"'})
-endf
+nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:check_back_space() abort
   let l:col = col('.') - 1
@@ -191,24 +142,22 @@ function! TrimWhitespace() abort
 endf
 
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-nmap <silent> gw <Plug>(coc-rename)
+nnoremap <silent> gd <cmd>Telescope coc definitions
+nnoremap <silent> gy <cmd>Telescope coc type_definitions
+nnoremap <silent> gi <cmd>Telescope coc implementations
+nnoremap <silent> gr <cmd>Telescope coc references
+nnoremap <silent> gw <Plug>(coc-rename)
 
 nnoremap <silent> T :bprev<CR>
 nnoremap <silent> Y :bnext<CR>
 
 nnoremap <C-u> :UndotreeToggle<CR>
 
-nnoremap <C-p> :call g:ListFiles()<CR>
+nnoremap <C-p> <cmd>Telescope find_files<CR>
 
 inoremap <silent><expr> <c-space> coc#refresh()
 inoremap <expr> <CR> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 fun! g:ClearSearch()
   let l:save = winsaveview()

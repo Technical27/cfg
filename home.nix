@@ -44,11 +44,15 @@ in {
     discord
 
     multimc
-    cpkgs.lunar-client
-    cpkgs.badlion-client
+    lunar-client
+    cpkgs.games.badlion-client
 
-    cpkgs.grapejuice
-    cpkgs.rbxfpsunlocker
+    cpkgs.games.roblox.grapejuice
+    cpkgs.games.roblox.rbxfpsunlocker
+
+    neovim-nightly
+    rnix-lsp
+    rust-analyzer
 
     mangohud
     killall
@@ -128,50 +132,52 @@ in {
     "waybar/gruvbox-light.css" = mkLaptop { source = ./themes/waybar/gruvbox-light.css; };
     "mako/gruvbox-dark.conf" = mkLaptop { source = ./themes/mako/gruvbox-dark.conf; };
     "mako/gruvbox-light.conf" = mkLaptop { source = ./themes/mako/gruvbox-light.conf; };
+
+    "nvim/init.lua".source = ./nvim/init.lua;
+    "nvim/after/ts.vim".source = ./nvim/ts.vim;
+    "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
   };
 
   programs.neovim = {
-    enable = true;
-    package = pkgs.neovim-nightly;
-    plugins = with pkgs.vimPlugins; [
-      vim-airline
-      vim-devicons
-      fzf-vim
-      vim-polyglot
-      gruvbox-community
-      undotree
-      vim-fugitive
-      vim-surround
-      vim-snippets
-      vim-lastplace
-      lexima-vim
-      commentary
-      vim-lion
-      vim-easymotion
-      vimtex
-      ultisnips
-      nvim-treesitter
-      goyo-vim
-      limelight-vim
+    # enable = true;
+    package = pkgs.neovim-unwrapped;
+    # plugins = with pkgs.vimPlugins; [
+    #   nvim-web-devicons
+    #   galaxyline-nvim
+    #   telescope-nvim
+    #   vim-polyglot
+    #   gruvbox-community
+    #   undotree
+    #   vim-surround
+    #   vim-snippets
+    #   vim-lastplace
+    #   lexima-vim
+    #   commentary
+    #   vim-lion
+    #   vim-easymotion
+    #   vimtex
+    #   ultisnips
+    #   nvim-treesitter
+    #   cpkgs.vim.telescope-coc
+    #   nvim-bufferline-lua
 
-      # coc extensions
-      coc-nvim
-      coc-fzf
-      coc-json
-      coc-css
-      coc-html
-      coc-snippets
-      coc-git
-      coc-rust-analyzer
-      coc-prettier
-      coc-tsserver
-      coc-tabnine
-      coc-eslint
-      nvim-treesitter-context
-    ];
+    #   # coc extensions
+    #   coc-nvim
+    #   coc-json
+    #   coc-css
+    #   coc-html
+    #   coc-snippets
+    #   coc-git
+    #   coc-rust-analyzer
+    #   coc-prettier
+    #   coc-tsserver
+    #   coc-tabnine
+    #   coc-eslint
+    #   nvim-treesitter-context
+    # ];
     withNodeJs = true;
     withPython3 = true;
-    extraConfig = builtins.readFile ./init.vim;
+    # extraConfig = builtins.readFile ./init.vim;
   };
 
   programs.direnv.enable = true;
@@ -179,7 +185,7 @@ in {
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = cpkgs.firefox-with-extensions;
+    package = cpkgs.firefox;
   };
 
   programs.zathura = {
@@ -303,7 +309,7 @@ in {
       make = "make -j8";
       icat = "kitty +kitten icat";
     };
-    functions.fish_greeting = "${cpkgs.info}/bin/info";
+    functions.fish_greeting = "${cpkgs.tools.info}/bin/info";
   };
 
   gtk = {
@@ -357,7 +363,7 @@ in {
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [{ command = "${cpkgs.waybar}/bin/waybar"; }];
+      bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
       floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
       startup = let
         swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
@@ -466,7 +472,7 @@ in {
           notification = false;
         }
         {
-          command = "${cpkgs.polybar}/bin/polybar main";
+          command = "${cpkgs.tools.polybar}/bin/polybar main";
           notification = false;
         }
         {
@@ -474,7 +480,7 @@ in {
           notification = false;
         }
         {
-          command = "${pkgs.setxkbmap}/bin/setxkbmap -option 'caps:swapescape'";
+          command = "${pkgs.xorg.setxkbmap}/bin/setxkbmap -option 'caps:swapescape,compose:ralt'";
           notification = false;
         }
       ];
@@ -544,7 +550,7 @@ in {
 
   services.polybar = mkDesktop {
     enable = true;
-    package = cpkgs.polybar;
+    package = cpkgs.tools.polybar;
     config = {
       "bar/main" = {
         width = "100%";
@@ -585,7 +591,7 @@ in {
       };
       "module/nixos" = {
         type = "custom/script";
-        exec = "${cpkgs.info}/bin/info --polybar";
+        exec = "${cpkgs.tools.info}/bin/info --polybar";
         interval = 600;
       };
     };
@@ -594,7 +600,6 @@ in {
 
   programs.waybar = mkLaptop {
     enable = true;
-    package = cpkgs.waybar;
     style = builtins.readFile ./themes/waybar/style.css;
     settings = [{
       layer = "top";
