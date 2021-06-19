@@ -19,7 +19,6 @@
           home-manager.useUserPackages = false;
           home-manager.users.aamaruvi = import ./home.nix device;
         }
-        (./cachix.nix)
       ] ++ extraModules;
     });
   in {
