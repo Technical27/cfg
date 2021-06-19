@@ -32,12 +32,12 @@ fun! g:LoadColors()
   hi! link TSPunctDelimiter GruvboxFg
   hi! link TSPunctBracket GruvboxFg
   hi! link TSPunctSpecial GruvboxFg
+  hi! link TSTagDelimiter GruvboxFg
   hi! link TSRepeat GruvboxRed
   hi! link TSString GruvboxGreen
   hi! link TSStringRegex GruvboxYellow
   hi! link TSStringEscape GruvboxOrange
   hi! link TSTag GruvboxRed
-  hi! link TSTagDelimiter GruvboxFg
   hi! link TSText TSNone
   hi! link TSLiteral GruvboxGreen
   hi! TSURI gui=underline guifg=GruvboxAqua
@@ -47,6 +47,8 @@ fun! g:LoadColors()
   hi! TSEmphasis gui=italic
   hi! TSUnderline gui=underline
 endf
+
+call g:LoadColors()
 
 augroup Color
   autocmd!

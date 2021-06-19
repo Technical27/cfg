@@ -43,12 +43,14 @@ in {
 
     discord
 
-    multimc
-    lunar-client
-    cpkgs.games.badlion-client
+    cachix
 
-    cpkgs.games.roblox.grapejuice
-    cpkgs.games.roblox.rbxfpsunlocker
+    multimc
+    # lunar-client
+    # cpkgs.games.badlion-client
+
+    # cpkgs.games.roblox.grapejuice
+    # cpkgs.games.roblox.rbxfpsunlocker
 
     neovim-nightly
     rnix-lsp
@@ -67,7 +69,7 @@ in {
     pulseeffects-pw
     cadence
     openscad
-    freecad
+    # freecad
 
     # set thermal modes
     libsmbios
@@ -88,10 +90,10 @@ in {
     wl-clipboard
     zoom-us
     teams
-    cpkgs.gruvbox-dark-theme
-    cpkgs.gruvbox-dark-icons
-    cpkgs.gruvbox-light-theme
-    cpkgs.gruvbox-light-icons
+    cpkgs.gruvbox.dark-theme
+    cpkgs.gruvbox.dark-icons
+    cpkgs.gruvbox.light-theme
+    cpkgs.gruvbox.light-icons
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
@@ -134,7 +136,7 @@ in {
     "mako/gruvbox-light.conf" = mkLaptop { source = ./themes/mako/gruvbox-light.conf; };
 
     "nvim/init.lua".source = ./nvim/init.lua;
-    "nvim/after/ts.vim".source = ./nvim/ts.vim;
+    "nvim/ts.vim".source = ./nvim/ts.vim;
     "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
   };
 
@@ -681,7 +683,7 @@ in {
         "custom/nixos" = {
           return-type = "json";
           interval = 600;
-          exec = "${cpkgs.info}/bin/info --waybar";
+          exec = "${cpkgs.tools.info}/bin/info --waybar";
         };
       };
     }];

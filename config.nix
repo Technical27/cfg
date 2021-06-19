@@ -204,7 +204,7 @@ in {
     description = "automatically change theme";
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.cpkgs.theme}/bin/theme";
+      ExecStart = "${pkgs.cpkgs.tools.theme}/bin/theme";
     };
     path = with pkgs; [ glib sway ];
     environment.XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}";
@@ -350,7 +350,7 @@ in {
     wireguard-tools
     polkit_gnome
 
-    cpkgs.wgvpn
+    cpkgs.tools.wgvpn
   ];
 
   # Desktop specific things
@@ -433,7 +433,7 @@ in {
       }));
     })
     (self: super: {
-      mako = super.cpkgs.mako;
+      mako = super.cpkgs.tools.mako;
     })
     (self: super: {
       lutris = super.lutris.override { steamSupport = false; };

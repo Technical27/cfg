@@ -36,6 +36,8 @@ require('packer').startup(function()
   use 'rafamadriz/friendly-snippets'
 end)
 
+vim.api.nvim_command('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
+
 vim.g.lexima_no_default_rules = true
 vim.fn['lexima#set_default_rules']()
 
@@ -217,4 +219,4 @@ vim.api.nvim_exec([[
     autocmd!
     autocmd BufWritePre * call v:lua.clear_whitespace()
   augroup END
-]])
+]], false)
