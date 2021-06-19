@@ -55,6 +55,7 @@ in {
     neovim-nightly
     rnix-lsp
     rust-analyzer
+    haskell-language-server
 
     mangohud
     killall

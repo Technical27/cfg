@@ -150,6 +150,7 @@ lspconfig.rnix.setup {}
 lspconfig.rust_analyzer.setup {
   capabilities = capabilites
 }
+lspconfig.hls.setup {}
 
 vim.o.termguicolors = true
 vim.o.showmode = false
