@@ -17,9 +17,9 @@
         home-manager.nixosModules.home-manager {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = false;
-          home-manager.users.aamaruvi =
-            import ./home.nix device;
+          home-manager.users.aamaruvi = import ./home.nix device;
         }
+        (./cachix.nix)
       ] ++ extraModules;
     });
   in {
