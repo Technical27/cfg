@@ -49,8 +49,8 @@ in {
     # lunar-client
     # cpkgs.games.badlion-client
 
-    # cpkgs.games.roblox.grapejuice
-    # cpkgs.games.roblox.rbxfpsunlocker
+    cpkgs.games.roblox.grapejuice
+    cpkgs.games.roblox.rbxfpsunlocker
 
     neovim-nightly
     rnix-lsp
@@ -69,7 +69,7 @@ in {
     pulseeffects-pw
     cadence
     openscad
-    # freecad
+    freecad
 
     # set thermal modes
     libsmbios
