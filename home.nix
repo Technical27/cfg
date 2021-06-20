@@ -577,6 +577,9 @@ in
         background = "#282828";
         foreground = "#ebdbb2";
         monitor = "DP-0";
+        tray-position = "right";
+        tray-detached = false;
+        tray-padding = 3;
       };
 
       "module/i3" = {
