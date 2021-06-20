@@ -54,9 +54,6 @@ in
     cpkgs.games.roblox.rbxfpsunlocker
 
     neovim-nightly
-    rnix-lsp
-    rust-analyzer
-    haskell-language-server
 
     mangohud
     killall
@@ -141,6 +138,15 @@ in
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
     "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
+    "nvim/lua/lsp.lua".text = builtins.replaceStrings [
+      "@RNIX_PATH@"
+      "@RUST_ANALYZER_PATH@"
+      "@HLS_PATH@"
+    ] [
+      "${pkgs.rnix-lsp}/bin/rnix-lsp"
+      "${pkgs.rust-analyzer}/bin/rust-analyzer"
+      "${pkgs.haskell-language-server}/bin/haskell-language-server-wrapper"
+    ] (builtins.readFile ./nvim/lsp.lua);
   };
 
   programs.neovim = {

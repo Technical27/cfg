@@ -24,7 +24,10 @@ require('packer').startup(function()
     requires = { 'kyazdani42/nvim-web-devicons', opt = true }
   }
 
-  use 'neovim/nvim-lspconfig'
+  use {
+    'neovim/nvim-lspconfig',
+    config = function() require 'lsp' end
+  }
 
   use 'hrsh7th/nvim-compe'
 
@@ -106,8 +109,6 @@ require 'compe'.setup {
 --     }
 -- }
 
-local lspconfig = require 'lspconfig'
-
 local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
@@ -117,7 +118,7 @@ local function check_back_space()
     return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
 end
 
-_G.snip_next = function()
+function _G.snip_next()
   if vim.fn.call("vsnip#available", {1}) == 1 then
     return t "<Plug>(vsnip-expand-or-jump)"
   else
@@ -125,7 +126,7 @@ _G.snip_next = function()
   end
 end
 
-_G.snip_prev = function()
+function _G.snip_prev()
   if vim.fn.call("vsnip#jumpable", {-1}) == 1 then
     return t "<Plug>(vsnip-jump-prev)"
   else
@@ -133,35 +134,13 @@ _G.snip_prev = function()
   end
 end
 
-_G.compe_complete = function()
+function _G.compe_complete()
   return vim.fn["compe#confirm"](vim.fn['lexima#expand'](t '<CR>', 'i'))
 end
 
 vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", { expr = true })
 vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.snip_prev()", { expr = true })
 vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
-
-local lsp_on_attach = function(client, bufnr)
-  if client.resolved_capabilities.document_highlight then
-    vim.api.nvim_exec([[
-      augroup LspHighlight
-        autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-        autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
-        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-      augroup END
-    ]], false)
-  end
-end
-
-lspconfig.rnix.setup {
-  on_attach = lsp_on_attach
-}
-lspconfig.rust_analyzer.setup {
-  on_attach = lsp_on_attach
-}
-lspconfig.hls.setup {
-  on_attach = lsp_on_attach
-}
 
 vim.o.termguicolors = true
 vim.o.showmode = false
