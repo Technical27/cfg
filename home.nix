@@ -143,8 +143,8 @@ in
       "@RUST_ANALYZER_PATH@"
       "@HLS_PATH@"
     ] [
-      "${pkgs.rnix-lsp}/bin/rnix-lsp"
-      "${pkgs.rust-analyzer}/bin/rust-analyzer"
+      "${pkgs.rnix-lsp}"
+      "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
     ] (builtins.readFile ./nvim/lsp.lua);
   };
