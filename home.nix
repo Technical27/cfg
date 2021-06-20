@@ -6,7 +6,8 @@ let
   isDesktop = device == "desktop";
   mkDesktop = obj: lib.mkIf isDesktop obj;
   inherit (pkgs) cpkgs;
-in {
+in
+{
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -46,8 +47,8 @@ in {
     cachix
 
     multimc
-    # lunar-client
-    # cpkgs.games.badlion-client
+    lunar-client
+    cpkgs.games.badlion-client
 
     cpkgs.games.roblox.grapejuice
     cpkgs.games.roblox.rbxfpsunlocker
@@ -113,13 +114,14 @@ in {
   xdg.mimeApps.defaultApplications = let
     browser = [ "firefox.desktop" ];
     files = [ "ranger.desktop" ];
-  in {
-    "text/html" = browser;
-    "x-scheme-handler/http" = browser;
-    "x-scheme-handler/https" = browser;
-    "x-scheme-handler/msteams" = mkLaptop "teams.desktop";
-    "inode/directory" = files;
-  };
+  in
+    {
+      "text/html" = browser;
+      "x-scheme-handler/http" = browser;
+      "x-scheme-handler/https" = browser;
+      "x-scheme-handler/msteams" = mkLaptop "teams.desktop";
+      "inode/directory" = files;
+    };
 
   xdg.configFile = {
     "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
@@ -366,54 +368,56 @@ in {
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
-      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
+      bars = [ { command = "${pkgs.waybar}/bin/waybar"; } ];
+      floating.criteria = [ { title = "^Firefox — Sharing Indicator$"; } ];
       startup = let
         swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
-      in [
-        {
-          command = ''
-            swayidle -w \
-              timeout 300 '${swaylock}' \
-              timeout 600 'swaymsg "output * dpms off"' \
-                resume 'swaymsg "output * dpms on"' \
-              before-sleep '${swaylock}'
-          '';
-        }
-        {
-          command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
-        }
-        {
-          command = "${pkgs.blueman}/bin/blueman-applet";
-        }
-        {
-          command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        }
-        {
-          command = "fcitx5";
-        }
-        {
-          command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
-        }
-      ];
+      in
+        [
+          {
+            command = ''
+              swayidle -w \
+                timeout 300 '${swaylock}' \
+                timeout 600 'swaymsg "output * dpms off"' \
+                  resume 'swaymsg "output * dpms on"' \
+                before-sleep '${swaylock}'
+            '';
+          }
+          {
+            command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
+          }
+          {
+            command = "${pkgs.blueman}/bin/blueman-applet";
+          }
+          {
+            command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+          }
+          {
+            command = "fcitx5";
+          }
+          {
+            command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
+          }
+        ];
       keybindings = let
         pmixer = str: "exec pulsemixer --max-volume 100 ${str}";
         brctl = str: "exec brightnessctl set ${str}";
-      in lib.mkOptionDefault {
-        "XF86AudioRaiseVolume"  = pmixer "--unmute --change-volume +10";
-        "XF86AudioLowerVolume"  = pmixer "--unmute --change-volume -10";
-        "XF86AudioMute"         = pmixer "--toggle-mute";
+      in
+        lib.mkOptionDefault {
+          "XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +10";
+          "XF86AudioLowerVolume" = pmixer "--unmute --change-volume -10";
+          "XF86AudioMute" = pmixer "--toggle-mute";
 
-        "Mod4+s" = "nop";
-        "Mod4+w" = "nop";
+          "Mod4+s" = "nop";
+          "Mod4+w" = "nop";
 
-        "XF86MonBrightnessUp"   = brctl "10%+";
-        "XF86MonBrightnessDown" = brctl "10%-";
+          "XF86MonBrightnessUp" = brctl "10%+";
+          "XF86MonBrightnessDown" = brctl "10%-";
 
-        "Mod4+e" = "exec firefox";
-        "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
-        "Mod4+Shift+o" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
-      };
+          "Mod4+e" = "exec firefox";
+          "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
+          "Mod4+Shift+o" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
+        };
       modes.resize = {
         "h" = "resize shrink width 10 px";
         "j" = "resize shrink height 10 px";
@@ -441,19 +445,19 @@ in {
     enable = true;
     package = pkgs.i3-gaps;
     extraConfig = ''
-    default_border none
+      default_border none
 
-    workspace 1 output primary
-    workspace 2 output primary
-    workspace 3 output primary
-    workspace 4 output primary
-    workspace 5 output primary
+      workspace 1 output primary
+      workspace 2 output primary
+      workspace 3 output primary
+      workspace 4 output primary
+      workspace 5 output primary
 
-    workspace 6 output HDMI-0
-    workspace 7 output HDMI-0
-    workspace 8 output HDMI-0
-    workspace 9 output HDMI-0
-    workspace 10 output HDMI-0
+      workspace 6 output HDMI-0
+      workspace 7 output HDMI-0
+      workspace 8 output HDMI-0
+      workspace 9 output HDMI-0
+      workspace 10 output HDMI-0
     '';
     config = {
       modifier = "Mod4";
@@ -604,90 +608,92 @@ in {
   programs.waybar = mkLaptop {
     enable = true;
     style = builtins.readFile ./themes/waybar/style.css;
-    settings = [{
-      layer = "top";
-      position = "top";
-      height = 30;
-      modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
-      modules-right = [ "idle_inhibitor" "custom/nixos" "network" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
-      modules = {
-        "sway/workspaces".disable-scroll = true;
-        "sway/mode".format = "<span style=\"italic\">{}</span>";
-        idle_inhibitor = {
-          format = "{icon}";
-          format-icons = {
-            activated = "";
-            deactivated = "";
+    settings = [
+      {
+        layer = "top";
+        position = "top";
+        height = 30;
+        modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
+        modules-right = [ "idle_inhibitor" "custom/nixos" "network" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
+        modules = {
+          "sway/workspaces".disable-scroll = true;
+          "sway/mode".format = "<span style=\"italic\">{}</span>";
+          idle_inhibitor = {
+            format = "{icon}";
+            format-icons = {
+              activated = "";
+              deactivated = "";
+            };
+          };
+          tray.spacing = 10;
+          clock = {
+            format = "{:%I:%M %p}";
+            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+            format-alt = "{:%Y-%m-%d}";
+          };
+          cpu = {
+            format = "{usage}% ";
+            tooltip = false;
+            interval = 2;
+          };
+          memory = {
+            format = "{}% ";
+            interval = 2;
+          };
+          temperature = {
+            critical-threshold = 80;
+            format = "{temperatureC}°C";
+            interval = 5;
+            # The actual cpu temperature as reported by BIOS
+            hwmon-path = "/sys/class/hwmon/hwmon5/temp1_input";
+          };
+          backlight = {
+            format = "{percent}% {icon}";
+            format-icons = [ "" "" ];
+          };
+          battery = {
+            states = {
+              warning = 20;
+              critical = 10;
+            };
+            format = "{capacity}% {icon}";
+            format-charging = "{capacity}% ";
+            format-plugged = "{capacity}% ";
+            format-tooltip = "{time} {icon}";
+            format-icons = [ "" "" "" "" "" ];
+          };
+          network = {
+            format-wifi = "{essid} ({signalStrength}%) ";
+            format-ethernet = "{ifname}: {ipaddr} ";
+            format-linked = "{ifname} (No IP) ";
+            format-disconnected = "Disconnected ⚠";
+            tooltip-format-ethernet = "{ipaddr}";
+            tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
+            interval = 5;
+          };
+          pulseaudio = {
+            scroll-step = 0;
+            format = "{volume}% {icon}";
+            format-bluetooth = "{volume}% {icon}";
+            format-icons = {
+              headphone = "";
+              hands-free = "";
+              headset = "";
+              phone = "";
+              portable = "";
+              car = "";
+              default = [ "" "" "" ];
+            };
+            on-click = "pavucontrol";
+          };
+          "custom/nixos" = {
+            return-type = "json";
+            interval = 600;
+            exec = "${cpkgs.tools.info}/bin/info --waybar";
           };
         };
-        tray.spacing = 10;
-        clock = {
-          format = "{:%I:%M %p}";
-          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          format-alt = "{:%Y-%m-%d}";
-        };
-        cpu = {
-          format = "{usage}% ";
-          tooltip = false;
-          interval = 2;
-        };
-        memory = {
-          format = "{}% ";
-          interval = 2;
-        };
-        temperature = {
-          critical-threshold = 80;
-          format = "{temperatureC}°C";
-          interval = 5;
-          # The actual cpu temperature as reported by BIOS
-          hwmon-path = "/sys/class/hwmon/hwmon5/temp1_input";
-        };
-        backlight = {
-          format = "{percent}% {icon}";
-          format-icons = [ "" "" ];
-        };
-        battery = {
-          states = {
-            warning = 20;
-            critical = 10;
-          };
-          format = "{capacity}% {icon}";
-          format-charging = "{capacity}% ";
-          format-plugged = "{capacity}% ";
-          format-tooltip = "{time} {icon}";
-          format-icons = [ ""  ""  ""  ""  "" ];
-        };
-        network = {
-          format-wifi = "{essid} ({signalStrength}%) ";
-          format-ethernet = "{ifname}: {ipaddr} ";
-          format-linked = "{ifname} (No IP) ";
-          format-disconnected = "Disconnected ⚠";
-          tooltip-format-ethernet = "{ipaddr}";
-          tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
-          interval = 5;
-        };
-        pulseaudio = {
-          scroll-step = 0;
-          format = "{volume}% {icon}";
-          format-bluetooth = "{volume}% {icon}";
-          format-icons = {
-            headphone = "";
-            hands-free = "";
-            headset = "";
-            phone = "";
-            portable = "";
-            car = "";
-            default = [ ""  ""  "" ];
-          };
-          on-click = "pavucontrol";
-        };
-        "custom/nixos" = {
-          return-type = "json";
-          interval = 600;
-          exec = "${cpkgs.tools.info}/bin/info --waybar";
-        };
-      };
-    }];
+      }
+    ];
   };
 
 

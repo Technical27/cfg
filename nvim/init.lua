@@ -184,7 +184,7 @@ vim.o.title = true
 vim.o.foldnestmax = 10
 vim.o.foldenable = false
 vim.o.lazyredraw = true
-vim.o.synmaxcol = 180
+vim.o.synmaxcol = 500
 
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
@@ -218,6 +218,15 @@ end
 vim.api.nvim_exec([[
   augroup Buffer
     autocmd!
+    autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
     autocmd BufWritePre * call v:lua.clear_whitespace()
+  augroup END
+]], false)
+
+vim.api.nvim_exec([[
+  augroup LspHighlight
+    autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+    autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
   augroup END
 ]], false)
