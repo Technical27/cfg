@@ -6,7 +6,8 @@ let
   mkLaptop = obj: lib.mkIf (isLaptop) obj;
   mkDesktop = obj: lib.mkIf (isDesktop) obj;
   mkPatch = name: { inherit name; patch = ./desktop + "/${name}.patch"; };
-in {
+in
+{
   nix = {
     package = pkgs.nixUnstable;
     extraOptions = ''
@@ -37,36 +38,42 @@ in {
       "ssd"
     ];
   in
-  mkLaptop {
-    "/".options = default_opts;
-    "/nix".options = default_opts;
-    "/var".options = default_opts;
-    "/home".options = default_opts;
-    "/swap".options = swap_opts;
-  };
+    mkLaptop {
+      "/".options = default_opts;
+      "/nix".options = default_opts;
+      "/var".options = default_opts;
+      "/home".options = default_opts;
+      "/swap".options = swap_opts;
+    };
 
-  swapDevices = [{ device = "/swap/file"; }];
+  swapDevices = [ { device = "/swap/file"; } ];
 
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
-  ++ (lib.optionals isLaptop [
-    "resume_offset=18382314"
-    "i915.enable_guc=2"
-    "mem_sleep_default=s2idle"
-  ]);
+  ++ (
+    lib.optionals isLaptop [
+      "resume_offset=18382314"
+      "i915.enable_guc=2"
+      "mem_sleep_default=s2idle"
+    ]
+  );
 
   boot.kernel.sysctl = lib.recursiveUpdate
-  (mkDesktop {
-    "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.default.forwarding" = 1;
-    "net.ipv4.ip_forward" = 1;
-    "vm.swappiness" = 10;
-  }) (mkLaptop {
-    "vm.swappiness" = 60;
-  });
+    (
+      mkDesktop {
+        "net.ipv6.conf.all.forwarding" = 1;
+        "net.ipv6.conf.default.forwarding" = 1;
+        "net.ipv4.ip_forward" = 1;
+        "vm.swappiness" = 10;
+      }
+    ) (
+    mkLaptop {
+      "vm.swappiness" = 60;
+    }
+  );
 
   systemd.network.enable = true;
   services.resolved = {
@@ -252,20 +259,21 @@ in {
       TIMELINE_CREATE=yes
       TIMELINE_CLEANUP=yes
     '';
-  in mkLaptop {
-    home = {
-      subvolume = "/home";
-      extraConfig = "ALLOW_USERS=aamaruvi\n" + timelineConfig;
+  in
+    mkLaptop {
+      home = {
+        subvolume = "/home";
+        extraConfig = "ALLOW_USERS=aamaruvi\n" + timelineConfig;
+      };
+      root = {
+        subvolume = "/";
+        extraConfig = timelineConfig;
+      };
+      var = {
+        subvolume = "/var";
+        extraConfig = timelineConfig;
+      };
     };
-    root = {
-      subvolume = "/";
-      extraConfig = timelineConfig;
-    };
-    var = {
-      subvolume = "/var";
-      extraConfig = timelineConfig;
-    };
-  };
 
   systemd.network.networks."00-wifi" = mkLaptop {
     name = "wlan0";
@@ -286,13 +294,15 @@ in {
       PrivateKeyFile = "/etc/wireguard/laptop.key";
       FirewallMark = 51000;
     };
-    wireguardPeers = [{
-      wireguardPeerConfig = {
-        PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
-        Endpoint = "aamaruvi.ddns.net:51820";
-        AllowedIPs = "0.0.0.0/0, ::/0";
-      };
-    }];
+    wireguardPeers = [
+      {
+        wireguardPeerConfig = {
+          PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
+          Endpoint = "aamaruvi.ddns.net:51820";
+          AllowedIPs = "0.0.0.0/0, ::/0";
+        };
+      }
+    ];
   };
 
   systemd.network.networks."20-wg0" = mkLaptop {
@@ -385,6 +395,7 @@ in {
   environment.etc = mkDesktop {
     "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
     "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
+    "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
   };
 
   services.picom = mkDesktop {
@@ -404,12 +415,14 @@ in {
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = mkDesktop (builtins.map mkPatch [
-    "openrgb"
-    "fsync"
-    "futex2"
-    "winesync"
-  ]);
+  boot.kernelPatches = mkDesktop (
+    builtins.map mkPatch [
+      "openrgb"
+      "fsync"
+      "futex2"
+      "winesync"
+    ]
+  );
 
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";
@@ -427,20 +440,32 @@ in {
   };
 
   nixpkgs.overlays = [
-    (self: super: {
-      freecad = (super.freecad.overrideAttrs (old: {
-        buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
-      }));
-    })
-    (self: super: {
-      mako = super.cpkgs.tools.mako;
-    })
-    (self: super: {
-      lutris = super.lutris.override { steamSupport = false; };
-    })
-    (self: super: {
-      cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
-    })
+    (
+      self: super: {
+        freecad = (
+          super.freecad.overrideAttrs (
+            old: {
+              buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
+            }
+          )
+        );
+      }
+    )
+    (
+      self: super: {
+        mako = super.cpkgs.tools.mako;
+      }
+    )
+    (
+      self: super: {
+        lutris = super.lutris.override { steamSupport = false; };
+      }
+    )
+    (
+      self: super: {
+        cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
+      }
+    )
   ];
 
   services.udev = mkDesktop {

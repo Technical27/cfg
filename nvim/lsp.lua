@@ -5,10 +5,12 @@ local function lsp_on_attach(client)
     vim.api.nvim_exec([[
       augroup LspHighlight
         autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-        autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+        autocmd CursorMovedI <buffer> lua vim.lsp.buf.clear_references()
       augroup END
     ]], false)
+    -- autocmd CursorHold  <buffer> lua vim.lsp.buf.hover()
+    -- autocmd CursorHoldI <buffer> lua vim.lsp.buf.hover()
   end
 end
 
@@ -21,6 +23,9 @@ lspconfig.rust_analyzer.setup {
   on_attach = lsp_on_attach
 }
 lspconfig.hls.setup {
-  cmd = { "@HLS_PATH@", "--lsp" },
+  cmd = { "@HLS_PATH@/bin/haskell-language-server-wrapper", "--lsp" },
+  cmd_env = {
+    PATH = vim.fn.getenv("PATH") .. ":@HLS_PATH@/bin"
+  },
   on_attach = lsp_on_attach
 }

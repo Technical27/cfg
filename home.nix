@@ -145,7 +145,7 @@ in
     ] [
       "${pkgs.rnix-lsp}/bin/rnix-lsp"
       "${pkgs.rust-analyzer}/bin/rust-analyzer"
-      "${pkgs.haskell-language-server}/bin/haskell-language-server-wrapper"
+      "${pkgs.haskell-language-server}"
     ] (builtins.readFile ./nvim/lsp.lua);
   };
 
