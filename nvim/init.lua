@@ -7,9 +7,9 @@ require('packer').startup(function()
   use 'nvim-treesitter/nvim-treesitter'
 
   use {
-      'nvim-telescope/telescope.nvim',
-      requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
-    }
+    'nvim-telescope/telescope.nvim',
+    requires = { { 'nvim-lua/popup.nvim' }, { 'nvim-lua/plenary.nvim' } }
+  }
 
   use 'gruvbox-community/gruvbox'
 
@@ -18,10 +18,10 @@ require('packer').startup(function()
   use 'cohama/lexima.vim'
 
   use {
-  'glepnir/galaxyline.nvim',
+    'glepnir/galaxyline.nvim',
     branch = 'main',
     config = function() require 'statusline' end,
-    requires = {'kyazdani42/nvim-web-devicons', opt = true}
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
   }
 
   use 'neovim/nvim-lspconfig'
@@ -29,14 +29,27 @@ require('packer').startup(function()
   use 'hrsh7th/nvim-compe'
 
   use 'tpope/vim-commentary'
+  use 'tpope/vim-surround'
 
-  use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'} }
+  use 'easymotion/vim-easymotion'
+
+  use {
+    'lewis6991/gitsigns.nvim',
+    requires = { 'nvim-lua/plenary.nvim' },
+    config = function() require('gitsigns').setup { numhl = true } end
+  }
 
   use 'hrsh7th/vim-vsnip'
   use 'rafamadriz/friendly-snippets'
 end)
 
 vim.api.nvim_command('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
+
+vim.api.nvim_set_keymap('n', '<Space>', '<Nop>', { noremap = false, silent = true })
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
+vim.api.nvim_set_keymap('n', '<Leader>', '<Plug>(easymotion-prefix)', {})
 
 vim.g.lexima_no_default_rules = true
 vim.fn['lexima#set_default_rules']()
@@ -68,8 +81,8 @@ require 'compe'.setup {
 
   source = {
     path = true,
-    buffer = {kind = "﬘", true},
-    vsnip = {kind = "﬌"},
+    buffer = { kind = "﬘", true },
+    vsnip = { kind = "﬌" },
     nvim_lsp = true,
   },
 }
@@ -95,21 +108,11 @@ require 'compe'.setup {
 
 local lspconfig = require 'lspconfig'
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-capabilities.textDocument.completion.completionItem.resolveSupport = {
-  properties = {
-    'documentation',
-    'detail',
-    'additionalTextEdits',
-  }
-}
-
-local t = function(str)
+local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-local check_back_space = function()
+local function check_back_space()
     local col = vim.fn.col(".") - 1
     return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
 end
@@ -134,23 +137,31 @@ _G.compe_complete = function()
   return vim.fn["compe#confirm"](vim.fn['lexima#expand'](t '<CR>', 'i'))
 end
 
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.snip_prev()", {expr = true})
-vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", {expr = true})
--- _G.snip_comp = function()
---   if vim.fn.pumvisible() == 1 then
---     return vim.fn['compe#complete']()
---   else
---     return t "<CR>"
---   end
--- end
---
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", { expr = true })
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.snip_prev()", { expr = true })
+vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
 
-lspconfig.rnix.setup {}
-lspconfig.rust_analyzer.setup {
-  capabilities = capabilites
+local lsp_on_attach = function(client, bufnr)
+  if client.resolved_capabilities.document_highlight then
+    vim.api.nvim_exec([[
+      augroup LspHighlight
+        autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+      augroup END
+    ]], false)
+  end
+end
+
+lspconfig.rnix.setup {
+  on_attach = lsp_on_attach
 }
-lspconfig.hls.setup {}
+lspconfig.rust_analyzer.setup {
+  on_attach = lsp_on_attach
+}
+lspconfig.hls.setup {
+  on_attach = lsp_on_attach
+}
 
 vim.o.termguicolors = true
 vim.o.showmode = false
@@ -204,7 +215,7 @@ vim.o.incsearch = true
 vim.o.hlsearch = true
 
 vim.o.foldmethod = 'expr'
-vim.o.foldexpr = vim.fn['nvim_treesitter#foldexpr']()
+vim.cmd [[set foldexpr=nvim_treesitter#foldexpr()]]
 vim.g.EasyMotion_smartcase = 1
 
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
@@ -218,15 +229,7 @@ end
 vim.api.nvim_exec([[
   augroup Buffer
     autocmd!
-    autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
     autocmd BufWritePre * call v:lua.clear_whitespace()
-  augroup END
-]], false)
-
-vim.api.nvim_exec([[
-  augroup LspHighlight
-    autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-    autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
-    autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+    autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
   augroup END
 ]], false)
