@@ -416,11 +416,6 @@ in
   nixpkgs.overlays = [
     (
       self: super: {
-        mako = super.cpkgs.tools.mako;
-      }
-    )
-    (
-      self: super: {
         cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
       }
     )

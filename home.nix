@@ -89,8 +89,8 @@ in
     wl-clipboard
     zoom-us
     teams
-    cpkgs.gruvbox.dark-theme
-    cpkgs.gruvbox.dark-icons
+    cpkgs.gruvbox.theme
+    cpkgs.gruvbox.icons
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
