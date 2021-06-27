@@ -46,7 +46,7 @@ require('packer').startup(function()
   use 'rafamadriz/friendly-snippets'
 end)
 
-vim.api.nvim_command('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
+vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
 
 vim.api.nvim_set_keymap('n', '<Space>', '<Nop>', { noremap = false, silent = true })
 vim.g.mapleader = ' '
@@ -57,7 +57,7 @@ vim.api.nvim_set_keymap('n', '<Leader>', '<Plug>(easymotion-prefix)', {})
 vim.g.lexima_no_default_rules = true
 vim.fn['lexima#set_default_rules']()
 
-vim.api.nvim_command('filetype plugin indent on')
+vim.cmd 'filetype plugin indent on'
 
 require 'nvim-treesitter.configs'.setup {
   indent = {
@@ -113,11 +113,6 @@ local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-local function check_back_space()
-    local col = vim.fn.col(".") - 1
-    return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
-end
-
 function _G.snip_next()
   if vim.fn.call("vsnip#available", {1}) == 1 then
     return t "<Plug>(vsnip-expand-or-jump)"
@@ -148,16 +143,8 @@ vim.o.showmode = false
 -- vim.g.gruvbox_sign_column = 'fg0'
 vim.g.gruvbox_italic = 1
 
-vim.cmd('colorscheme gruvbox')
-
-local theme_file = vim.fn.glob('~/.config/nvim/theme')
-
-if vim.fn.filereadable(theme_file) then
-    vim.o.background = vim.fn.readfile(theme_file)[1]
-else
-    print('failed to load theme file')
-    vim.o.background = 'dark'
-end
+vim.o.background = 'dark'
+vim.cmd 'colorscheme gruvbox'
 
 vim.o.number = true
 vim.o.hidden = true
@@ -194,14 +181,14 @@ vim.o.incsearch = true
 vim.o.hlsearch = true
 
 vim.o.foldmethod = 'expr'
-vim.cmd [[set foldexpr=nvim_treesitter#foldexpr()]]
+vim.cmd 'set foldexpr=nvim_treesitter#foldexpr()'
 vim.g.EasyMotion_smartcase = 1
 
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
 
 function _G.clear_whitespace()
   local save = vim.fn.winsaveview()
-  vim.api.nvim_command([[%s/\\\@<!\s\+$//e]])
+  vim.cmd [[%s/\\\@<!\s\+$//e]]
   vim.fn.winrestview(save)
 end
 

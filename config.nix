@@ -204,18 +204,7 @@ in
   programs.sway.enable = isLaptop;
 
   networking.wireless.iwd.enable = isLaptop;
-  networking.hosts."10.200.200.1" = mkLaptop [ "yogs.tech" ];
-  networking.hosts."192.168.1.2" = mkDesktop [ "yogs.tech" ];
-
-  systemd.user.services.auto-theme = mkLaptop {
-    description = "automatically change theme";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.cpkgs.tools.theme}/bin/theme";
-    };
-    path = with pkgs; [ glib sway ];
-    environment.XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}";
-  };
+  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
 
   systemd.user.timers.auto-theme = mkLaptop {
     description = "automatically change theme at 12";
@@ -235,24 +224,6 @@ in
     };
     wantedBy = [ "graphical-session.target" ];
   };
-
-  # systemd.user.services.sway = mkLaptop {
-  #   description = "Sway - Wayland window manager";
-  #   documentation = [ "man:sway(5)" ];
-  #   bindsTo = [ "graphical-session.target" ];
-  #   wants = [ "graphical-session-pre.target" "dbus.service" ];
-  #   after = [ "graphical-session-pre.target" "dbus.service" ];
-  #   # We explicitly unset PATH here, as we want it to be set by
-  #   # systemctl --user import-environment in startsway
-  #   environment.PATH = lib.mkForce null;
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     ExecStart = "${pkgs.sway}/bin/sway";
-  #     Restart = "on-failure";
-  #     RestartSec = 1;
-  #     TimeoutStopSec = 10;
-  #   };
-  # };
 
   services.snapper.configs = let
     timelineConfig = ''
@@ -442,23 +413,7 @@ in
   nixpkgs.overlays = [
     (
       self: super: {
-        freecad = (
-          super.freecad.overrideAttrs (
-            old: {
-              buildInputs = old.buildInputs ++ (with super; [ gmsh calculix ]);
-            }
-          )
-        );
-      }
-    )
-    (
-      self: super: {
         mako = super.cpkgs.tools.mako;
-      }
-    )
-    (
-      self: super: {
-        lutris = super.lutris.override { steamSupport = false; };
       }
     )
     (

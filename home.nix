@@ -91,8 +91,6 @@ in
     teams
     cpkgs.gruvbox.dark-theme
     cpkgs.gruvbox.dark-icons
-    cpkgs.gruvbox.light-theme
-    cpkgs.gruvbox.light-icons
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
@@ -121,19 +119,7 @@ in
     };
 
   xdg.configFile = {
-    "nvim/coc-settings.json".text = builtins.toJSON (import ./coc.nix pkgs);
-    "kitty/gruvbox-dark.conf".source = ./themes/kitty/gruvbox-dark.conf;
-    "kitty/gruvbox-light.conf".source = ./themes/kitty/gruvbox-light.conf;
-    "zathura/gruvbox-dark.conf".source = ./themes/zathura/gruvbox-dark.conf;
-    "zathura/gruvbox-light.conf".source = ./themes/zathura/gruvbox-light.conf;
-    "bpytop/gruvbox-dark.theme".source = ./themes/bpytop/gruvbox-dark.theme;
-    "bpytop/gruvbox-light.theme".source = ./themes/bpytop/gruvbox-light.theme;
-
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
-    "waybar/gruvbox-dark.css" = mkLaptop { source = ./themes/waybar/gruvbox-dark.css; };
-    "waybar/gruvbox-light.css" = mkLaptop { source = ./themes/waybar/gruvbox-light.css; };
-    "mako/gruvbox-dark.conf" = mkLaptop { source = ./themes/mako/gruvbox-dark.conf; };
-    "mako/gruvbox-light.conf" = mkLaptop { source = ./themes/mako/gruvbox-light.conf; };
 
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
@@ -147,48 +133,6 @@ in
       "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
     ] (builtins.readFile ./nvim/lsp.lua);
-  };
-
-  programs.neovim = {
-    # enable = true;
-    package = pkgs.neovim-unwrapped;
-    # plugins = with pkgs.vimPlugins; [
-    #   nvim-web-devicons
-    #   galaxyline-nvim
-    #   telescope-nvim
-    #   vim-polyglot
-    #   gruvbox-community
-    #   undotree
-    #   vim-surround
-    #   vim-snippets
-    #   vim-lastplace
-    #   lexima-vim
-    #   commentary
-    #   vim-lion
-    #   vim-easymotion
-    #   vimtex
-    #   ultisnips
-    #   nvim-treesitter
-    #   cpkgs.vim.telescope-coc
-    #   nvim-bufferline-lua
-
-    #   # coc extensions
-    #   coc-nvim
-    #   coc-json
-    #   coc-css
-    #   coc-html
-    #   coc-snippets
-    #   coc-git
-    #   coc-rust-analyzer
-    #   coc-prettier
-    #   coc-tsserver
-    #   coc-tabnine
-    #   coc-eslint
-    #   nvim-treesitter-context
-    # ];
-    withNodeJs = true;
-    withPython3 = true;
-    # extraConfig = builtins.readFile ./init.vim;
   };
 
   programs.direnv.enable = true;
@@ -205,17 +149,29 @@ in
       font = "'JetBrains Mono NerdFont' 13";
       statusbar-home-tilde = true;
       window-title-home-tilde = true;
+      completion-bg = "#282828";
+      completion-fg = "#ebdbb2";
+      completion-group-bg = "#282828";
+      completion-group-fg = "#ebdbb2";
+      completion-highlight-bg = "#ebdbb2";
+      completion-highlight-fg = "#282828";
+      default-bg = "#282828";
+      default-fg = "#ebdbb2";
+      highlight-color = "#8ec07c";
+      inputbar-bg = "#282828";
+      inputbar-fg = "#ebdbb2";
+      statusbar-bg = "#282828";
+      statusbar-fg = "#ebdbb2";
     };
-    extraConfig = "include style.conf";
   };
 
   programs.mako = mkLaptop {
     enable = true;
     borderSize = 5;
-    defaultTimeout = 10000;
-    extraConfig = ''
-      include=style.conf
-    '';
+    defaultTimeout = 3000;
+    textColor = "#ebdbb2";
+    backgroundColor = "#282828";
+    borderColor = "#8ec07c";
   };
 
   xsession.preferStatusNotifierItems = true;
