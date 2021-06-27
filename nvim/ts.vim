@@ -23,7 +23,6 @@ fun! g:LoadColors()
   hi! link TSLabel GruvboxRed
   hi! link TSMethod GruvboxGreenBold
   hi! link TSNamespace GruvboxAqua
-  hi! clear TSNone
   hi! link TSNumber GruvboxPurple
   hi! link TSOperator GruvboxFg1
   hi! link TSParamter GruvboxBlue
