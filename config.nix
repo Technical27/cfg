@@ -361,6 +361,9 @@ in
       enable = true;
       package = pkgs.i3-gaps;
     };
+    displayManager.sddm = {
+      enable = true;
+    };
   };
 
   environment.etc = mkDesktop {
@@ -377,12 +380,12 @@ in
     };
   };
 
-  security.pam.services = mkDesktop {
-    i3lock.enableGnomeKeyring = true;
-    i3lock-color.enableGnomeKeyring = true;
-    login.enableGnomeKeyring = true;
-    lightdm.enableGnomeKeyring = true;
-  };
+  # security.pam.services = mkDesktop {
+  #   i3lock.enableGnomeKeyring = true;
+  #   i3lock-color.enableGnomeKeyring = true;
+  #   login.enableGnomeKeyring = true;
+  #   lightdm.enableGnomeKeyring = true;
+  # };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
