@@ -70,6 +70,9 @@ in
     openscad
     freecad
 
+    cpkgs.gruvbox.theme
+    cpkgs.gruvbox.icons
+
     # set thermal modes
     libsmbios
 
@@ -89,8 +92,6 @@ in
     wl-clipboard
     zoom-us
     teams
-    cpkgs.gruvbox.theme
-    cpkgs.gruvbox.icons
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
