@@ -33,26 +33,43 @@ require('packer').startup(function()
 
   use 'tpope/vim-commentary'
   use 'tpope/vim-surround'
+  use 'tpope/vim-repeat'
+  use 'tpope/vim-sexp-mappings-for-regular-people'
 
-  use 'easymotion/vim-easymotion'
+  use 'guns/vim-sexp'
+
+  use {'akinsho/nvim-bufferline.lua', requires = 'kyazdani42/nvim-web-devicons'}
 
   use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
-    config = function() require('gitsigns').setup { numhl = true } end
+    config = function() require('gitsigns').setup {} end
   }
+
+  use {
+    "folke/todo-comments.nvim",
+    requires = "nvim-lua/plenary.nvim",
+    config = function() require("todo-comments").setup {} end
+  }
+
 
   use 'hrsh7th/vim-vsnip'
   use 'rafamadriz/friendly-snippets'
+
+  use {
+    'phaazon/hop.nvim',
+    as = 'hop',
+    config = function()
+      -- you can configure Hop the way you like here; see :h hop-config
+      require'hop'.setup {}
+    end
+  }
+
+  use 'ThePrimeagen/vim-be-good'
+
 end)
 
 vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
-
-vim.api.nvim_set_keymap('n', '<Space>', '<Nop>', { noremap = false, silent = true })
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
-vim.api.nvim_set_keymap('n', '<Leader>', '<Plug>(easymotion-prefix)', {})
 
 vim.g.lexima_no_default_rules = true
 vim.fn['lexima#set_default_rules']()
@@ -93,21 +110,28 @@ require 'compe'.setup {
 -- local telescope = require 'telescope'
 -- telescope.load_extension('coc')
 
--- require('bufferline').setup {
---     oions = {
---         show_close_icon = false,
---         show_buffer_close_icons = false,
---         modified_icon = nil
---     },
---     highlights = {
---         fill = {
---             guibg = {
---                 attribute = 'fg',
---                 highlight = 'GruvboxBg1'
---             }
---         }
---     }
--- }
+require('bufferline').setup {
+    options = {
+        show_close_icon = false,
+        show_buffer_close_icons = false,
+        modified_icon = nil,
+        right_mouse_command = ""
+    },
+    highlights = {
+        fill = {
+            guibg = {
+                attribute = 'fg',
+                highlight = 'GruvboxBg1'
+            }
+        }
+    }
+}
+
+vim.api.nvim_set_keymap("n", "T", "<cmd>bprev<cr>", { noremap = true })
+vim.api.nvim_set_keymap("n", "Y", "<cmd>bnext<cr>", { noremap = true })
+
+-- vim.api.nvim_set_keymap("", "w", "<cmd>lua require'hop'.hint_words()<cr>", {})
+vim.api.nvim_set_keymap("", " f", "<cmd>lua require'hop'.hint_char1()<cr>", {})
 
 local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)

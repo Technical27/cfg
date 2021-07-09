@@ -1,8 +1,8 @@
 local lspconfig = require 'lspconfig'
 
 local function lsp_on_attach(client, bufnr)
-  local function buf_set_keymap(...)
-    vim.api.nvim_buf_set_keymap(bufnr, ..., { noremap = true, silent = true })
+  local function buf_set_keymap(mode, key, cmd)
+    vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
   end
 
   buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
@@ -34,6 +34,10 @@ lspconfig.rnix.setup {
 }
 lspconfig.rust_analyzer.setup {
   cmd = { "@RUST_ANALYZER_PATH@/bin/rust-analyzer" },
+  on_attach = lsp_on_attach
+}
+lspconfig.clojure_lsp.setup {
+  cmd = { "@CLOJURE_LSP_PATH@/bin/clojure-lsp" },
   on_attach = lsp_on_attach
 }
 lspconfig.hls.setup {

@@ -51,7 +51,8 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # NOTE: nvidia drivers don't work on 5.13 yet
+  boot.kernelPackages = if (isLaptop) then pkgs.linuxPackages_latest else pkgs.linuxPackages_5_12;
   boot.kernelParams = []
   ++ (
     lib.optionals isLaptop [
@@ -392,7 +393,6 @@ in
   boot.kernelPatches = mkDesktop (
     builtins.map mkPatch [
       "openrgb"
-      "fsync"
       "futex2"
       "winesync"
     ]
@@ -407,8 +407,8 @@ in
       Type = "oneshot";
       ExecStart = [
         "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
+        "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
         "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
-        "${pkgs.openrgb}/bin/openrgb -d 2 -m breathing -c FF0000"
       ];
     };
   };

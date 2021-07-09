@@ -70,9 +70,6 @@ in
     openscad
     freecad
 
-    cpkgs.gruvbox.theme
-    cpkgs.gruvbox.icons
-
     # set thermal modes
     libsmbios
 
@@ -106,19 +103,6 @@ in
     scrot
   ];
 
-  xdg.mimeApps.enable = true;
-  xdg.mimeApps.defaultApplications = let
-    browser = [ "firefox.desktop" ];
-    files = [ "ranger.desktop" ];
-  in
-    {
-      "text/html" = browser;
-      "x-scheme-handler/http" = browser;
-      "x-scheme-handler/https" = browser;
-      "x-scheme-handler/msteams" = mkLaptop "teams.desktop";
-      "inode/directory" = files;
-    };
-
   xdg.configFile = {
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
 
@@ -129,10 +113,12 @@ in
       "@RNIX_PATH@"
       "@RUST_ANALYZER_PATH@"
       "@HLS_PATH@"
+      "@CLOJURE_LSP_PATH@"
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
+      "${pkgs.clojure-lsp}"
     ] (builtins.readFile ./nvim/lsp.lua);
   };
 
@@ -276,12 +262,16 @@ in
     shellAliases = {
       make = "make -j8";
       icat = "kitty +kitten icat";
+      cat = "bat";
+      grep = "rg";
     };
     functions.fish_greeting = "${cpkgs.tools.info}/bin/info";
   };
 
   gtk = {
     enable = true;
+    theme = { name = "gruvbox-dark"; package = cpkgs.gruvbox.theme; };
+    iconTheme = { name = "gruvbox-dark"; package = cpkgs.gruvbox.icons; };
     gtk3.extraConfig = {
       gtk-cursor-theme-name = "WhiteSur-cursors";
       gtk-cursor-theme-size = if isLaptop then 48 else 24;
