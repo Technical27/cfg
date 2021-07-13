@@ -90,20 +90,12 @@ gls.left[2] = {
     }
 }
 
-local function file_readonly()
-    if vim.bo.filetype == 'help' then return '' end
-    if vim.bo.readonly == true then return '  ' end
-    return ''
-end
-
 local function get_current_file_name()
     local file = vim.fn.expand('%:t')
     if vim.fn.empty(file) == 1 then return '' end
-    if string.len(file_readonly()) ~= 0 then return file .. file_readonly() end
-    if vim.bo.modifiable then
-        if vim.bo.modified then return file .. ' + ' end
-    end
-    return file .. ' '
+    -- if string.len(file_readonly()) ~= 0 then return file .. file_readonly() end
+    --  .. ' '
+    return file
 end
 
 gls.left[3] = {
@@ -115,6 +107,24 @@ gls.left[3] = {
         highlight = { colors.middlegrey, colors.section_bg },
     },
 }
+
+local function file_status()
+    if vim.bo.filetype == 'help' then return '' end
+    if vim.bo.readonly == true then return '' end
+    if vim.bo.modifiable then
+        if vim.bo.modified then
+            vim.api.nvim_command('hi GalaxyFileStatus guifg=' .. mode_color())
+            return file .. '+'
+        end
+    end
+    return ''
+end
+
+-- gls.left[4] = {
+--    FileStatus = {
+--        provider = file_status, condition = is_file, highlight = { colors.middlegrey, colors.section_bg },
+--    }
+--}
 
 gls.right[2] = {
     Ruler = {

@@ -1,7 +1,7 @@
-From e434311562a21e6fc917edeadac7b25732c6ea60 Mon Sep 17 00:00:00 2001
+From ed1408eb394c22190c04ce29f859114b34891bec Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:00 -0300
-Subject: [PATCH] futex2: Implement wait and wake functions
+Subject: [PATCH 01/14] futex2: Implement wait and wake functions
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -79,207 +79,8 @@ options known to be buggy. Given that, `timo` should be a 64bit timeout at
 all platforms, using an absolute timeout value.
 
 Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
----
 
-[RFC Add futex2 syscall 0/0]
-
-Hi,
-
-This patch series introduces the futex2 syscalls.
-
-* What happened to the current futex()?
-
-For some years now, developers have been trying to add new features to
-futex, but maintainers have been reluctant to accept then, given the
-multiplexed interface full of legacy features and tricky to do big
-changes. Some problems that people tried to address with patchsets are:
-NUMA-awareness[0], smaller sized futexes[1], wait on multiple futexes[2].
-NUMA, for instance, just doesn't fit the current API in a reasonable
-way. Considering that, it's not possible to merge new features into the
-current futex.
-
- ** The NUMA problem
-
- At the current implementation, all futex kernel side infrastructure is
- stored on a single node. Given that, all futex() calls issued by
- processors that aren't located on that node will have a memory access
- penalty when doing it.
-
- ** The 32bit sized futex problem
-
- Embedded systems or anything with memory constrains would benefit of
- using smaller sizes for the futex userspace integer. Also, a mutex
- implementation can be done using just three values, so 8 bits is enough
- for various scenarios.
-
- ** The wait on multiple problem
-
- The use case lies in the Wine implementation of the Windows NT interface
- WaitMultipleObjects. This Windows API function allows a thread to sleep
- waiting on the first of a set of event sources (mutexes, timers, signal,
- console input, etc) to signal.  Considering this is a primitive
- synchronization operation for Windows applications, being able to quickly
- signal events on the producer side, and quickly go to sleep on the
- consumer side is essential for good performance of those running over Wine.
-
-[0] https://lore.kernel.org/lkml/20160505204230.932454245@linutronix.de/
-[1] https://lore.kernel.org/lkml/20191221155659.3159-2-malteskarupke@web.de/
-[2] https://lore.kernel.org/lkml/20200213214525.183689-1-andrealmeid@collabora.com/
-
-* The solution
-
-As proposed by Peter Zijlstra and Florian Weimer[3], a new interface
-is required to solve this, which must be designed with those features in
-mind. futex2() is that interface. As opposed to the current multiplexed
-interface, the new one should have one syscall per operation. This will
-allow the maintainability of the API if it gets extended, and will help
-users with type checking of arguments.
-
-In particular, the new interface is extended to support the ability to
-wait on any of a list of futexes at a time, which could be seen as a
-vectored extension of the FUTEX_WAIT semantics.
-
-[3] https://lore.kernel.org/lkml/20200303120050.GC2596@hirez.programming.kicks-ass.net/
-
-* The interface
-
-The new interface can be seen in details in the following patches, but
-this is a high level summary of what the interface can do:
-
- - Supports wake/wait semantics, as in futex()
- - Supports requeue operations, similarly as FUTEX_CMP_REQUEUE, but with
-   individual flags for each address
- - Supports waiting for a vector of futexes, using a new syscall named
-   futex_waitv()
- - Supports variable sized futexes (8bits, 16bits and 32bits)
- - Supports NUMA-awareness operations, where the user can specify on
-   which memory node would like to operate
-
-* Implementation
-
-The internal implementation follows a similar design to the original futex.
-Given that we want to replicate the same external behavior of current
-futex, this should be somewhat expected. For some functions, like the
-init and the code to get a shared key, I literally copied code and
-comments from kernel/futex.c. I decided to do so instead of exposing the
-original function as a public function since in that way we can freely
-modify our implementation if required, without any impact on old futex.
-Also, the comments precisely describes the details and corner cases of
-the implementation.
-
-Each patch contains a brief description of implementation, but patch 6
-"docs: locking: futex2: Add documentation" adds a more complete document
-about it.
-
-* The patchset
-
-This patchset can be also found at my git tree:
-
-https://gitlab.collabora.com/tonyk/linux/-/tree/futex2-dev
-
-  - Patch 1: Implements wait/wake, and the basics foundations of futex2
-
-  - Patches 2-4: Implement the remaining features (shared, waitv, requeue).
-
-  - Patch 5:  Adds the x86_x32 ABI handling. I kept it in a separated
-    patch since I'm not sure if x86_x32 is still a thing, or if it should
-    return -ENOSYS.
-
-  - Patch 6: Add a documentation file which details the interface and
-    the internal implementation.
-
-  - Patches 7-13: Selftests for all operations along with perf
-    support for futex2.
-
-  - Patch 14: While working on porting glibc for futex2, I found out
-    that there's a futex_wake() call at the user thread exit path, if
-    that thread was created with clone(..., CLONE_CHILD_SETTID, ...). In
-    order to make pthreads work with futex2, it was required to add
-    this patch. Note that this is more a proof-of-concept of what we
-    will need to do in future, rather than part of the interface and
-    shouldn't be merged as it is.
-
-* Testing:
-
-This patchset provides selftests for each operation and their flags.
-Along with that, the following work was done:
-
- ** Stability
-
- To stress the interface in "real world scenarios":
-
- - glibc[4]: nptl's low level locking was modified to use futex2 API
-   (except for robust and PI things). All relevant nptl/ tests passed.
-
- - Wine[5]: Proton/Wine was modified in order to use futex2() for the
-   emulation of Windows NT sync mechanisms based on futex, called "fsync".
-   Triple-A games with huge CPU's loads and tons of parallel jobs worked
-   as expected when compared with the previous FUTEX_WAIT_MULTIPLE
-   implementation at futex(). Some games issue 42k futex2() calls
-   per second.
-
- - Full GNU/Linux distro: I installed the modified glibc in my host
-   machine, so all pthread's programs would use futex2(). After tweaking
-   systemd[6] to allow futex2() calls at seccomp, everything worked as
-   expected (web browsers do some syscall sandboxing and need some
-   configuration as well).
-
- - perf: The perf benchmarks tests can also be used to stress the
-   interface, and they can be found in this patchset.
-
- ** Performance
-
- - For comparing futex() and futex2() performance, I used the artificial
-   benchmarks implemented at perf (wake, wake-parallel, hash and
-   requeue). The setup was 200 runs for each test and using 8, 80, 800,
-   8000 for the number of threads, Note that for this test, I'm not using
-   patch 14 ("kernel: Enable waitpid() for futex2") , for reasons explained
-   at "The patchset" section.
-
- - For the first three ones, I measured an average of 4% gain in
-   performance. This is not a big step, but it shows that the new
-   interface is at least comparable in performance with the current one.
-
- - For requeue, I measured an average of 21% decrease in performance
-   compared to the original futex implementation. This is expected given
-   the new design with individual flags. The performance trade-offs are
-   explained at patch 4 ("futex2: Implement requeue operation").
-
-[4] https://gitlab.collabora.com/tonyk/glibc/-/tree/futex2
-[5] https://gitlab.collabora.com/tonyk/wine/-/tree/proton_5.13
-[6] https://gitlab.collabora.com/tonyk/systemd
-
-* FAQ
-
- ** "Where's the code for NUMA and FUTEX_8/16?"
-
- The current code is already complex enough to take some time for
- review, so I believe it's better to split that work out to a future
- iteration of this patchset. Besides that, this RFC is the core part of the
- infrastructure, and the following features will not pose big design
- changes to it, the work will be more about wiring up the flags and
- modifying some functions.
-
- ** "And what's about FUTEX_64?"
-
- By supporting 64 bit futexes, the kernel structure for futex would
- need to have a 64 bit field for the value, and that could defeat one of
- the purposes of having different sized futexes in the first place:
- supporting smaller ones to decrease memory usage. This might be
- something that could be disabled for 32bit archs (and even for
- CONFIG_BASE_SMALL).
-
- Which use case would benefit for FUTEX_64? Does it worth the trade-offs?
-
- ** "Where's the PI/robust stuff?"
-
- As said by Peter Zijlstra at [3], all those new features are related to
- the "simple" futex interface, that doesn't use PI or robust. Do we want
- to have this complexity at futex2() and if so, should it be part of
- this patchset or can it be future work?
-
-Thanks,
-	AndrÃ©
+Rebased-by: Joshua Ashton <joshua@froggi.es>
 ---
  MAINTAINERS                                   |   2 +-
  arch/arm/tools/syscall.tbl                    |   2 +
@@ -300,10 +101,10 @@ Thanks,
  create mode 100644 kernel/futex2.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index d92f85ca831d..01aceb92aa40 100644
+index 673cadd5107a..b4b81b9a6e37 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -7370,7 +7370,7 @@ F:	Documentation/locking/*futex*
+@@ -7521,7 +7521,7 @@ F:	Documentation/locking/*futex*
  F:	include/asm-generic/futex.h
  F:	include/linux/futex.h
  F:	include/uapi/linux/futex.h
@@ -313,71 +114,71 @@ index d92f85ca831d..01aceb92aa40 100644
  F:	tools/testing/selftests/futex/
  
 diff --git a/arch/arm/tools/syscall.tbl b/arch/arm/tools/syscall.tbl
-index dcc1191291a2..2bf93c69e00a 100644
+index 28e03b5fec00..b60a8bdab623 100644
 --- a/arch/arm/tools/syscall.tbl
 +++ b/arch/arm/tools/syscall.tbl
-@@ -456,3 +456,5 @@
- 440	common	process_madvise			sys_process_madvise
- 441	common	epoll_pwait2			sys_epoll_pwait2
- 442	common	mount_setattr			sys_mount_setattr
-+443	common	futex_wait			sys_futex_wait
-+444	common	futex_wake			sys_futex_wake
+@@ -460,3 +460,5 @@
+ 444	common	landlock_create_ruleset		sys_landlock_create_ruleset
+ 445	common	landlock_add_rule		sys_landlock_add_rule
+ 446	common	landlock_restrict_self		sys_landlock_restrict_self
++447	common	futex_wait			sys_futex_wait
++448	common	futex_wake			sys_futex_wake
 diff --git a/arch/arm64/include/asm/unistd.h b/arch/arm64/include/asm/unistd.h
-index 949788f5ba40..64ebdc1ec581 100644
+index 727bfc3be99b..3cb206aea3db 100644
 --- a/arch/arm64/include/asm/unistd.h
 +++ b/arch/arm64/include/asm/unistd.h
 @@ -38,7 +38,7 @@
  #define __ARM_NR_compat_set_tls		(__ARM_NR_COMPAT_BASE + 5)
  #define __ARM_NR_COMPAT_END		(__ARM_NR_COMPAT_BASE + 0x800)
  
--#define __NR_compat_syscalls		443
-+#define __NR_compat_syscalls		445
+-#define __NR_compat_syscalls		447
++#define __NR_compat_syscalls		449
  #endif
  
  #define __ARCH_WANT_SYS_CLONE
 diff --git a/arch/arm64/include/asm/unistd32.h b/arch/arm64/include/asm/unistd32.h
-index 3d874f624056..15c2cd5f1c95 100644
+index 5dab69d2c22b..1749cc108449 100644
 --- a/arch/arm64/include/asm/unistd32.h
 +++ b/arch/arm64/include/asm/unistd32.h
-@@ -893,6 +893,10 @@ __SYSCALL(__NR_process_madvise, sys_process_madvise)
- __SYSCALL(__NR_epoll_pwait2, compat_sys_epoll_pwait2)
- #define __NR_mount_setattr 442
- __SYSCALL(__NR_mount_setattr, sys_mount_setattr)
-+#define __NR_futex_wait 443
+@@ -900,6 +900,10 @@ __SYSCALL(__NR_landlock_create_ruleset, sys_landlock_create_ruleset)
+ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
+ #define __NR_landlock_restrict_self 446
+ __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
++#define __NR_futex_wait 447
 +__SYSCALL(__NR_futex_wait, sys_futex_wait)
-+#define __NR_futex_wake 444
++#define __NR_futex_wake 448
 +__SYSCALL(__NR_futex_wake, sys_futex_wake)
  
  /*
   * Please add new compat syscalls above this comment and update
 diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-index a1c9f496fca6..17d22509d780 100644
+index 4bbc267fb36b..f75de79fa93d 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
-@@ -447,3 +447,5 @@
- 440	i386	process_madvise		sys_process_madvise
- 441	i386	epoll_pwait2		sys_epoll_pwait2		compat_sys_epoll_pwait2
- 442	i386	mount_setattr		sys_mount_setattr
-+443	i386	futex_wait		sys_futex_wait
-+444	i386	futex_wake		sys_futex_wake
+@@ -451,3 +451,5 @@
+ 444	i386	landlock_create_ruleset	sys_landlock_create_ruleset
+ 445	i386	landlock_add_rule	sys_landlock_add_rule
+ 446	i386	landlock_restrict_self	sys_landlock_restrict_self
++447	i386	futex_wait		sys_futex_wait
++448	i386	futex_wake		sys_futex_wake
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index 7bf01cbe582f..3336b5cd5bdb 100644
+index ce18119ea0d0..63b447255df2 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -364,6 +364,8 @@
- 440	common	process_madvise		sys_process_madvise
- 441	common	epoll_pwait2		sys_epoll_pwait2
- 442	common	mount_setattr		sys_mount_setattr
-+443	common	futex_wait		sys_futex_wait
-+444	common	futex_wake		sys_futex_wake
+@@ -368,6 +368,8 @@
+ 444	common	landlock_create_ruleset	sys_landlock_create_ruleset
+ 445	common	landlock_add_rule	sys_landlock_add_rule
+ 446	common	landlock_restrict_self	sys_landlock_restrict_self
++447	common	futex_wait		sys_futex_wait
++448	common	futex_wake		sys_futex_wake
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 2839dc9a7c01..352f69a2b94c 100644
+index 050511e8f1f8..0f9b64cc34f7 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -619,6 +619,13 @@ asmlinkage long sys_get_robust_list(int pid,
+@@ -623,6 +623,13 @@ asmlinkage long sys_get_robust_list(int pid,
  asmlinkage long sys_set_robust_list(struct robust_list_head __user *head,
  				    size_t len);
  
@@ -392,12 +193,12 @@ index 2839dc9a7c01..352f69a2b94c 100644
  asmlinkage long sys_nanosleep(struct __kernel_timespec __user *rqtp,
  			      struct __kernel_timespec __user *rmtp);
 diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index ce58cff99b66..738315f148fa 100644
+index 6de5a7fc066b..2a62ecca2b00 100644
 --- a/include/uapi/asm-generic/unistd.h
 +++ b/include/uapi/asm-generic/unistd.h
-@@ -864,8 +864,14 @@ __SC_COMP(__NR_epoll_pwait2, sys_epoll_pwait2, compat_sys_epoll_pwait2)
- #define __NR_mount_setattr 442
- __SYSCALL(__NR_mount_setattr, sys_mount_setattr)
+@@ -873,8 +873,14 @@ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
+ #define __NR_landlock_restrict_self 446
+ __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
  
 +#define __NR_futex_wait 443
 +__SYSCALL(__NR_futex_wait, sys_futex_wait)
@@ -406,8 +207,8 @@ index ce58cff99b66..738315f148fa 100644
 +__SYSCALL(__NR_futex_wake, sys_futex_wake)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 443
-+#define __NR_syscalls 445
+-#define __NR_syscalls 447
++#define __NR_syscalls 449
  
  /*
   * 32 bit systems traditionally used different
@@ -428,10 +229,10 @@ index a89eb0accd5e..8d30f4b6d094 100644
   * Support for robust futexes: the kernel cleans up held futexes at
   * thread exit time.
 diff --git a/init/Kconfig b/init/Kconfig
-index 22946fe5ded9..0dce39965bfb 100644
+index a61c92066c2e..d87629ec7e48 100644
 --- a/init/Kconfig
 +++ b/init/Kconfig
-@@ -1538,6 +1538,13 @@ config FUTEX
+@@ -1555,6 +1555,13 @@ config FUTEX
  	  support for "fast userspace mutexes".  The resulting kernel may not
  	  run glibc-based applications correctly.
  
@@ -446,10 +247,10 @@ index 22946fe5ded9..0dce39965bfb 100644
  	bool
  	depends on FUTEX && RT_MUTEXES
 diff --git a/kernel/Makefile b/kernel/Makefile
-index 320f1f3941b7..b6407f92c9af 100644
+index 4df609be42d0..1eaf2af50283 100644
 --- a/kernel/Makefile
 +++ b/kernel/Makefile
-@@ -57,6 +57,7 @@ obj-$(CONFIG_PROFILING) += profile.o
+@@ -60,6 +60,7 @@ obj-$(CONFIG_PROFILING) += profile.o
  obj-$(CONFIG_STACKTRACE) += stacktrace.o
  obj-y += time/
  obj-$(CONFIG_FUTEX) += futex.o
@@ -459,7 +260,7 @@ index 320f1f3941b7..b6407f92c9af 100644
  ifneq ($(CONFIG_SMP),y)
 diff --git a/kernel/futex2.c b/kernel/futex2.c
 new file mode 100644
-index 000000000000..d6a2efbfa488
+index 000000000000..ade407c1abb7
 --- /dev/null
 +++ b/kernel/futex2.c
 @@ -0,0 +1,619 @@
@@ -1083,10 +884,10 @@ index 000000000000..d6a2efbfa488
 +}
 +core_initcall(futex2_init);
 diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-index 19aa806890d5..27ef83ca8a9d 100644
+index 0ea8128468c3..9addbe373f00 100644
 --- a/kernel/sys_ni.c
 +++ b/kernel/sys_ni.c
-@@ -150,6 +150,10 @@ COND_SYSCALL_COMPAT(set_robust_list);
+@@ -151,6 +151,10 @@ COND_SYSCALL_COMPAT(set_robust_list);
  COND_SYSCALL(get_robust_list);
  COND_SYSCALL_COMPAT(get_robust_list);
  
@@ -1098,12 +899,12 @@ index 19aa806890d5..27ef83ca8a9d 100644
  
  /* kernel/itimer.c */
 diff --git a/tools/include/uapi/asm-generic/unistd.h b/tools/include/uapi/asm-generic/unistd.h
-index ce58cff99b66..738315f148fa 100644
+index 6de5a7fc066b..2a62ecca2b00 100644
 --- a/tools/include/uapi/asm-generic/unistd.h
 +++ b/tools/include/uapi/asm-generic/unistd.h
-@@ -864,8 +864,14 @@ __SC_COMP(__NR_epoll_pwait2, sys_epoll_pwait2, compat_sys_epoll_pwait2)
- #define __NR_mount_setattr 442
- __SYSCALL(__NR_mount_setattr, sys_mount_setattr)
+@@ -873,8 +873,14 @@ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
+ #define __NR_landlock_restrict_self 446
+ __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
  
 +#define __NR_futex_wait 443
 +__SYSCALL(__NR_futex_wait, sys_futex_wait)
@@ -1112,32 +913,32 @@ index ce58cff99b66..738315f148fa 100644
 +__SYSCALL(__NR_futex_wake, sys_futex_wake)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 443
-+#define __NR_syscalls 445
+-#define __NR_syscalls 447
++#define __NR_syscalls 449
  
  /*
   * 32 bit systems traditionally used different
 diff --git a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
-index 78672124d28b..15d2b89b6ad7 100644
+index ce18119ea0d0..8eb17cc08a69 100644
 --- a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -363,6 +363,8 @@
- 439	common	faccessat2		sys_faccessat2
- 440	common	process_madvise		sys_process_madvise
- 441	common	epoll_pwait2		sys_epoll_pwait2
- 442	common	mount_setattr		sys_mount_setattr
-+443	common  futex_wait              sys_futex_wait
-+444	common  futex_wake              sys_futex_wake
+@@ -368,6 +368,8 @@
+ 444	common	landlock_create_ruleset	sys_landlock_create_ruleset
+ 445	common	landlock_add_rule	sys_landlock_add_rule
+ 446	common	landlock_restrict_self	sys_landlock_restrict_self
++447	common  futex_wait              sys_futex_wait
++448	common  futex_wake              sys_futex_wake
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
 -- 
-GitLab
+2.31.1
 
-From 5e0a8c1ff68778e373871b741a54554e89f0b8fe Mon Sep 17 00:00:00 2001
+
+From 24d84c5a45d3a5c5f3b6f2899bfe1c97e2380964 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH] futex2: Add support for shared futexes
+Subject: [PATCH 02/14] futex2: Add support for shared futexes
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -1182,10 +983,10 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  4 files changed, 220 insertions(+), 6 deletions(-)
 
 diff --git a/fs/inode.c b/fs/inode.c
-index a047ab306f9a..c5e1dd13fd40 100644
+index c93500d84264..73e82a304d10 100644
 --- a/fs/inode.c
 +++ b/fs/inode.c
-@@ -139,6 +139,7 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
+@@ -138,6 +138,7 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
  	inode->i_blkbits = sb->s_blocksize_bits;
  	inode->i_flags = 0;
  	atomic64_set(&inode->i_sequence, 0);
@@ -1194,10 +995,10 @@ index a047ab306f9a..c5e1dd13fd40 100644
  	inode->i_op = &empty_iops;
  	inode->i_fop = &no_open_fops;
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index ec8f3ddf4a6a..33683ff94cb3 100644
+index c3c88fdb9b2a..5dd112c04357 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -683,6 +683,7 @@ struct inode {
+@@ -682,6 +682,7 @@ struct inode {
  	};
  	atomic64_t		i_version;
  	atomic64_t		i_sequence; /* see futex */
@@ -1219,7 +1020,7 @@ index 8d30f4b6d094..70ea66fffb1c 100644
   * Support for robust futexes: the kernel cleans up held futexes at
   * thread exit time.
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index d6a2efbfa488..69866f98f287 100644
+index ade407c1abb7..51086d0c3fd5 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -14,8 +14,10 @@
@@ -1429,7 +1230,7 @@ index d6a2efbfa488..69866f98f287 100644
 +		}
 +
 +		key->pointer = futex_get_inode_uuid(inode);
-+		key->index = (unsigned long)basepage_index(tail);
++		key->index = (unsigned long)page_to_pgoff(tail);
 +		key->offset |= FUT_OFF_INODE;
 +
 +		rcu_read_unlock();
@@ -1540,12 +1341,13 @@ index d6a2efbfa488..69866f98f287 100644
  		return PTR_ERR(bucket);
  
 -- 
-GitLab
+2.31.1
 
-From 9ac7e0f5c6a4f0e56d0e974e21ec4fa09d899be1 Mon Sep 17 00:00:00 2001
+
+From 649c033164d9a09f9ab682f579298b5f0449fe70 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:00 -0300
-Subject: [PATCH] futex2: Implement vectorized wait
+Subject: [PATCH 03/14] futex2: Implement vectorized wait
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -1575,8 +1377,11 @@ information of how many were awakened, or any particular attribute of it
 (if itâ€™s the first awakened, if it is of the smaller index...).
 
 Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
+
+Rebased-by: Joshua Ashton <joshua@froggi.es>
 ---
  arch/arm/tools/syscall.tbl                    |   1 +
+ arch/arm64/include/asm/unistd.h               |   2 +-
  arch/x86/entry/syscalls/syscall_32.tbl        |   1 +
  arch/x86/entry/syscalls/syscall_64.tbl        |   1 +
  include/linux/compat.h                        |  11 ++
@@ -1587,43 +1392,56 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  kernel/sys_ni.c                               |   1 +
  tools/include/uapi/asm-generic/unistd.h       |   5 +-
  .../arch/x86/entry/syscalls/syscall_64.tbl    |   1 +
- 11 files changed, 219 insertions(+), 2 deletions(-)
+ 12 files changed, 220 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm/tools/syscall.tbl b/arch/arm/tools/syscall.tbl
-index 2bf93c69e00a..f9b55f2ea444 100644
+index b60a8bdab623..6e476c34bd00 100644
 --- a/arch/arm/tools/syscall.tbl
 +++ b/arch/arm/tools/syscall.tbl
-@@ -458,3 +458,4 @@
- 442	common	mount_setattr			sys_mount_setattr
- 443	common	futex_wait			sys_futex_wait
- 444	common	futex_wake			sys_futex_wake
-+445	common  futex_waitv                     sys_futex_waitv
+@@ -462,3 +462,4 @@
+ 446	common	landlock_restrict_self		sys_landlock_restrict_self
+ 447	common	futex_wait			sys_futex_wait
+ 448	common	futex_wake			sys_futex_wake
++449	common  futex_waitv                     sys_futex_waitv
+diff --git a/arch/arm64/include/asm/unistd.h b/arch/arm64/include/asm/unistd.h
+index 3cb206aea3db..6bdb5f5db438 100644
+--- a/arch/arm64/include/asm/unistd.h
++++ b/arch/arm64/include/asm/unistd.h
+@@ -38,7 +38,7 @@
+ #define __ARM_NR_compat_set_tls		(__ARM_NR_COMPAT_BASE + 5)
+ #define __ARM_NR_COMPAT_END		(__ARM_NR_COMPAT_BASE + 0x800)
+ 
+-#define __NR_compat_syscalls		449
++#define __NR_compat_syscalls		450
+ #endif
+ 
+ #define __ARCH_WANT_SYS_CLONE
 diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-index 17d22509d780..4bc546c841b0 100644
+index f75de79fa93d..b991991a434a 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
-@@ -449,3 +449,4 @@
- 442	i386	mount_setattr		sys_mount_setattr
- 443	i386	futex_wait		sys_futex_wait
- 444	i386	futex_wake		sys_futex_wake
-+445	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
+@@ -453,3 +453,4 @@
+ 446	i386	landlock_restrict_self	sys_landlock_restrict_self
+ 447	i386	futex_wait		sys_futex_wait
+ 448	i386	futex_wake		sys_futex_wake
++449	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index 3336b5cd5bdb..a715e88e3d6d 100644
+index 63b447255df2..bad4aca3e9ba 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -366,6 +366,7 @@
- 442	common	mount_setattr		sys_mount_setattr
- 443	common	futex_wait		sys_futex_wait
- 444	common	futex_wake		sys_futex_wake
-+445	common	futex_waitv		sys_futex_waitv
+@@ -370,6 +370,7 @@
+ 446	common	landlock_restrict_self	sys_landlock_restrict_self
+ 447	common	futex_wait		sys_futex_wait
+ 448	common	futex_wake		sys_futex_wake
++449	common	futex_waitv		sys_futex_waitv
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
 diff --git a/include/linux/compat.h b/include/linux/compat.h
-index 6e65be753603..041d18174350 100644
+index 8855b1b702b2..06a40776d8a5 100644
 --- a/include/linux/compat.h
 +++ b/include/linux/compat.h
-@@ -365,6 +365,12 @@ struct compat_robust_list_head {
+@@ -368,6 +368,12 @@ struct compat_robust_list_head {
  	compat_uptr_t			list_op_pending;
  };
  
@@ -1636,7 +1454,7 @@ index 6e65be753603..041d18174350 100644
  #ifdef CONFIG_COMPAT_OLD_SIGACTION
  struct compat_old_sigaction {
  	compat_uptr_t			sa_handler;
-@@ -654,6 +660,11 @@ asmlinkage long
+@@ -692,6 +698,11 @@ asmlinkage long
  compat_sys_get_robust_list(int pid, compat_uptr_t __user *head_ptr,
  			   compat_size_t __user *len_ptr);
  
@@ -1649,18 +1467,18 @@ index 6e65be753603..041d18174350 100644
  asmlinkage long compat_sys_getitimer(int which,
  				     struct old_itimerval32 __user *it);
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 352f69a2b94c..48e96fe7d8f6 100644
+index 0f9b64cc34f7..7d166f7304ae 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -69,6 +69,7 @@ struct io_uring_params;
- struct clone_args;
- struct open_how;
+@@ -71,6 +71,7 @@ struct open_how;
  struct mount_attr;
+ struct landlock_ruleset_attr;
+ enum landlock_rule_type;
 +struct futex_waitv;
  
  #include <linux/types.h>
  #include <linux/aio_abi.h>
-@@ -625,6 +626,9 @@ asmlinkage long sys_futex_wait(void __user *uaddr, unsigned int val,
+@@ -629,6 +630,9 @@ asmlinkage long sys_futex_wait(void __user *uaddr, unsigned int val,
  			       struct __kernel_timespec __user *timo);
  asmlinkage long sys_futex_wake(void __user *uaddr, unsigned int nr_wake,
  			       unsigned int flags);
@@ -1671,10 +1489,10 @@ index 352f69a2b94c..48e96fe7d8f6 100644
  /* kernel/hrtimer.c */
  asmlinkage long sys_nanosleep(struct __kernel_timespec __user *rqtp,
 diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index 738315f148fa..2a6adca37fe9 100644
+index 2a62ecca2b00..1179d3f02d65 100644
 --- a/include/uapi/asm-generic/unistd.h
 +++ b/include/uapi/asm-generic/unistd.h
-@@ -870,8 +870,11 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
+@@ -879,8 +879,11 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
  #define __NR_futex_wake 444
  __SYSCALL(__NR_futex_wake, sys_futex_wake)
  
@@ -1682,8 +1500,8 @@ index 738315f148fa..2a6adca37fe9 100644
 +__SC_COMP(__NR_futex_waitv, sys_futex_waitv, compat_sys_futex_waitv)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 445
-+#define __NR_syscalls 446
+-#define __NR_syscalls 449
++#define __NR_syscalls 450
  
  /*
   * 32 bit systems traditionally used different
@@ -1713,7 +1531,7 @@ index 70ea66fffb1c..3216aee015d2 100644
   * Support for robust futexes: the kernel cleans up held futexes at
   * thread exit time.
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index 69866f98f287..3290e51695eb 100644
+index 51086d0c3fd5..beb2ce11ac83 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -83,6 +83,12 @@ struct futex_bucket {
@@ -1908,10 +1726,10 @@ index 69866f98f287..3290e51695eb 100644
   * futex_get_parent - For a given futex in a futexv list, get a pointer to the futexv
   * @waiter: Address of futex in the list
 diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-index 27ef83ca8a9d..977890c58ab5 100644
+index 9addbe373f00..d70bb8cb884f 100644
 --- a/kernel/sys_ni.c
 +++ b/kernel/sys_ni.c
-@@ -153,6 +153,7 @@ COND_SYSCALL_COMPAT(get_robust_list);
+@@ -154,6 +154,7 @@ COND_SYSCALL_COMPAT(get_robust_list);
  /* kernel/futex2.c */
  COND_SYSCALL(futex_wait);
  COND_SYSCALL(futex_wake);
@@ -1920,41 +1738,42 @@ index 27ef83ca8a9d..977890c58ab5 100644
  /* kernel/hrtimer.c */
  
 diff --git a/tools/include/uapi/asm-generic/unistd.h b/tools/include/uapi/asm-generic/unistd.h
-index 738315f148fa..b1ab5e14d0c3 100644
+index 2a62ecca2b00..1179d3f02d65 100644
 --- a/tools/include/uapi/asm-generic/unistd.h
 +++ b/tools/include/uapi/asm-generic/unistd.h
-@@ -870,8 +870,11 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
+@@ -879,8 +879,11 @@ __SYSCALL(__NR_futex_wait, sys_futex_wait)
  #define __NR_futex_wake 444
  __SYSCALL(__NR_futex_wake, sys_futex_wake)
  
-+#define __NR_epoll_pwait2 445
++#define __NR_futex_waitv 445
 +__SC_COMP(__NR_futex_waitv, sys_futex_waitv, compat_sys_futex_waitv)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 445
-+#define __NR_syscalls 446
+-#define __NR_syscalls 449
++#define __NR_syscalls 450
  
  /*
   * 32 bit systems traditionally used different
 diff --git a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
-index 15d2b89b6ad7..820c1e4b1aa9 100644
+index 8eb17cc08a69..faa5a3442e43 100644
 --- a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -365,6 +365,7 @@
- 442	common	mount_setattr		sys_mount_setattr
- 443	common  futex_wait              sys_futex_wait
- 444	common  futex_wake              sys_futex_wake
-+445	common  futex_waitv             sys_futex_waitv
+@@ -370,6 +370,7 @@
+ 446	common	landlock_restrict_self	sys_landlock_restrict_self
+ 447	common  futex_wait              sys_futex_wait
+ 448	common  futex_wake              sys_futex_wake
++449	common	futex_waitv		sys_futex_waitv
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
 -- 
-GitLab
+2.31.1
 
-From f22443c43d18f487392cb2a3d2a6557ff6081ce0 Mon Sep 17 00:00:00 2001
+
+From 3f11c8e493c1c7a6602ed564ee4c5e074c90b10f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH] futex2: Implement requeue operation
+Subject: [PATCH 04/14] futex2: Implement requeue operation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -1982,36 +1801,8 @@ Return the number of the woken futexes + the number of requeued ones on
 success, error code otherwise.
 
 Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
----
 
-The original FUTEX_CMP_REQUEUE interfaces is such as follows:
-
-futex(*uaddr1, FUTEX_CMP_REQUEUE, nr_wake, nr_requeue, *uaddr2, cmpval);
-
-Given that when this interface was created they was only one type of
-futex (as opposed to futex2, where there is shared, sizes, and NUMA),
-there was no way to specify individual flags for uaddr1 and 2. When
-FUTEX_PRIVATE was implemented, a new opcode was created as well
-(FUTEX_CMP_REQUEUE_PRIVATE), but they apply both futexes, so they
-should be of the same type regarding private/shared. This imposes a
-limitation on the use cases of the operation, and to overcome that at futex2,
-`struct futex_requeue` was created, so one can set individual flags for
-each futex. This flexibility is a trade-off with performance, given that
-now we need to perform two extra copy_from_user(). One alternative would
-be to use the upper half of flags bits to the first one, and the bottom
-half for the second futex, but this would also impose limitations, given
-that we would limit by half the flags possibilities. If equal futexes
-are common enough, the following extension could be added to overcome
-the current performance:
-
-- A flag FUTEX_REQUEUE_EQUAL is added to futex2() flags;
-- If futex_requeue() see this flag, that means that both futexes uses
-  the same set of attributes.
-- Then, the function parses the flags as of futex_wait/wake().
-- *uaddr1 and *uaddr2 are used as void* (instead of struct
-  futex_requeue) just like wait/wake().
-
-In that way, we could avoid the copy_from_user().
+Rebased-by: Joshua Ashton <joshua@froggi.es>
 ---
  arch/arm/tools/syscall.tbl             |   1 +
  arch/arm64/include/asm/unistd.h        |   2 +-
@@ -2026,53 +1817,53 @@ In that way, we could avoid the copy_from_user().
  10 files changed, 251 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm/tools/syscall.tbl b/arch/arm/tools/syscall.tbl
-index f9b55f2ea444..24a700535747 100644
+index 6e476c34bd00..25f175ada125 100644
 --- a/arch/arm/tools/syscall.tbl
 +++ b/arch/arm/tools/syscall.tbl
-@@ -459,3 +459,4 @@
- 443	common	futex_wait			sys_futex_wait
- 444	common	futex_wake			sys_futex_wake
- 445	common  futex_waitv                     sys_futex_waitv
-+446	common	futex_requeue			sys_futex_requeue
+@@ -463,3 +463,4 @@
+ 447	common	futex_wait			sys_futex_wait
+ 448	common	futex_wake			sys_futex_wake
+ 449	common  futex_waitv                     sys_futex_waitv
++450	common	futex_requeue			sys_futex_requeue
 diff --git a/arch/arm64/include/asm/unistd.h b/arch/arm64/include/asm/unistd.h
-index 64ebdc1ec581..d1cc2849dc00 100644
+index 6bdb5f5db438..4e65da3445c7 100644
 --- a/arch/arm64/include/asm/unistd.h
 +++ b/arch/arm64/include/asm/unistd.h
 @@ -38,7 +38,7 @@
  #define __ARM_NR_compat_set_tls		(__ARM_NR_COMPAT_BASE + 5)
  #define __ARM_NR_COMPAT_END		(__ARM_NR_COMPAT_BASE + 0x800)
  
--#define __NR_compat_syscalls		445
-+#define __NR_compat_syscalls		446
+-#define __NR_compat_syscalls		450
++#define __NR_compat_syscalls		451
  #endif
  
  #define __ARCH_WANT_SYS_CLONE
 diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-index 4bc546c841b0..4d0111f44d79 100644
+index b991991a434a..1c3ca8b50247 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
-@@ -450,3 +450,4 @@
- 443	i386	futex_wait		sys_futex_wait
- 444	i386	futex_wake		sys_futex_wake
- 445	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
-+446	i386	futex_requeue		sys_futex_requeue		compat_sys_futex_requeue
+@@ -454,3 +454,4 @@
+ 447	i386	futex_wait		sys_futex_wait
+ 448	i386	futex_wake		sys_futex_wake
+ 449	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
++450	i386	futex_requeue		sys_futex_requeue		compat_sys_futex_requeue
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index a715e88e3d6d..61c0b47365e3 100644
+index bad4aca3e9ba..a1a39ed156e8 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -367,6 +367,7 @@
- 443	common	futex_wait		sys_futex_wait
- 444	common	futex_wake		sys_futex_wake
- 445	common	futex_waitv		sys_futex_waitv
-+446	common	futex_requeue		sys_futex_requeue
+@@ -371,6 +371,7 @@
+ 447	common	futex_wait		sys_futex_wait
+ 448	common	futex_wake		sys_futex_wake
+ 449	common	futex_waitv		sys_futex_waitv
++450	common	futex_requeue		sys_futex_requeue
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
 diff --git a/include/linux/compat.h b/include/linux/compat.h
-index 041d18174350..d4c1b402b962 100644
+index 06a40776d8a5..34ad63bac18d 100644
 --- a/include/linux/compat.h
 +++ b/include/linux/compat.h
-@@ -371,6 +371,11 @@ struct compat_futex_waitv {
+@@ -374,6 +374,11 @@ struct compat_futex_waitv {
  	compat_uint_t flags;
  };
  
@@ -2084,7 +1875,7 @@ index 041d18174350..d4c1b402b962 100644
  #ifdef CONFIG_COMPAT_OLD_SIGACTION
  struct compat_old_sigaction {
  	compat_uptr_t			sa_handler;
-@@ -665,6 +670,13 @@ asmlinkage long compat_sys_futex_waitv(struct compat_futex_waitv *waiters,
+@@ -703,6 +708,13 @@ asmlinkage long compat_sys_futex_waitv(struct compat_futex_waitv *waiters,
  				       compat_uint_t nr_futexes, compat_uint_t flags,
  				       struct __kernel_timespec __user *timo);
  
@@ -2099,18 +1890,18 @@ index 041d18174350..d4c1b402b962 100644
  asmlinkage long compat_sys_getitimer(int which,
  				     struct old_itimerval32 __user *it);
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 48e96fe7d8f6..b0675f236066 100644
+index 7d166f7304ae..aca64b5126a7 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -70,6 +70,7 @@ struct clone_args;
- struct open_how;
- struct mount_attr;
+@@ -72,6 +72,7 @@ struct mount_attr;
+ struct landlock_ruleset_attr;
+ enum landlock_rule_type;
  struct futex_waitv;
 +struct futex_requeue;
  
  #include <linux/types.h>
  #include <linux/aio_abi.h>
-@@ -629,6 +630,10 @@ asmlinkage long sys_futex_wake(void __user *uaddr, unsigned int nr_wake,
+@@ -633,6 +634,10 @@ asmlinkage long sys_futex_wake(void __user *uaddr, unsigned int nr_wake,
  asmlinkage long sys_futex_waitv(struct futex_waitv __user *waiters,
  				unsigned int nr_futexes, unsigned int flags,
  				struct __kernel_timespec __user *timo);
@@ -2122,10 +1913,10 @@ index 48e96fe7d8f6..b0675f236066 100644
  /* kernel/hrtimer.c */
  asmlinkage long sys_nanosleep(struct __kernel_timespec __user *rqtp,
 diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index 2a6adca37fe9..2778da551846 100644
+index 1179d3f02d65..78d30c06b217 100644
 --- a/include/uapi/asm-generic/unistd.h
 +++ b/include/uapi/asm-generic/unistd.h
-@@ -873,8 +873,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
+@@ -882,8 +882,11 @@ __SYSCALL(__NR_futex_wake, sys_futex_wake)
  #define __NR_futex_waitv 445
  __SC_COMP(__NR_futex_waitv, sys_futex_waitv, compat_sys_futex_waitv)
  
@@ -2133,8 +1924,8 @@ index 2a6adca37fe9..2778da551846 100644
 +__SC_COMP(__NR_futex_requeue, sys_futex_requeue, compat_sys_futex_requeue)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 446
-+#define __NR_syscalls 447
+-#define __NR_syscalls 450
++#define __NR_syscalls 451
  
  /*
   * 32 bit systems traditionally used different
@@ -2160,7 +1951,7 @@ index 3216aee015d2..c15bfddcf1e2 100644
   * Support for robust futexes: the kernel cleans up held futexes at
   * thread exit time.
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index 3290e51695eb..75c961b309bb 100644
+index beb2ce11ac83..0d1db071c363 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -975,6 +975,221 @@ SYSCALL_DEFINE3(futex_wake, void __user *, uaddr, unsigned int, nr_wake,
@@ -2386,10 +2177,10 @@ index 3290e51695eb..75c961b309bb 100644
  {
  	int i;
 diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-index 977890c58ab5..1750dfc416d8 100644
+index d70bb8cb884f..af0b1ef09d93 100644
 --- a/kernel/sys_ni.c
 +++ b/kernel/sys_ni.c
-@@ -154,6 +154,7 @@ COND_SYSCALL_COMPAT(get_robust_list);
+@@ -155,6 +155,7 @@ COND_SYSCALL_COMPAT(get_robust_list);
  COND_SYSCALL(futex_wait);
  COND_SYSCALL(futex_wake);
  COND_SYSCALL(futex_waitv);
@@ -2398,12 +2189,13 @@ index 977890c58ab5..1750dfc416d8 100644
  /* kernel/hrtimer.c */
  
 -- 
-GitLab
+2.31.1
 
-From a439256740d175a9a5f9da6f81af1ad070541151 Mon Sep 17 00:00:00 2001
+
+From 75ed26356ac56c0110ee39243b8c2948751cfd36 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Thu, 11 Feb 2021 10:47:23 -0300
-Subject: [PATCH] futex2: Add compatibility entry point for x86_x32 ABI
+Subject: [PATCH 05/14] futex2: Add compatibility entry point for x86_x32 ABI
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2418,7 +2210,7 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  1 file changed, 35 insertions(+), 7 deletions(-)
 
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index 75c961b309bb..61b81b401e58 100644
+index 0d1db071c363..22ba9b3e45e2 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -23,6 +23,10 @@
@@ -2486,12 +2278,13 @@ index 75c961b309bb..61b81b401e58 100644
  	return __futex_requeue(rq1, rq2, nr_wake, nr_requeue, cmpval, shared1, shared2);
  }
 -- 
-GitLab
+2.31.1
 
-From 6ae4534eedef59fa3bd48e4cc03961813e10f643 Mon Sep 17 00:00:00 2001
+
+From ccdfc0a01aca5de728da256a2e5dea1d8a2ffc1f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Tue, 9 Feb 2021 13:59:00 -0300
-Subject: [PATCH] docs: locking: futex2: Add documentation
+Subject: [PATCH 06/14] docs: locking: futex2: Add documentation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2508,7 +2301,7 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
 
 diff --git a/Documentation/locking/futex2.rst b/Documentation/locking/futex2.rst
 new file mode 100644
-index 000000000000..3ab49f0e741c
+index 000000000000..13a7699bd6fc
 --- /dev/null
 +++ b/Documentation/locking/futex2.rst
 @@ -0,0 +1,198 @@
@@ -2723,12 +2516,13 @@ index 7003bd5aeff4..9bf03c7fa1ec 100644
  .. only::  subproject and html
  
 -- 
-GitLab
+2.31.1
 
-From 2e88815c729ee716e3ce15c0b182d9a0d7958079 Mon Sep 17 00:00:00 2001
+
+From 213a8dc8b0266d98f95d7b5d642abbbf9a636d2b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH] selftests: futex2: Add wake/wait test
+Subject: [PATCH 07/14] selftests: futex2: Add wake/wait test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2792,7 +2586,7 @@ index 23207829ec75..9b334f190759 100644
  
 diff --git a/tools/testing/selftests/futex/functional/futex2_wait.c b/tools/testing/selftests/futex/functional/futex2_wait.c
 new file mode 100644
-index 000000000000..4b5416585c79
+index 000000000000..752a26b33bf8
 --- /dev/null
 +++ b/tools/testing/selftests/futex/functional/futex2_wait.c
 @@ -0,0 +1,209 @@
@@ -3018,7 +2812,7 @@ index 1acb6ace1680..3730159c865a 100755
 +./futex2_wait $COLOR
 diff --git a/tools/testing/selftests/futex/include/futex2test.h b/tools/testing/selftests/futex/include/futex2test.h
 new file mode 100644
-index 000000000000..e724d56b917e
+index 000000000000..917ac8909a3b
 --- /dev/null
 +++ b/tools/testing/selftests/futex/include/futex2test.h
 @@ -0,0 +1,79 @@
@@ -3102,12 +2896,13 @@ index 000000000000..e724d56b917e
 +	return syscall(__NR_futex_wake, uaddr, nr, flags);
 +}
 -- 
-GitLab
+2.31.1
 
-From 4564c36175c0c0cf31cac0fd1e94c4813b6c7244 Mon Sep 17 00:00:00 2001
+
+From daefe54ab3e913048e88050a66f81d5e678287c0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH] selftests: futex2: Add timeout test
+Subject: [PATCH 08/14] selftests: futex2: Add timeout test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3122,7 +2917,7 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  1 file changed, 49 insertions(+), 9 deletions(-)
 
 diff --git a/tools/testing/selftests/futex/functional/futex_wait_timeout.c b/tools/testing/selftests/futex/functional/futex_wait_timeout.c
-index ee55e6d389a3..b4dffe9e3b44 100644
+index ee55e6d389a3..4569bf303b05 100644
 --- a/tools/testing/selftests/futex/functional/futex_wait_timeout.c
 +++ b/tools/testing/selftests/futex/functional/futex_wait_timeout.c
 @@ -11,6 +11,7 @@
@@ -3221,12 +3016,13 @@ index ee55e6d389a3..b4dffe9e3b44 100644
  	return ret;
  }
 -- 
-GitLab
+2.31.1
 
-From 3e2b4ab146c93d51e083f410b34be3ccb2bbee5b Mon Sep 17 00:00:00 2001
+
+From ffc9b6260a0a8f12da9aa20f3c0a91bf90e732aa Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH] selftests: futex2: Add wouldblock test
+Subject: [PATCH 09/14] selftests: futex2: Add wouldblock test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3240,7 +3036,7 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  1 file changed, 29 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/futex/functional/futex_wait_wouldblock.c b/tools/testing/selftests/futex/functional/futex_wait_wouldblock.c
-index 0ae390ff8164..ed3660090907 100644
+index 0ae390ff8164..b1d463ebb33d 100644
 --- a/tools/testing/selftests/futex/functional/futex_wait_wouldblock.c
 +++ b/tools/testing/selftests/futex/functional/futex_wait_wouldblock.c
 @@ -12,6 +12,7 @@
@@ -3314,12 +3110,13 @@ index 0ae390ff8164..ed3660090907 100644
  	return ret;
  }
 -- 
-GitLab
+2.31.1
 
-From 671e79d935493cdc5aa05a7e3a96547adbb3c200 Mon Sep 17 00:00:00 2001
+
+From 1b9fd688507408bd196b03ec96b6d5d303ed344b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:02 -0300
-Subject: [PATCH] selftests: futex2: Add waitv test
+Subject: [PATCH 10/14] selftests: futex2: Add waitv test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3363,7 +3160,7 @@ index 9b334f190759..09c08ccdeaf2 100644
  
 diff --git a/tools/testing/selftests/futex/functional/futex2_waitv.c b/tools/testing/selftests/futex/functional/futex2_waitv.c
 new file mode 100644
-index 000000000000..2f81d296d95d
+index 000000000000..8ba74f1cbd51
 --- /dev/null
 +++ b/tools/testing/selftests/futex/functional/futex2_waitv.c
 @@ -0,0 +1,157 @@
@@ -3536,7 +3333,7 @@ index 3730159c865a..18b3883d7236 100755
 +echo
 +./futex2_waitv $COLOR
 diff --git a/tools/testing/selftests/futex/include/futex2test.h b/tools/testing/selftests/futex/include/futex2test.h
-index e724d56b917e..31979afc486f 100644
+index 917ac8909a3b..7f847bd60594 100644
 --- a/tools/testing/selftests/futex/include/futex2test.h
 +++ b/tools/testing/selftests/futex/include/futex2test.h
 @@ -28,6 +28,19 @@
@@ -3577,12 +3374,13 @@ index e724d56b917e..31979afc486f 100644
 +	return syscall(__NR_futex_waitv, waiters, nr_waiters, flags, timo);
 +}
 -- 
-GitLab
+2.31.1
 
-From c6f8ed51da9411d893ea5efe6ba3cba4624cfda5 Mon Sep 17 00:00:00 2001
+
+From 232e77c996fb8a19ef4511771568019d3545156f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:02 -0300
-Subject: [PATCH] selftests: futex2: Add requeue test
+Subject: [PATCH 11/14] selftests: futex2: Add requeue test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -3626,7 +3424,7 @@ index 09c08ccdeaf2..3ccb9ea58ddd 100644
  
 diff --git a/tools/testing/selftests/futex/functional/futex2_requeue.c b/tools/testing/selftests/futex/functional/futex2_requeue.c
 new file mode 100644
-index 000000000000..1bc3704dc8c2
+index 000000000000..05629c2257d0
 --- /dev/null
 +++ b/tools/testing/selftests/futex/functional/futex2_requeue.c
 @@ -0,0 +1,164 @@
@@ -3795,7 +3593,7 @@ index 000000000000..1bc3704dc8c2
 +	return ret;
 +}
 diff --git a/tools/testing/selftests/futex/include/futex2test.h b/tools/testing/selftests/futex/include/futex2test.h
-index 31979afc486f..e2635006b1a9 100644
+index 7f847bd60594..faa4027ce5b1 100644
 --- a/tools/testing/selftests/futex/include/futex2test.h
 +++ b/tools/testing/selftests/futex/include/futex2test.h
 @@ -103,3 +103,19 @@ static inline int futex2_waitv(volatile struct futex_waitv *waiters, unsigned lo
@@ -3819,12 +3617,13 @@ index 31979afc486f..e2635006b1a9 100644
 +	return syscall(__NR_futex_requeue, uaddr1, uaddr2, nr_wake, nr_requeue, cmpval, flags);
 +}
 -- 
-GitLab
+2.31.1
 
-From 7a9cacbb174d26d4adfcca3efa5747bf6ae05fa2 Mon Sep 17 00:00:00 2001
+
+From 34e8923658222740ed4357544cf38df3ea4a0bf2 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:02 -0300
-Subject: [PATCH] perf bench: Add futex2 benchmark tests
+Subject: [PATCH 12/14] perf bench: Add futex2 benchmark tests
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -4347,12 +4146,13 @@ index 62a7b7420a44..e41a95ad2db6 100644
  	{"epoll",       "Epoll stressing benchmarks",                   epoll_benchmarks        },
  #endif
 -- 
-GitLab
+2.31.1
 
-From dcd3dfa6c75d110174c948aadb14e41416a826dd Mon Sep 17 00:00:00 2001
+
+From 04b171b8aae7843cc1cc15d4f41188626382548b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:02 -0300
-Subject: [PATCH] kernel: Enable waitpid() for futex2
+Subject: [PATCH 13/14] kernel: Enable waitpid() for futex2
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -4366,23 +4166,16 @@ that it isn't using.
 
 Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
 ---
-
-This commit is here for the intend to show what we need to do in order
-to get a full NPTL working on top of futex2. It should be merged after
-we talk to glibc folks on the details around the futex_wait() side. For
-instance, we could use this as an opportunity to use private futexes or
-8bit sized futexes, but both sides need to use the exactly same flags.
----
  include/linux/syscalls.h |  2 ++
  kernel/fork.c            |  2 ++
  kernel/futex2.c          | 30 ++++++++++++++++++------------
  3 files changed, 22 insertions(+), 12 deletions(-)
 
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index b0675f236066..b07b7d4334a6 100644
+index aca64b5126a7..a0a9748b0236 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -1316,6 +1316,8 @@ int ksys_ipc(unsigned int call, int first, unsigned long second,
+@@ -1325,6 +1325,8 @@ int ksys_ipc(unsigned int call, int first, unsigned long second,
  	unsigned long third, void __user * ptr, long fifth);
  int compat_ksys_ipc(u32 call, int first, int second,
  	u32 third, u32 ptr, u32 fifth);
@@ -4392,10 +4185,10 @@ index b0675f236066..b07b7d4334a6 100644
  /*
   * The following kernel syscall equivalents are just wrappers to fs-internal
 diff --git a/kernel/fork.c b/kernel/fork.c
-index d66cd1014211..e39846a73a43 100644
+index dc06afd725cb..344430d882b1 100644
 --- a/kernel/fork.c
 +++ b/kernel/fork.c
-@@ -1308,6 +1308,8 @@ static void mm_release(struct task_struct *tsk, struct mm_struct *mm)
+@@ -1322,6 +1322,8 @@ static void mm_release(struct task_struct *tsk, struct mm_struct *mm)
  			put_user(0, tsk->clear_child_tid);
  			do_futex(tsk->clear_child_tid, FUTEX_WAKE,
  					1, NULL, NULL, 0, 0);
@@ -4405,7 +4198,7 @@ index d66cd1014211..e39846a73a43 100644
  		tsk->clear_child_tid = NULL;
  	}
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index 61b81b401e58..b92c3ca5e89f 100644
+index 22ba9b3e45e2..25f5dea49ad7 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -940,18 +940,8 @@ static inline bool futex_match(struct futex_key key1, struct futex_key key2)
@@ -4453,12 +4246,13 @@ index 61b81b401e58..b92c3ca5e89f 100644
  {
  	spin_unlock(&b1->lock);
 -- 
-GitLab
+2.31.1
 
-From 3fe11532bcb2560097e0f19bfd612ca4e19cd098 Mon Sep 17 00:00:00 2001
+
+From 015b8cacf01907cdedfb46522908c3a8ab482bd6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:02 -0300
-Subject: [PATCH] futex2: Add sysfs entry for syscall numbers
+Subject: [PATCH 14/14] futex2: Add sysfs entry for syscall numbers
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -4475,7 +4269,7 @@ Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
  1 file changed, 42 insertions(+)
 
 diff --git a/kernel/futex2.c b/kernel/futex2.c
-index b92c3ca5e89f..d138340a3f7b 100644
+index 25f5dea49ad7..a7f132bb061d 100644
 --- a/kernel/futex2.c
 +++ b/kernel/futex2.c
 @@ -1224,6 +1224,48 @@ SYSCALL_DEFINE6(futex_requeue, struct futex_requeue __user *, uaddr1,
@@ -4528,4 +4322,5 @@ index b92c3ca5e89f..d138340a3f7b 100644
  {
  	int i;
 -- 
-GitLab
+2.31.1
+

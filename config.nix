@@ -52,7 +52,8 @@ in
 
   boot.loader.systemd-boot.enable = true;
   # NOTE: nvidia drivers don't work on 5.13 yet
-  boot.kernelPackages = if (isLaptop) then pkgs.linuxPackages_latest else pkgs.linuxPackages_5_12;
+  # boot.kernelPackages = if (isLaptop) then pkgs.linuxPackages_latest else pkgs.linuxPackages_5_12;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
   ++ (
     lib.optionals isLaptop [
@@ -354,6 +355,8 @@ in
     };
   };
 
+  hardware.nvidia.package = mkDesktop config.boot.kernelPackages.nvidiaPackages.beta;
+
   services.xserver = mkDesktop {
     enable = true;
     videoDrivers = [ "nvidia" ];
@@ -376,8 +379,10 @@ in
   services.picom = mkDesktop {
     enable = true;
     backend = "glx";
+    experimentalBackends = true;
     settings = {
       unredir-if-possible = false;
+      xrender-sync-fence = true;
     };
   };
 
