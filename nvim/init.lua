@@ -18,19 +18,13 @@ require('packer').startup(function()
   use 'cohama/lexima.vim'
 
   use {
-    'glepnir/galaxyline.nvim',
-    branch = 'main',
-    config = function() require 'statusline' end,
-    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
-  }
-
-  use {
     'neovim/nvim-lspconfig',
     config = function() require 'lsp' end
   }
 
   use 'hrsh7th/nvim-compe'
 
+  use 'tpope/vim-fugitive'
   use 'tpope/vim-commentary'
   use 'tpope/vim-surround'
   use 'tpope/vim-repeat'
@@ -38,7 +32,9 @@ require('packer').startup(function()
 
   use 'guns/vim-sexp'
 
-  use {'akinsho/nvim-bufferline.lua', requires = 'kyazdani42/nvim-web-devicons'}
+  use 'ryanoasis/vim-devicons'
+
+  use 'vim-airline/vim-airline'
 
   use {
     'lewis6991/gitsigns.nvim',
@@ -52,18 +48,15 @@ require('packer').startup(function()
     config = function() require("todo-comments").setup {} end
   }
 
+  use {
+    "gbrlsnchs/telescope-lsp-handlers.nvim",
+    requires = "nvim-telescope/telescope.nvim",
+    config = function() require('telescope').load_extension('lsp_handlers') end
+  }
+
 
   use 'hrsh7th/vim-vsnip'
   use 'rafamadriz/friendly-snippets'
-
-  use {
-    'phaazon/hop.nvim',
-    as = 'hop',
-    config = function()
-      -- you can configure Hop the way you like here; see :h hop-config
-      require'hop'.setup {}
-    end
-  }
 
   use 'ThePrimeagen/vim-be-good'
 
@@ -107,31 +100,14 @@ require 'compe'.setup {
   },
 }
 
--- local telescope = require 'telescope'
--- telescope.load_extension('coc')
-
-require('bufferline').setup {
-    options = {
-        show_close_icon = false,
-        show_buffer_close_icons = false,
-        modified_icon = nil,
-        right_mouse_command = ""
-    },
-    highlights = {
-        fill = {
-            guibg = {
-                attribute = 'fg',
-                highlight = 'GruvboxBg1'
-            }
-        }
-    }
-}
+vim.g["airline#extensions#tabline#enabled"] = 1
+vim.g["airline#extensions#nvimlsp#enabled"] = 1
+vim.g["airline#extensions#tabline#tab_nr_type"] = 1
+vim.g["airline_powerline_fonts"] = 1
+vim.g["airline#extensions#tabline#formatter"] = 'unique_tail_improved'
 
 vim.api.nvim_set_keymap("n", "T", "<cmd>bprev<cr>", { noremap = true })
 vim.api.nvim_set_keymap("n", "Y", "<cmd>bnext<cr>", { noremap = true })
-
--- vim.api.nvim_set_keymap("", "w", "<cmd>lua require'hop'.hint_words()<cr>", {})
-vim.api.nvim_set_keymap("", " f", "<cmd>lua require'hop'.hint_char1()<cr>", {})
 
 local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -164,7 +140,6 @@ vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
 vim.o.termguicolors = true
 vim.o.showmode = false
 
--- vim.g.gruvbox_sign_column = 'fg0'
 vim.g.gruvbox_italic = 1
 
 vim.o.background = 'dark'

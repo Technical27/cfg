@@ -44,7 +44,7 @@ in
 
     discord
 
-    cachix
+    gh
 
     multimc
     lunar-client
@@ -108,7 +108,6 @@ in
 
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
-    "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
     "nvim/lua/lsp.lua".text = builtins.replaceStrings [
       "@RNIX_PATH@"
       "@RUST_ANALYZER_PATH@"
