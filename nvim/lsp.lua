@@ -48,3 +48,15 @@ lspconfig.hls.setup {
   },
   on_attach = lsp_on_attach
 }
+lspconfig.svelte.setup {
+  cmd = { "@SVELTE_LANGUAGE_SERVER_PATH@/bin/svelteserver", "--stdio" },
+  on_attach = lsp_on_attach
+}
+
+lspconfig.tsserver.setup {
+  cmd = { "@TSSERVER_PATH@/bin/typescript-language-server", "--stdio" },
+  cmd_env = {
+    PATH = vim.fn.getenv("PATH") .. ":@TYPESCRIPT@/bin"
+  },
+  on_attach = lsp_on_attach
+}

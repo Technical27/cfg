@@ -113,11 +113,17 @@ in
       "@RUST_ANALYZER_PATH@"
       "@HLS_PATH@"
       "@CLOJURE_LSP_PATH@"
+      "@SVELTE_LANGUAGE_SERVER_PATH@"
+      "@TSSERVER_PATH@"
+      "@TYPESCIRPT_PATH@"
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
       "${pkgs.clojure-lsp}"
+      "${pkgs.nodePackages.svelte-language-server}"
+      "${pkgs.nodePackages.typescript-language-server}"
+      "${pkgs.nodePackages.typescript}"
     ] (builtins.readFile ./nvim/lsp.lua);
   };
 
@@ -126,7 +132,7 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = cpkgs.firefox;
+    # package = cpkgs.firefox;
   };
 
   programs.zathura = {

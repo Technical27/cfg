@@ -15,7 +15,10 @@ require('packer').startup(function()
 
   use 'farmergreg/vim-lastplace'
 
-  use 'cohama/lexima.vim'
+  use {
+    'windwp/nvim-autopairs',
+    config = function() require("nvim-autopairs.completion.compe").setup({ map_cr = true }) end,
+  }
 
   use {
     'neovim/nvim-lspconfig',
@@ -60,12 +63,12 @@ require('packer').startup(function()
 
   use 'ThePrimeagen/vim-be-good'
 
+  use 'leafOfTree/vim-svelte-plugin'
+
 end)
 
 vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
 
-vim.g.lexima_no_default_rules = true
-vim.fn['lexima#set_default_rules']()
 
 vim.cmd 'filetype plugin indent on'
 
@@ -109,6 +112,8 @@ vim.g["airline#extensions#tabline#formatter"] = 'unique_tail_improved'
 vim.api.nvim_set_keymap("n", "T", "<cmd>bprev<cr>", { noremap = true })
 vim.api.nvim_set_keymap("n", "Y", "<cmd>bnext<cr>", { noremap = true })
 
+vim.g.vim_svelte_plugin_load_full_syntax = 1
+
 local function t(str)
     return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
@@ -129,13 +134,13 @@ function _G.snip_prev()
   end
 end
 
-function _G.compe_complete()
-  return vim.fn["compe#confirm"](vim.fn['lexima#expand'](t '<CR>', 'i'))
-end
+-- function _G.compe_complete()
+--   return vim.fn["compe#confirm"](vim.fn['lexima#expand'](t '<CR>', 'i'))
+-- end
 
 vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", { expr = true })
 vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.snip_prev()", { expr = true })
-vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
+-- vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
 
 vim.o.termguicolors = true
 vim.o.showmode = false
@@ -198,3 +203,21 @@ vim.api.nvim_exec([[
     autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
   augroup END
 ]], false)
+
+-- function _G.mk_non_existent_dir(file, buf)
+--   if vim.fn.getbufvar(buf, '&buftype') == '' && file:match()
+
+-- vim.api.nvim_exec([[
+--   function s:MkNonExDir(file, buf)
+--       if empty(getbufvar(a:buf, '&buftype')) && a:file!~#'\v^\w+\:\/'
+--           let dir=fnamemodify(a:file, ':h')
+--           if !isdirectory(dir)
+--               call mkdir(dir, 'p')
+--           endif
+--       endif
+--   endfunction
+--   augroup BWCCreateDir
+--       autocmd!
+--       autocmd BufWritePre * :call s:MkNonExDir(expand('<afile>'), +expand('<abuf>'))
+--   augroup END
+-- ]], false)
