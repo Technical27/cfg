@@ -51,8 +51,7 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  # NOTE: nvidia drivers don't work on 5.13 yet
-  # boot.kernelPackages = if (isLaptop) then pkgs.linuxPackages_latest else pkgs.linuxPackages_5_12;
+  boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = []
   ++ (

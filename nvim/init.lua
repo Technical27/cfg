@@ -17,7 +17,13 @@ require('packer').startup(function()
 
   use {
     'windwp/nvim-autopairs',
-    config = function() require("nvim-autopairs.completion.compe").setup({ map_cr = true }) end,
+    config = function()
+      require('nvim-autopairs').setup()
+      require("nvim-autopairs.completion.compe").setup({
+        map_cr = true,
+        map_complete = true;
+      })
+    end,
   }
 
   use {
@@ -135,7 +141,7 @@ function _G.snip_prev()
 end
 
 -- function _G.compe_complete()
---   return vim.fn["compe#confirm"](vim.fn['lexima#expand'](t '<CR>', 'i'))
+--   return vim.fn["compe#confirm"](require 'nvim-autopairs'.autopairs_cr())
 -- end
 
 vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", { expr = true })
@@ -201,6 +207,7 @@ vim.api.nvim_exec([[
     autocmd!
     autocmd BufWritePre * call v:lua.clear_whitespace()
     autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
+    autocmd BufRead,BufNewfile flake.lock set filetype=json
   augroup END
 ]], false)
 

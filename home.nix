@@ -101,6 +101,8 @@ in
     mumble
     libguestfs
     scrot
+
+    udiskie # try to fix missing icons
   ];
 
   xdg.configFile = {
@@ -433,7 +435,7 @@ in
           notification = false;
         }
         {
-          command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
+          command = "udiskie -a -n --appindicator";
           notification = false;
         }
         {

@@ -5,27 +5,17 @@ local function lsp_on_attach(client, bufnr)
     vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
   end
 
-  buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>")
-  buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-  buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
-  buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>")
-  buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-  -- buf_set_keymap("n", "<space>e", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>")
-  buf_set_keymap("n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>")
-  buf_set_keymap("n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>")
-
-  -- if client.resolved_capabilities.document_highlight then
-  --   vim.api.nvim_exec([[
-  --     augroup LspHighlight
-  --       autocmd!
-  --       autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-  --       autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-  --       autocmd CursorMovedI <buffer> lua vim.lsp.buf.clear_references()
-  --     augroup END
-  --   ]], false)
-  --   -- autocmd CursorHold  <buffer> lua vim.lsp.buf.hover()
-  --   -- autocmd CursorHoldI <buffer> lua vim.lsp.buf.hover()
-  -- end
+  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
+  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
+  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>')
+  buf_set_keymap('n', '[g', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
+  buf_set_keymap('n', ']g', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
 end
 
 lspconfig.rnix.setup {
