@@ -13,9 +13,9 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    binaryCaches = [
-      "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
-    ];
+    # binaryCaches = [
+    #   "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
+    # ];
     requireSignedBinaryCaches = false;
     gc = {
       dates = "weekly";
@@ -79,7 +79,7 @@ in
   systemd.network.enable = true;
   services.resolved = {
     enable = true;
-    dnssec = "allow-downgrade";
+    # dnssec = "allow-downgrade";
   };
   networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
   systemd.services.dhcpcd.enable = !isLaptop;
@@ -144,6 +144,7 @@ in
   };
 
   programs.dconf.enable = true;
+  programs.tilp2.enable = true;
 
   security.rtkit.enable = true;
   services.pipewire = {

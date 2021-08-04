@@ -47,11 +47,6 @@ in
     gh
 
     multimc
-    lunar-client
-    cpkgs.games.badlion-client
-
-    cpkgs.games.roblox.grapejuice
-    cpkgs.games.roblox.rbxfpsunlocker
 
     neovim-nightly
 
@@ -103,6 +98,10 @@ in
     scrot
 
     udiskie # try to fix missing icons
+    cpkgs.games.roblox.grapejuice
+    cpkgs.games.roblox.rbxfpsunlocker
+    cpkgs.games.badlion-client
+    lunar-client
   ];
 
   xdg.configFile = {
