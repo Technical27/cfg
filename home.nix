@@ -51,6 +51,7 @@ in
     neovim-nightly
 
     mangohud
+    vulkan-tools
     killall
     nix-index
     neofetch
@@ -109,6 +110,8 @@ in
     mumble
     libguestfs
     scrot
+
+    minecraft
 
     udiskie # try to fix missing icons
     cpkgs.games.badlion-client
