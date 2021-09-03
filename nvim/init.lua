@@ -71,6 +71,9 @@ require('packer').startup(function()
 
   use 'leafOfTree/vim-svelte-plugin'
 
+  use 'lervag/vimtex'
+
+  use 'vimwiki/vimwiki'
 end)
 
 vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
@@ -114,6 +117,17 @@ vim.g["airline#extensions#nvimlsp#enabled"] = 1
 vim.g["airline#extensions#tabline#tab_nr_type"] = 1
 vim.g["airline_powerline_fonts"] = 1
 vim.g["airline#extensions#tabline#formatter"] = 'unique_tail_improved'
+
+vim.g.tex_flavor = 'latex'
+vim.g.vimtex_compiler_method = 'tectonic'
+vim.g.vimtex_quickfix_mode = 0
+vim.g.vimtex_view_method = 'zathura'
+vim.cmd [[
+  augroup Latex
+    autocmd!
+    autocmd FileType tex setlocal spell
+  augroup END
+]]
 
 vim.api.nvim_set_keymap("n", "T", "<cmd>bprev<cr>", { noremap = true })
 vim.api.nvim_set_keymap("n", "Y", "<cmd>bnext<cr>", { noremap = true })

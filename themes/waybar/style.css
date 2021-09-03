@@ -78,7 +78,8 @@ window#waybar.hidden {
 #idle_inhibitor,
 #window,
 #workspaces,
-#custom-nixos {
+#custom-nixos,
+#custom-vpn {
   padding: 0 15px;
   color: @gruvbox-fg;
 }
@@ -128,4 +129,8 @@ window#waybar.hidden {
 
 #custom-nixos.update-available {
   color: @gruvbox-yellow;
+}
+
+#custom-vpn.connected {
+  color: @gruvbox-green;
 }

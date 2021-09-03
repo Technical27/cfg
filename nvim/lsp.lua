@@ -50,3 +50,8 @@ lspconfig.tsserver.setup {
   },
   on_attach = lsp_on_attach
 }
+
+lspconfig.ccls.setup {
+  cmd = { "@CCLS_PATH@/bin/ccls" },
+  on_attach = lsp_on_attach
+}

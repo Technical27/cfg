@@ -46,7 +46,7 @@ in
 
     gh
 
-    multimc
+    # multimc
 
     neovim-nightly
 
@@ -73,6 +73,9 @@ in
     ifuse
     # get libreoffice spellchecking
     hunspellDicts.en-us
+    cpkgs.tools.cemu
+    cpkgs.games.roblox.grapejuice
+    cpkgs.games.roblox.rbxfpsunlocker
   ] ++ lib.optionals isLaptop [
     libsmbios
     #sway stuff
@@ -84,6 +87,16 @@ in
     wl-clipboard
     zoom-us
     teams
+
+    cpkgs.tools.pros
+    gnumake
+    # latest version has some weird ld issues
+    gcc-arm-embedded-9
+
+    gradle
+    vscodium
+    python3
+    slack
   ] ++ lib.optionals isDesktop [
     lutris
     razergenie
@@ -98,8 +111,6 @@ in
     scrot
 
     udiskie # try to fix missing icons
-    cpkgs.games.roblox.grapejuice
-    cpkgs.games.roblox.rbxfpsunlocker
     cpkgs.games.badlion-client
     lunar-client
   ];
@@ -117,14 +128,17 @@ in
       "@SVELTE_LANGUAGE_SERVER_PATH@"
       "@TSSERVER_PATH@"
       "@TYPESCIRPT_PATH@"
+      "@CCLS_PATH@"
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
-      "${pkgs.haskell-language-server}"
+      # "${pkgs.haskell-language-server}"
+      ""
       "${pkgs.clojure-lsp}"
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
+      "${pkgs.ccls}"
     ] (builtins.readFile ./nvim/lsp.lua);
   };
 
@@ -237,7 +251,13 @@ in
 
   programs.fish = {
     enable = true;
-    shellInit = ''
+    interactiveShellInit = ''
+      set TTY1 (tty)
+      if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
+        exec sway
+      end
+
+      source (jump shell fish | psub)
       set -g fish_color_autosuggestion '555'  'brblack'
       set -g fish_color_cancel -r
       set -g fish_color_command --bold
@@ -264,7 +284,6 @@ in
       set -g fish_cursor_default block
       fish_vi_key_bindings
     '';
-    interactiveShellInit = "source (jump shell fish | psub)";
     shellAliases = {
       make = "make -j8";
       icat = "kitty +kitten icat";
@@ -318,10 +337,10 @@ in
           tap = "enabled";
           natural_scroll = "enabled";
           pointer_accel = "0.3";
-          dwt = "enabled";
+          dwt = "disabled";
         };
         # this will take some getting used too...
-        "1:1:AT_Translated_Set_2_keyboard".xkb_options = "compose:ralt,caps:swapescape";
+        "*".xkb_options = "compose:ralt,caps:swapescape";
       };
       gaps.inner = 10;
       terminal = "kitty";
@@ -576,7 +595,7 @@ in
         position = "top";
         height = 30;
         modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
-        modules-right = [ "idle_inhibitor" "custom/nixos" "network" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
+        modules-right = [ "idle_inhibitor" "custom/nixos" "network" "custom/vpn" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
         modules = {
           "sway/workspaces".disable-scroll = true;
           "sway/mode".format = "<span style=\"italic\">{}</span>";
@@ -652,6 +671,12 @@ in
             return-type = "json";
             interval = 600;
             exec = "${cpkgs.tools.info}/bin/info --waybar";
+          };
+          "custom/vpn" = {
+            return-type = "json";
+            exec = "echo '{\"class\": \"connected\", \"text\": \"VPN \"}'";
+            exec-if = "${cpkgs.tools.wgvpn}/bin/wgvpn status";
+            interval = 10;
           };
         };
       }

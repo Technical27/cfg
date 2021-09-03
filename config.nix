@@ -79,7 +79,7 @@ in
   systemd.network.enable = true;
   services.resolved = {
     enable = true;
-    # dnssec = "allow-downgrade";
+    dnssec = "allow-downgrade";
   };
   networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
   systemd.services.dhcpcd.enable = !isLaptop;
@@ -118,6 +118,7 @@ in
 
   services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
+  systemd.services.cups-browsed.enable = false;
   services.avahi = {
     enable = true;
     nssmdns = true;
@@ -132,7 +133,8 @@ in
   users.extraUsers.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
-    ++ lib.optionals isDesktop [ "plugdev" ];
+    ++ lib.optionals isDesktop [ "plugdev" ]
+    ++ lib.optionals isLaptop [ "dialout" ];
     shell = pkgs.fish;
   };
 
@@ -205,21 +207,20 @@ in
 
   programs.sway.enable = isLaptop;
 
-  networking.wireless.iwd.enable = isLaptop;
-  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
-
-  systemd.user.timers.auto-theme = mkLaptop {
-    description = "automatically change theme at 12";
-    timerConfig = {
-      Unit = "auto-theme.service";
-      OnCalendar = [ "*-*-* 18:00:00" "*-*-* 06:00:00" ];
-      Persistent = true;
+  networking.wireless.iwd = mkLaptop {
+    enable = true;
+    settings = {
+      Settings = {
+        AlwaysRandomizeAddress = true;
+      };
     };
-    wantedBy = [ "timers.target" ];
   };
+  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
+    after = [ "bluetooth.service" ];
+    wants = [ "bluetooth.service" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
@@ -336,10 +337,14 @@ in
     cpkgs.tools.wgvpn
   ];
 
+  programs.java = {
+    enable = true;
+    package = mkLaptop pkgs.jdk11;
+  };
+
   # Desktop specific things
   services.sshd.enable = isDesktop;
   services.fstrim.enable = isDesktop;
-  programs.java.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
 
   networking.firewall = {
@@ -422,6 +427,34 @@ in
     (
       self: super: {
         cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
+      }
+    )
+    (
+      self: super: {
+        vscodium = super.vscodium.overrideAttrs (
+          old: rec {
+            desktopItem = super.makeDesktopItem {
+              name = "codium";
+              desktopName = "VSCodium";
+              comment = "Code Editing. Redefined.";
+              genericName = "Text Editor";
+              exec = "codium --enable-features=UseOzonePlatform --ozone-platform=wayland %F";
+              icon = "code";
+              startupNotify = "true";
+              categories = "Utility;TextEditor;Development;IDE;";
+              mimeType = "text/plain;inode/directory;";
+              extraEntries = ''
+                StartupWMClass=vscodium
+                Actions=new-empty-window;
+                Keywords=vscode;
+                [Desktop Action new-empty-window]
+                Name=New Empty Window
+                Exec=codium --new-window --enable-features=UseOzonePlatform --ozone-platform=wayland %F
+                Icon=code
+              '';
+            };
+          }
+        );
       }
     )
   ];
