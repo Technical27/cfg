@@ -19,9 +19,10 @@ require('packer').startup(function()
     'windwp/nvim-autopairs',
     config = function()
       require('nvim-autopairs').setup()
-      require("nvim-autopairs.completion.compe").setup({
+      require("nvim-autopairs.completion.cmp").setup({
         map_cr = true,
-        map_complete = true;
+        map_complete = true,
+        auto_select = true
       })
     end,
   }
@@ -30,8 +31,6 @@ require('packer').startup(function()
     'neovim/nvim-lspconfig',
     config = function() require 'lsp' end
   }
-
-  use 'hrsh7th/nvim-compe'
 
   use 'tpope/vim-fugitive'
   use 'tpope/vim-commentary'
@@ -63,8 +62,12 @@ require('packer').startup(function()
     config = function() require('telescope').load_extension('lsp_handlers') end
   }
 
-
+  use 'hrsh7th/nvim-cmp'
+  use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-path'
   use 'hrsh7th/vim-vsnip'
+  use 'hrsh7th/cmp-vsnip'
   use 'rafamadriz/friendly-snippets'
 
   use 'ThePrimeagen/vim-be-good'
@@ -78,6 +81,48 @@ end)
 
 vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
 
+-- nvim-cmp setup
+local cmp = require 'cmp'
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  completion = {
+    completeopt = 'menu,menuone,noinsert',
+  },
+  mapping = {
+    ['<C-p>'] = function(fallback)
+      if vim.fn["vsnip#jumpable"](-1) == 1 then
+        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(vsnip-jump-prev)', true, true, true), '')
+      elseif not cmp.select_prev_item() then
+          fallback()
+      end
+    end,
+    ['<C-n>'] = function(fallback)
+      if vim.fn["vsnip#jumpable"](1) == 1 then
+        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(vsnip-jump-next)', true, true, true), '')
+      elseif not cmp.select_next_item() then
+          fallback()
+      end
+    end,
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm {
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    },
+  },
+  sources = {
+    { name = 'vsnip' },
+    { name = 'nvim_lsp' },
+    { name = 'path' },
+    { name = 'buffer' }
+  },
+}
 
 vim.cmd 'filetype plugin indent on'
 
@@ -88,28 +133,6 @@ require 'nvim-treesitter.configs'.setup {
   highlight = {
     enable = true
   }
-}
-
-require 'compe'.setup {
-  enabled = true,
-  autocomplete = true,
-  debug = false,
-  min_length = 1,
-  preselect = 'always',
-  throttle_time = 80,
-  source_timeout = 200,
-  incomplete_delay = 400,
-  max_abbr_width = 100,
-  max_kind_width = 100,
-  max_menu_width = 100,
-  documentation = true,
-
-  source = {
-    path = true,
-    buffer = { kind = "﬘", true },
-    vsnip = { kind = "﬌" },
-    nvim_lsp = true,
-  },
 }
 
 vim.g["airline#extensions#tabline#enabled"] = 1
@@ -153,14 +176,6 @@ function _G.snip_prev()
     return t "<S-Tab>"
   end
 end
-
--- function _G.compe_complete()
---   return vim.fn["compe#confirm"](require 'nvim-autopairs'.autopairs_cr())
--- end
-
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.snip_next()", { expr = true })
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.snip_prev()", { expr = true })
--- vim.api.nvim_set_keymap("i", "<CR>", "v:lua.compe_complete()", { expr = true })
 
 vim.o.termguicolors = true
 vim.o.showmode = false
@@ -224,21 +239,3 @@ vim.api.nvim_exec([[
     autocmd BufRead,BufNewfile flake.lock set filetype=json
   augroup END
 ]], false)
-
--- function _G.mk_non_existent_dir(file, buf)
---   if vim.fn.getbufvar(buf, '&buftype') == '' && file:match()
-
--- vim.api.nvim_exec([[
---   function s:MkNonExDir(file, buf)
---       if empty(getbufvar(a:buf, '&buftype')) && a:file!~#'\v^\w+\:\/'
---           let dir=fnamemodify(a:file, ':h')
---           if !isdirectory(dir)
---               call mkdir(dir, 'p')
---           endif
---       endif
---   endfunction
---   augroup BWCCreateDir
---       autocmd!
---       autocmd BufWritePre * :call s:MkNonExDir(expand('<afile>'), +expand('<abuf>'))
---   augroup END
--- ]], false)

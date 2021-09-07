@@ -51,6 +51,15 @@ lspconfig.tsserver.setup {
   on_attach = lsp_on_attach
 }
 
+lspconfig.jdtls.setup {
+  cmd = { "/home/aamaruvi/.local/share/jdt/launch.sh" },
+  cmd_env = {
+    JAVA_HOME = '/home/aamaruvi/wpilib/2021/jdk/',
+    WORKSPACE = '/home/aamaruvi/wpilib/2021/jdt/workspace/',
+    GRADLE_HOME = '/home/aamaruvi/wpilib/2021/'
+  }
+}
+
 lspconfig.ccls.setup {
   cmd = { "@CCLS_PATH@/bin/ccls" },
   on_attach = lsp_on_attach
