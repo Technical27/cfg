@@ -20,64 +20,42 @@ in
   home.packages = with pkgs; [
     ripgrep
     nerdfonts
-    noto-fonts-extra
-    noto-fonts-cjk
-    noto-fonts-emoji
-    noto-fonts
-    glib
-    niv
-    xdg_utils
-    libnotify
     tldr
     imv
-    texlive.combined.scheme-small
     tectonic
     gcc
     jq
     file
     unzip
     zip
-
-    atom
-
-    ranger
-
-    discord
-
     gh
-
-    # multimc
-
     neovim-nightly
-
-    mangohud
-    vulkan-tools
     killall
     nix-index
     neofetch
-    jump
+    bpytop
+
+    texlive.combined.scheme-small
+
+    noto-fonts
+    noto-fonts-extra
+    noto-fonts-cjk
+    noto-fonts-emoji
+
+    discord
     libreoffice
     gimp
-    bpytop
     pavucontrol
-    pulsemixer
     pulseeffects-pw
-    cadence
-    openscad
-    freecad
 
-    # set thermal modes
-    libsmbios
 
     # read files from phone
     libimobiledevice
     ifuse
     # get libreoffice spellchecking
     hunspellDicts.en-us
-    cpkgs.tools.cemu
-    cpkgs.games.roblox.grapejuice
-    cpkgs.games.roblox.rbxfpsunlocker
   ] ++ lib.optionals isLaptop [
+    # set thermal modes
     libsmbios
     #sway stuff
     sway-contrib.grimshot
@@ -85,15 +63,17 @@ in
     swayidle
     wofi
     brightnessctl
+    pulsemixer
     wl-clipboard
     zoom-us
-    teams
 
+    # VEX
     cpkgs.tools.pros
     gnumake
     # latest version has some weird ld issues
     gcc-arm-embedded-9
 
+    # FRC
     gradle
     vscodium
     python3
@@ -106,16 +86,12 @@ in
     liquidctl
     obs-studio
     olive-editor
-    unityhub
     mumble
-    libguestfs
     scrot
+    multimc
+    mangohud
 
-    minecraft
-
-    udiskie # try to fix missing icons
     cpkgs.games.badlion-client
-    lunar-client
   ];
 
   xdg.configFile = {
@@ -148,10 +124,7 @@ in
   programs.direnv.enable = true;
   programs.fzf.enable = true;
   programs.bat.enable = true;
-  programs.firefox = {
-    enable = true;
-    # package = cpkgs.firefox;
-  };
+  programs.firefox.enable = true;
 
   programs.zathura = {
     enable = true;
@@ -260,7 +233,6 @@ in
         exec sway
       end
 
-      source (jump shell fish | psub)
       set -g fish_color_autosuggestion '555'  'brblack'
       set -g fish_color_cancel -r
       set -g fish_color_command --bold
@@ -589,6 +561,8 @@ in
   };
   systemd.user.services.polybar = lib.mkForce {};
 
+  services.mpris-proxy.enable = isLaptop;
+
   programs.waybar = mkLaptop {
     enable = true;
     style = builtins.readFile ./themes/waybar/style.css;
@@ -618,11 +592,11 @@ in
           cpu = {
             format = "{usage}% ";
             tooltip = false;
-            interval = 2;
+            interval = 3;
           };
           memory = {
             format = "{}% ";
-            interval = 2;
+            interval = 3;
           };
           temperature = {
             critical-threshold = 80;

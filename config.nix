@@ -217,17 +217,6 @@ in
   };
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
 
-  systemd.user.services.mpris-proxy = mkLaptop {
-    description = "bluez mpris-proxy";
-    after = [ "bluetooth.service" ];
-    wants = [ "bluetooth.service" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
-    };
-    wantedBy = [ "graphical-session.target" ];
-  };
-
   services.snapper.configs = let
     timelineConfig = ''
       TIMELINE_CREATE=yes

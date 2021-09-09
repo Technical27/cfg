@@ -226,9 +226,11 @@ vim.g.EasyMotion_smartcase = 1
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
 
 function _G.clear_whitespace()
-  local save = vim.fn.winsaveview()
-  vim.cmd [[%s/\\\@<!\s\+$//e]]
-  vim.fn.winrestview(save)
+  if not vim.b.noclear then
+    local save = vim.fn.winsaveview()
+    vim.cmd [[%s/\\\@<!\s\+$//e]]
+    vim.fn.winrestview(save)
+  end
 end
 
 vim.api.nvim_exec([[
@@ -236,6 +238,6 @@ vim.api.nvim_exec([[
     autocmd!
     autocmd BufWritePre * call v:lua.clear_whitespace()
     autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
-    autocmd BufRead,BufNewfile flake.lock set filetype=json
+    autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
 ]], false)
