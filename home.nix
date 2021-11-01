@@ -37,6 +37,7 @@ in
     nix-index
     neofetch
     bpytop
+    sage
 
     texlive.combined.scheme-small
 
@@ -46,11 +47,11 @@ in
     noto-fonts-emoji
 
     discord
-    libreoffice
     gimp
     pavucontrol
-    pulseeffects-pw
 
+    # easyeffects
+    # libreoffice
 
     # read files from phone
     libimobiledevice
@@ -126,6 +127,7 @@ in
       "${pkgs.ccls}"
     ]
       (builtins.readFile ./nvim/lsp.lua);
+    "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
   };
 
   programs.direnv.enable = true;
@@ -291,8 +293,6 @@ in
       export _JAVA_AWT_WM_NONREPARENTING=1
       export LIBVA_DRIVER_NAME=i965
       export MOZ_ENABLE_WAYLAND=1
-      export XDG_SESSION_TYPE=wayland
-      export XDG_CURRENT_DESKTOP=sway
       export QT_QPA_PLATFORM=wayland-egl
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
     '';
@@ -321,7 +321,6 @@ in
           pointer_accel = "0.3";
           dwt = "disabled";
         };
-        # this will take some getting used too...
         "*".xkb_options = "compose:ralt,caps:swapescape";
       };
       gaps.inner = 10;
@@ -356,9 +355,6 @@ in
           {
             command = "fcitx5";
           }
-          {
-            command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
-          }
         ];
       keybindings =
         let
@@ -375,6 +371,9 @@ in
 
           "XF86MonBrightnessUp" = brctl "10%+";
           "XF86MonBrightnessDown" = brctl "10%-";
+
+          "Shift+XF86MonBrightnessUp" = brctl "5%+";
+          "Shift+XF86MonBrightnessDown" = brctl "5%-";
 
           "Mod4+e" = "exec firefox";
           "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";

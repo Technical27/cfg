@@ -16,7 +16,7 @@ in
     # binaryCaches = [
     #   "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
     # ];
-    requireSignedBinaryCaches = false;
+    # requireSignedBinaryCaches = false;
     gc = {
       dates = "weekly";
       automatic = true;
@@ -194,8 +194,15 @@ in
   boot.plymouth.enable = isLaptop;
 
   services.upower.enable = isLaptop;
-  services.tlp.enable = isLaptop;
-  services.auto-cpufreq.enable = isLaptop;
+  services.tlp = mkLaptop {
+    enable = true;
+    settings = {
+      DISK_DEVICES = "nvme0n1";
+      PCIE_ASPM_ON_BAT = "powersupersave";
+    };
+  };
+  # services.auto-cpufreq.enable = isLaptop;
+  # services.power-profiles-daemon.enable = true;
   services.throttled.enable = false;
   services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
@@ -337,6 +344,10 @@ in
     wireguard-tools
     polkit_gnome
 
+    # power-profiles-daemon
+
+    # libreoffice
+
     cpkgs.tools.wgvpn
   ];
 
@@ -428,11 +439,27 @@ in
   # };
 
   nixpkgs.overlays = [
-    (
-      self: super: {
-        cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
-      }
-    )
+    # (
+    #   self: super: {
+    #     power-profiles-daemon = super.power-profiles-daemon.overrideAttrs (
+    #       old: rec {
+    #         version = "0.9.0";
+    #         src = super.fetchFromGitLab {
+    #           domain = "gitlab.freedesktop.org";
+    #           owner = "hadess";
+    #           repo = "power-profiles-daemon";
+    #           rev = version;
+    #           sha256 = "sha256-HIt45zNZ7w52Obnsr0uUOJosrTTM1GJ1JTCbwm8jZdA=";
+    #         };
+    #       }
+    #     );
+    #   }
+    # )
+    # (
+    #   self: super: {
+    #     cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
+    #   }
+    # )
     (
       self: super: {
         discord = super.discord.overrideAttrs (
@@ -494,6 +521,11 @@ in
     )
   ];
 
-  services.udev.packages = mkDesktop
-    [ pkgs.openrgb ];
+  services.udev = {
+    packages = mkDesktop [ pkgs.openrgb ];
+    extraRules = mkLaptop ''
+      // Allows user access so that nspireconnect.ti.com can access the calculator
+      ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"
+    '';
+  };
 }

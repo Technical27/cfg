@@ -54,11 +54,19 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635672778,
         "narHash": "sha256-WW1Gew3tL0ScjTre5hSWlpKy27c1huLCLweS63u9Wv4=",
         "owner": "nix-community",
         "repo": "home-manager",
         "rev": "275f955db979e069fbe7a1fd7cfcb5ec030a2096",
+=======
+        "lastModified": 1635123562,
+        "narHash": "sha256-kYuwQqHXDYxy5ijpm8SvCoPNx0br1TpoWeTIOEwOYvA=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "da8a78eec9f7adb57f9e961d1da64805efacff37",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -77,11 +85,19 @@
       },
       "locked": {
         "dir": "contrib",
+<<<<<<< HEAD
         "lastModified": 1635627110,
         "narHash": "sha256-sjgo3gUbjuaXF1rlOpkEaEsvuqbnh+a3pLmIhCG5wBs=",
         "owner": "neovim",
         "repo": "neovim",
         "rev": "653d96329306d52a4c143a71acd59e2a5b8c63cc",
+=======
+        "lastModified": 1635085216,
+        "narHash": "sha256-gy1TjtpL8Sjaa7UnwsdcgmvsxA57D16kXMbDqSfHgGI=",
+        "owner": "neovim",
+        "repo": "neovim",
+        "rev": "09e96fe6096f07365eb65b51bb7f2fd0f1b043b0",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -98,11 +114,19 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635667971,
         "narHash": "sha256-tGCJ3fx/hfWyv7kupaDN8JbxxyLq3Z3hBEyJLmUm2EM=",
         "owner": "nix-community",
         "repo": "neovim-nightly-overlay",
         "rev": "22f8ee21d3c4245c5b4f71a8bf7934920094ccc5",
+=======
+        "lastModified": 1635149654,
+        "narHash": "sha256-JxqJEtG744ZMrLiGxZgoGh2eWergDVm9VN5xSgPyo8E=",
+        "owner": "nix-community",
+        "repo": "neovim-nightly-overlay",
+        "rev": "c4e9149ff03c9d77bc9023d1bd658bfbb3035bc0",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -113,11 +137,19 @@
     },
     "nixos-hardware": {
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635449388,
         "narHash": "sha256-i7hMiAgpRTGsMPTQKuNCDfW/ftQ+g9N6iaMj+RN6yws=",
         "owner": "nixos",
         "repo": "nixos-hardware",
         "rev": "518b9c2159e7d4b7696ee18b8828f9086012923b",
+=======
+        "lastModified": 1633793047,
+        "narHash": "sha256-XSMlHMVPKwcEqyHGdFj/ZeGMeZeKNwVExOfLlxcg4oE=",
+        "owner": "nixos",
+        "repo": "nixos-hardware",
+        "rev": "3aabf78bfcae62f5f99474f2ebbbe418f1c6e54f",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -144,11 +176,19 @@
     },
     "nixpkgs_2": {
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635660751,
         "narHash": "sha256-A4M5R66gofcB3Qh8yLpp04Qv7hKqFLXZiILUxD+Z7S0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "9303cc044586dd40599233454f1fd79176584c0f",
+=======
+        "lastModified": 1634782485,
+        "narHash": "sha256-psfh4OQSokGXG0lpq3zKFbhOo3QfoeudRcaUnwMRkQo=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "34ad3ffe08adfca17fcb4e4a47bb5f3b113687be",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -158,11 +198,19 @@
     },
     "nixpkgs_3": {
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635403963,
         "narHash": "sha256-0actzfzBAXvvDJ/EvPSGbtCPXUwSObQrcq0RpsPWZgA=",
         "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "2deb07f3ac4eeb5de1c12c4ba2911a2eb1f6ed61",
+=======
+        "lastModified": 1634782485,
+        "narHash": "sha256-psfh4OQSokGXG0lpq3zKFbhOo3QfoeudRcaUnwMRkQo=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "34ad3ffe08adfca17fcb4e4a47bb5f3b113687be",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
@@ -174,11 +222,19 @@
     },
     "nixpkgs_4": {
       "locked": {
+<<<<<<< HEAD
         "lastModified": 1635403963,
         "narHash": "sha256-0actzfzBAXvvDJ/EvPSGbtCPXUwSObQrcq0RpsPWZgA=",
         "owner": "nixos",
         "repo": "nixpkgs",
         "rev": "2deb07f3ac4eeb5de1c12c4ba2911a2eb1f6ed61",
+=======
+        "lastModified": 1634782485,
+        "narHash": "sha256-psfh4OQSokGXG0lpq3zKFbhOo3QfoeudRcaUnwMRkQo=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "34ad3ffe08adfca17fcb4e4a47bb5f3b113687be",
+>>>>>>> 5c9c05f (laptop updates)
         "type": "github"
       },
       "original": {
