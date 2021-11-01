@@ -29,6 +29,9 @@ in
     unzip
     zip
     gh
+
+    multimc
+
     neovim-nightly
     killall
     nix-index
@@ -54,6 +57,9 @@ in
     ifuse
     # get libreoffice spellchecking
     hunspellDicts.en-us
+
+    cpkgs.tools.cemu
+    (grapejuice.override { wine = wineWowPackages.staging; })
   ] ++ lib.optionals isLaptop [
     # set thermal modes
     libsmbios
@@ -118,7 +124,8 @@ in
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
       "${pkgs.ccls}"
-    ] (builtins.readFile ./nvim/lsp.lua);
+    ]
+      (builtins.readFile ./nvim/lsp.lua);
   };
 
   programs.direnv.enable = true;
@@ -321,11 +328,12 @@ in
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [ { command = "${pkgs.waybar}/bin/waybar"; } ];
-      floating.criteria = [ { title = "^Firefox — Sharing Indicator$"; } ];
-      startup = let
-        swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
-      in
+      bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
+      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
+      startup =
+        let
+          swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
+        in
         [
           {
             command = ''
@@ -352,10 +360,11 @@ in
             command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS SWAYSOCK";
           }
         ];
-      keybindings = let
-        pmixer = str: "exec pulsemixer --max-volume 100 ${str}";
-        brctl = str: "exec brightnessctl set ${str}";
-      in
+      keybindings =
+        let
+          pmixer = str: "exec pulsemixer --max-volume 100 ${str}";
+          brctl = str: "exec brightnessctl set ${str}";
+        in
         lib.mkOptionDefault {
           "XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +10";
           "XF86AudioLowerVolume" = pmixer "--unmute --change-volume -10";
@@ -480,7 +489,7 @@ in
         "Escape" = "mode default";
         "Return" = "mode default";
       };
-      bars = [];
+      bars = [ ];
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }
@@ -559,7 +568,7 @@ in
       };
     };
   };
-  systemd.user.services.polybar = lib.mkForce {};
+  systemd.user.services.polybar = lib.mkForce { };
 
   services.mpris-proxy.enable = isLaptop;
 

@@ -23,21 +23,22 @@ in
     };
   };
 
-  fileSystems = let
-    default_opts = [
-      "noatime"
-      "nodiratime"
-      "compress-force=zstd:5"
-      "ssd"
-      "space_cache"
-      "autodefrag"
-    ];
-    swap_opts = [
-      "noatime"
-      "nodiratime"
-      "ssd"
-    ];
-  in
+  fileSystems =
+    let
+      default_opts = [
+        "noatime"
+        "nodiratime"
+        "compress-force=zstd:5"
+        "ssd"
+        "space_cache"
+        "autodefrag"
+      ];
+      swap_opts = [
+        "noatime"
+        "nodiratime"
+        "ssd"
+      ];
+    in
     mkLaptop {
       "/".options = default_opts;
       "/nix".options = default_opts;
@@ -46,15 +47,15 @@ in
       "/swap".options = swap_opts;
     };
 
-  swapDevices = [ { device = "/swap/file"; } ];
+  swapDevices = [{ device = "/swap/file"; }];
 
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
   boot.cleanTmpDir = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = []
-  ++ (
+  boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
+  boot.kernelParams = [ ]
+    ++ (
     lib.optionals isLaptop [
       "resume_offset=18382314"
       "i915.enable_guc=2"
@@ -70,11 +71,12 @@ in
         "net.ipv4.ip_forward" = 1;
         "vm.swappiness" = 10;
       }
-    ) (
-    mkLaptop {
-      "vm.swappiness" = 60;
-    }
-  );
+    )
+    (
+      mkLaptop {
+        "vm.swappiness" = 60;
+      }
+    );
 
   systemd.network.enable = true;
   services.resolved = {
@@ -133,8 +135,8 @@ in
   users.extraUsers.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
-    ++ lib.optionals isDesktop [ "plugdev" ]
-    ++ lib.optionals isLaptop [ "dialout" ];
+      ++ lib.optionals isDesktop [ "openrazer" ]
+      ++ lib.optionals isLaptop [ "dialout" ];
     shell = pkgs.fish;
   };
 
@@ -217,12 +219,24 @@ in
   };
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
 
-  services.snapper.configs = let
-    timelineConfig = ''
-      TIMELINE_CREATE=yes
-      TIMELINE_CLEANUP=yes
-    '';
-  in
+  systemd.user.services.mpris-proxy = mkLaptop {
+    description = "bluez mpris-proxy";
+    after = [ "bluetooth.service" ];
+    wants = [ "bluetooth.service" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
+    };
+    wantedBy = [ "graphical-session.target" ];
+  };
+
+  services.snapper.configs =
+    let
+      timelineConfig = ''
+        TIMELINE_CREATE=yes
+        TIMELINE_CLEANUP=yes
+      '';
+    in
     mkLaptop {
       home = {
         subvolume = "/home";
@@ -393,29 +407,43 @@ in
     builtins.map mkPatch [
       "openrgb"
       "futex2"
-      "winesync"
+      # "winesync"
+      "fsync"
     ]
   );
 
-  systemd.user.services.rgb-restore = mkDesktop {
-    description = "restore rgb effects";
-    wants = [ "dbus.service" "openrazer-daemon.service" ];
-    after = [ "dbus.service" "openrazer-daemon.service" ];
-    wantedBy = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = [
-        "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
-        "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
-        "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
-      ];
-    };
-  };
+  # systemd.user.services.rgb-restore = mkDesktop {
+  #   description = "restore rgb effects";
+  #   wants = [ "dbus.service" "openrazer-daemon.service" ];
+  #   after = [ "dbus.service" "openrazer-daemon.service" ];
+  #   wantedBy = [ "graphical-session.target" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     ExecStart = [
+  #       "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
+  #       "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
+  #       "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
+  #     ];
+  #   };
+  # };
 
   nixpkgs.overlays = [
     (
       self: super: {
         cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
+      }
+    )
+    (
+      self: super: {
+        discord = super.discord.overrideAttrs (
+          old: rec {
+            version = "0.0.16";
+            src = super.fetchurl {
+              url = "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
+              sha256 = "UTVKjs/i7C/m8141bXBsakQRFd/c//EmqqhKhkr1OOk=";
+            };
+          }
+        );
       }
     )
     (
@@ -446,13 +474,26 @@ in
         );
       }
     )
+    (
+      self: super: {
+        # tracker = super.tracker.overrideAttrs (
+        #   old: rec {
+        #     patches = old.patches ++ super.lib.optionals (super.stdenv.hostPlatform.isi686) [
+        #       # Upstream: https://gitlab.gnome.org/GNOME/tracker/-/issues/332
+        #       (
+        #         super.fetchpatch {
+        #           name = "i686-test.patch";
+        #           url = "https://gitlab.gnome.org/GNOME/tracker/-/commit/af707181a2c492a794daec7ce3f3062d67ffd9dc.patch";
+        #           sha256 = "sha256-KOdkTy79w3oiQILrPG00UVrv+VBjAk4Y868I8jtifqk=";
+        #         }
+        #       )
+        #     ];
+        #   }
+        # );
+      }
+    )
   ];
 
-  services.udev = mkDesktop {
-    packages = [ pkgs.openrgb ];
-    extraRules = ''
-      // The nari works with the steelseries arctis profile well
-      ATTRS{idVendor}=="1532", ATTRS{idProduct}=="051c", ENV{ACP_PROFILE_SET}="steelseries-arctis-common-usb-audio.conf"
-    '';
-  };
+  services.udev.packages = mkDesktop
+    [ pkgs.openrgb ];
 }

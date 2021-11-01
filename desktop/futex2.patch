@@ -156,21 +156,21 @@ index 4bbc267fb36b..f75de79fa93d 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
 @@ -451,3 +451,5 @@
- 444	i386	landlock_create_ruleset	sys_landlock_create_ruleset
  445	i386	landlock_add_rule	sys_landlock_add_rule
  446	i386	landlock_restrict_self	sys_landlock_restrict_self
-+447	i386	futex_wait		sys_futex_wait
-+448	i386	futex_wake		sys_futex_wake
+ 447	i386	memfd_secret		sys_memfd_secret
++448	i386	futex_wait		sys_futex_wait
++449	i386	futex_wake		sys_futex_wake
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
 index ce18119ea0d0..63b447255df2 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
 @@ -368,6 +368,8 @@
- 444	common	landlock_create_ruleset	sys_landlock_create_ruleset
  445	common	landlock_add_rule	sys_landlock_add_rule
  446	common	landlock_restrict_self	sys_landlock_restrict_self
-+447	common	futex_wait		sys_futex_wait
-+448	common	futex_wake		sys_futex_wake
+ 447	common	memfd_secret		sys_memfd_secret
++448	common	futex_wait		sys_futex_wait
++449	common	futex_wake		sys_futex_wake
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
@@ -197,8 +197,8 @@ index 6de5a7fc066b..2a62ecca2b00 100644
 --- a/include/uapi/asm-generic/unistd.h
 +++ b/include/uapi/asm-generic/unistd.h
 @@ -873,8 +873,14 @@ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
- #define __NR_landlock_restrict_self 446
- __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
+ __SYSCALL(__NR_memfd_secret, sys_memfd_secret)
+ #endif
  
 +#define __NR_futex_wait 443
 +__SYSCALL(__NR_futex_wait, sys_futex_wait)
@@ -207,8 +207,8 @@ index 6de5a7fc066b..2a62ecca2b00 100644
 +__SYSCALL(__NR_futex_wake, sys_futex_wake)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 447
-+#define __NR_syscalls 449
+-#define __NR_syscalls 448
++#define __NR_syscalls 450
  
  /*
   * 32 bit systems traditionally used different
@@ -903,8 +903,8 @@ index 6de5a7fc066b..2a62ecca2b00 100644
 --- a/tools/include/uapi/asm-generic/unistd.h
 +++ b/tools/include/uapi/asm-generic/unistd.h
 @@ -873,8 +873,14 @@ __SYSCALL(__NR_landlock_add_rule, sys_landlock_add_rule)
- #define __NR_landlock_restrict_self 446
- __SYSCALL(__NR_landlock_restrict_self, sys_landlock_restrict_self)
+ __SYSCALL(__NR_memfd_secret, sys_memfd_secret)
+ #endif
  
 +#define __NR_futex_wait 443
 +__SYSCALL(__NR_futex_wait, sys_futex_wait)
@@ -913,8 +913,8 @@ index 6de5a7fc066b..2a62ecca2b00 100644
 +__SYSCALL(__NR_futex_wake, sys_futex_wake)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 447
-+#define __NR_syscalls 449
+-#define __NR_syscalls 448
++#define __NR_syscalls 450
  
  /*
   * 32 bit systems traditionally used different
@@ -923,11 +923,11 @@ index ce18119ea0d0..8eb17cc08a69 100644
 --- a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 @@ -368,6 +368,8 @@
- 444	common	landlock_create_ruleset	sys_landlock_create_ruleset
  445	common	landlock_add_rule	sys_landlock_add_rule
  446	common	landlock_restrict_self	sys_landlock_restrict_self
-+447	common  futex_wait              sys_futex_wait
-+448	common  futex_wake              sys_futex_wake
+ 447	common	memfd_secret		sys_memfd_secret
++448	common  futex_wait              sys_futex_wait
++449	common  futex_wake              sys_futex_wake
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
@@ -1421,19 +1421,19 @@ index f75de79fa93d..b991991a434a 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
 @@ -453,3 +453,4 @@
- 446	i386	landlock_restrict_self	sys_landlock_restrict_self
- 447	i386	futex_wait		sys_futex_wait
- 448	i386	futex_wake		sys_futex_wake
-+449	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
+ 447	common	memfd_secret		sys_memfd_secret
+ 448	i386	futex_wait		sys_futex_wait
+ 449	i386	futex_wake		sys_futex_wake
++450	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
 index 63b447255df2..bad4aca3e9ba 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
 @@ -370,6 +370,7 @@
- 446	common	landlock_restrict_self	sys_landlock_restrict_self
- 447	common	futex_wait		sys_futex_wait
- 448	common	futex_wake		sys_futex_wake
-+449	common	futex_waitv		sys_futex_waitv
+ 447	common	memfd_secret		sys_memfd_secret
+ 448	common	futex_wait		sys_futex_wait
+ 449	common	futex_wake		sys_futex_wake
++450	common	futex_waitv		sys_futex_waitv
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
@@ -1500,8 +1500,8 @@ index 2a62ecca2b00..1179d3f02d65 100644
 +__SC_COMP(__NR_futex_waitv, sys_futex_waitv, compat_sys_futex_waitv)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 449
-+#define __NR_syscalls 450
+-#define __NR_syscalls 450
++#define __NR_syscalls 451
  
  /*
   * 32 bit systems traditionally used different
@@ -1749,8 +1749,8 @@ index 2a62ecca2b00..1179d3f02d65 100644
 +__SC_COMP(__NR_futex_waitv, sys_futex_waitv, compat_sys_futex_waitv)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 449
-+#define __NR_syscalls 450
+-#define __NR_syscalls 450
++#define __NR_syscalls 451
  
  /*
   * 32 bit systems traditionally used different
@@ -1759,10 +1759,10 @@ index 8eb17cc08a69..faa5a3442e43 100644
 --- a/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/tools/perf/arch/x86/entry/syscalls/syscall_64.tbl
 @@ -370,6 +370,7 @@
- 446	common	landlock_restrict_self	sys_landlock_restrict_self
- 447	common  futex_wait              sys_futex_wait
- 448	common  futex_wake              sys_futex_wake
-+449	common	futex_waitv		sys_futex_waitv
+ 447	common	memfd_secret		sys_memfd_secret
+ 448	common  futex_wait              sys_futex_wait
+ 449	common  futex_wake              sys_futex_wake
++450	common	futex_waitv		sys_futex_waitv
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
@@ -1843,19 +1843,19 @@ index b991991a434a..1c3ca8b50247 100644
 --- a/arch/x86/entry/syscalls/syscall_32.tbl
 +++ b/arch/x86/entry/syscalls/syscall_32.tbl
 @@ -454,3 +454,4 @@
- 447	i386	futex_wait		sys_futex_wait
- 448	i386	futex_wake		sys_futex_wake
- 449	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
-+450	i386	futex_requeue		sys_futex_requeue		compat_sys_futex_requeue
+ 448	i386	futex_wait		sys_futex_wait
+ 449	i386	futex_wake		sys_futex_wake
+ 450	i386	futex_waitv		sys_futex_waitv			compat_sys_futex_waitv
++451	i386	futex_requeue		sys_futex_requeue		compat_sys_futex_requeue
 diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
 index bad4aca3e9ba..a1a39ed156e8 100644
 --- a/arch/x86/entry/syscalls/syscall_64.tbl
 +++ b/arch/x86/entry/syscalls/syscall_64.tbl
 @@ -371,6 +371,7 @@
- 447	common	futex_wait		sys_futex_wait
- 448	common	futex_wake		sys_futex_wake
- 449	common	futex_waitv		sys_futex_waitv
-+450	common	futex_requeue		sys_futex_requeue
+ 448	common	futex_wait		sys_futex_wait
+ 449	common	futex_wake		sys_futex_wake
+ 450	common	futex_waitv		sys_futex_waitv
++451	common	futex_requeue		sys_futex_requeue
  
  #
  # Due to a historical design error, certain syscalls are numbered differently
@@ -1924,8 +1924,8 @@ index 1179d3f02d65..78d30c06b217 100644
 +__SC_COMP(__NR_futex_requeue, sys_futex_requeue, compat_sys_futex_requeue)
 +
  #undef __NR_syscalls
--#define __NR_syscalls 450
-+#define __NR_syscalls 451
+-#define __NR_syscalls 451
++#define __NR_syscalls 452
  
  /*
   * 32 bit systems traditionally used different
@@ -2553,20 +2553,15 @@ index 0efcd494daab..d61f1df94360 100644
 --- a/tools/testing/selftests/futex/functional/.gitignore
 +++ b/tools/testing/selftests/futex/functional/.gitignore
 @@ -6,3 +6,4 @@ futex_wait_private_mapped_file
- futex_wait_timeout
- futex_wait_uninitialized_heap
  futex_wait_wouldblock
+ futex_wait
+ futex_requeue
 +futex2_wait
 diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
 index 23207829ec75..9b334f190759 100644
 --- a/tools/testing/selftests/futex/functional/Makefile
 +++ b/tools/testing/selftests/futex/functional/Makefile
-@@ -1,10 +1,11 @@
- # SPDX-License-Identifier: GPL-2.0
--INCLUDES := -I../include -I../../
-+INCLUDES := -I../include -I../../ -I../../../../../usr/include/
- CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE -pthread $(INCLUDES)
- LDLIBS := -lpthread -lrt
+@@ -1,6 +1,7 @@
  
  HEADERS := \
  	../include/futextest.h \
@@ -2575,11 +2570,11 @@ index 23207829ec75..9b334f190759 100644
  	../include/logging.h
  TEST_GEN_FILES := \
 @@ -14,7 +15,8 @@ TEST_GEN_FILES := \
- 	futex_requeue_pi_signal_restart \
- 	futex_requeue_pi_mismatched_ops \
  	futex_wait_uninitialized_heap \
--	futex_wait_private_mapped_file
-+	futex_wait_private_mapped_file \
+ 	futex_wait_private_mapped_file \
+ 	futex_wait \
+-	futex_requeue
++	futex_requeue \
 +	futex2_wait
  
  TEST_PROGS := run.sh
@@ -2804,9 +2799,9 @@ index 1acb6ace1680..3730159c865a 100755
 --- a/tools/testing/selftests/futex/functional/run.sh
 +++ b/tools/testing/selftests/futex/functional/run.sh
 @@ -73,3 +73,6 @@ echo
+
  echo
- ./futex_wait_uninitialized_heap $COLOR
- ./futex_wait_private_mapped_file $COLOR
+ ./futex_requeue $COLOR
 +
 +echo
 +./futex2_wait $COLOR
@@ -2898,11 +2893,10 @@ index 000000000000..917ac8909a3b
 -- 
 2.31.1
 
-
-From daefe54ab3e913048e88050a66f81d5e678287c0 Mon Sep 17 00:00:00 2001
+From ccc384997de6ef7014440514b7e7acfe5c35202c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
 Date: Fri, 5 Feb 2021 10:34:01 -0300
-Subject: [PATCH 08/14] selftests: futex2: Add timeout test
+Subject: [PATCH 05/10] selftests: futex2: Add timeout test
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -2911,113 +2905,70 @@ Adapt existing futex wait timeout file to test the same mechanism for
 futex2. futex2 accepts only absolute 64bit timers, but supports both
 monotonic and realtime clocks.
 
-Signed-off-by: AndrÃ© Almeida <andrealmeid@collabora.com>
+Signed-off-by: André Almeida <andrealmeid@collabora.com>
 ---
- .../futex/functional/futex_wait_timeout.c     | 58 ++++++++++++++++---
- 1 file changed, 49 insertions(+), 9 deletions(-)
+ .../futex/functional/futex_wait_timeout.c     | 24 +++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/futex/functional/futex_wait_timeout.c b/tools/testing/selftests/futex/functional/futex_wait_timeout.c
-index ee55e6d389a3..4569bf303b05 100644
+index 1f8f6daaf1e7..d20f54745c2e 100644
 --- a/tools/testing/selftests/futex/functional/futex_wait_timeout.c
 +++ b/tools/testing/selftests/futex/functional/futex_wait_timeout.c
-@@ -11,6 +11,7 @@
-  *
-  * HISTORY
-  *      2009-Nov-6: Initial version by Darren Hart <dvhart@linux.intel.com>
-+ *      2021-Feb-5: Add futex2 test by AndrÃ© <andrealmeid@collabora.com>
-  *
-  *****************************************************************************/
- 
-@@ -20,7 +21,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <time.h>
--#include "futextest.h"
+@@ -17,6 +17,14 @@
+
+ #include <pthread.h>
+ #include "futextest.h"
++
++#include <errno.h>
++#include <getopt.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
 +#include "futex2test.h"
  #include "logging.h"
- 
+
  #define TEST_NAME "futex-wait-timeout"
-@@ -40,7 +41,8 @@ void usage(char *prog)
+@@ -92,8 +100,8 @@ static int futex_get_abs_timeout(clockid_t clockid, struct timespec *to,
  int main(int argc, char *argv[])
  {
  	futex_t f1 = FUTEX_INITIALIZER;
--	struct timespec to;
 +	struct timespec to = {.tv_sec = 0, .tv_nsec = timeout_ns};
-+	struct timespec64 to64;
  	int res, ret = RET_PASS;
+-	struct timespec to;
+ 	pthread_t thread;
  	int c;
- 
-@@ -65,22 +67,60 @@ int main(int argc, char *argv[])
+
+@@ -118,7 +126,7 @@ int main(int argc, char *argv[])
  	}
- 
+
  	ksft_print_header();
--	ksft_set_plan(1);
-+	ksft_set_plan(3);
+-	ksft_set_plan(7);
++	ksft_set_plan(9);
  	ksft_print_msg("%s: Block on a futex and wait for timeout\n",
  	       basename(argv[0]));
  	ksft_print_msg("\tArguments: timeout=%ldns\n", timeout_ns);
- 
--	/* initialize timeout */
--	to.tv_sec = 0;
--	to.tv_nsec = timeout_ns;
--
- 	info("Calling futex_wait on f1: %u @ %p\n", f1, &f1);
- 	res = futex_wait(&f1, f1, &to, FUTEX_PRIVATE_FLAG);
- 	if (!res || errno != ETIMEDOUT) {
--		fail("futex_wait returned %d\n", ret < 0 ? errno : ret);
-+		ksft_test_result_fail("futex_wait returned %d\n", ret < 0 ? errno : ret);
-+		ret = RET_FAIL;
-+	} else {
-+		ksft_test_result_pass("futex_wait timeout succeeds\n");
-+	}
-+
+@@ -175,6 +183,18 @@ int main(int argc, char *argv[])
+ 	res = futex_lock_pi(&futex_pi, NULL, 0, FUTEX_CLOCK_REALTIME);
+ 	test_timeout(res, &ret, "futex_lock_pi invalid timeout flag", ENOSYS);
+
 +	/* setting absolute monotonic timeout for futex2 */
-+	if (gettime64(CLOCK_MONOTONIC, &to64))
-+		error("gettime64 failed\n", errno);
-+
-+	to64.tv_nsec += timeout_ns;
-+
-+	if (to64.tv_nsec >= 1000000000) {
-+		to64.tv_sec++;
-+		to64.tv_nsec -= 1000000000;
-+	}
-+
-+	info("Calling futex2_wait on f1: %u @ %p\n", f1, &f1);
-+	res = futex2_wait(&f1, f1, FUTEX_32, &to64);
-+	if (!res || errno != ETIMEDOUT) {
-+		ksft_test_result_fail("futex2_wait monotonic returned %d\n", ret < 0 ? errno : ret);
-+		ret = RET_FAIL;
-+	} else {
-+		ksft_test_result_pass("futex2_wait monotonic timeout succeeds\n");
-+	}
++	if (futex_get_abs_timeout(CLOCK_MONOTONIC, &to, timeout_ns))
++		return RET_FAIL;
++	res = futex2_wait(&f1, f1, FUTEX_32, &to);
++	test_timeout(res, &ret, "futex2_wait monotonic", ETIMEDOUT);
 +
 +	/* setting absolute realtime timeout for futex2 */
-+	if (gettime64(CLOCK_REALTIME, &to64))
-+		error("gettime64 failed\n", errno);
++	if (futex_get_abs_timeout(CLOCK_REALTIME, &to, timeout_ns))
++		return RET_FAIL;
++	res = futex2_wait(&f1, f1, FUTEX_32 | FUTEX_CLOCK_REALTIME, &to);
++	test_timeout(res, &ret, "futex2_wait realtime", ETIMEDOUT);
 +
-+	to64.tv_nsec += timeout_ns;
-+
-+	if (to64.tv_nsec >= 1000000000) {
-+		to64.tv_sec++;
-+		to64.tv_nsec -= 1000000000;
-+	}
-+
-+	info("Calling futex2_wait on f1: %u @ %p\n", f1, &f1);
-+	res = futex2_wait(&f1, f1, FUTEX_32 | FUTEX_CLOCK_REALTIME, &to64);
-+	if (!res || errno != ETIMEDOUT) {
-+		ksft_test_result_fail("futex2_wait realtime returned %d\n", ret < 0 ? errno : ret);
- 		ret = RET_FAIL;
-+	} else {
-+		ksft_test_result_pass("futex2_wait realtime timeout succeeds\n");
- 	}
- 
--	print_result(TEST_NAME, ret);
-+	ksft_print_cnts();
+ 	ksft_print_cnts();
  	return ret;
  }
--- 
-2.31.1
-
+--
+2.33.0
 
 From ffc9b6260a0a8f12da9aa20f3c0a91bf90e732aa Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@collabora.com>
@@ -3149,9 +3100,9 @@ index 9b334f190759..09c08ccdeaf2 100644
 --- a/tools/testing/selftests/futex/functional/Makefile
 +++ b/tools/testing/selftests/futex/functional/Makefile
 @@ -16,7 +16,8 @@ TEST_GEN_FILES := \
- 	futex_requeue_pi_mismatched_ops \
- 	futex_wait_uninitialized_heap \
  	futex_wait_private_mapped_file \
+ 	futex_wait \
+ 	futex_requeue \
 -	futex2_wait
 +	futex2_wait \
 +	futex2_waitv
@@ -3413,8 +3364,8 @@ index 09c08ccdeaf2..3ccb9ea58ddd 100644
 --- a/tools/testing/selftests/futex/functional/Makefile
 +++ b/tools/testing/selftests/futex/functional/Makefile
 @@ -17,7 +17,8 @@ TEST_GEN_FILES := \
- 	futex_wait_uninitialized_heap \
- 	futex_wait_private_mapped_file \
+ 	futex_wait \
+ 	futex_requeue \
  	futex2_wait \
 -	futex2_waitv
 +	futex2_waitv \
