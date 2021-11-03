@@ -417,9 +417,9 @@ in
   boot.kernelPatches = mkDesktop (
     builtins.map mkPatch [
       "openrgb"
-      "futex2"
+      "futex_waitv"
       # "winesync"
-      "fsync"
+      # "fsync"
     ]
   );
 
