@@ -30,14 +30,12 @@ in
     zip
     gh
 
-    multimc
-
     neovim-nightly
     killall
     nix-index
     neofetch
     bpytop
-    sage
+    # sage
 
     texlive.combined.scheme-small
 
@@ -58,9 +56,6 @@ in
     ifuse
     # get libreoffice spellchecking
     hunspellDicts.en-us
-
-    cpkgs.tools.cemu
-    cpkgs.games.grapejuice
   ] ++ lib.optionals isLaptop [
     # set thermal modes
     libsmbios
@@ -86,7 +81,6 @@ in
     python3
     slack
   ] ++ lib.optionals isDesktop [
-    lutris
     razergenie
     virt-manager
     openrgb
@@ -95,10 +89,12 @@ in
     olive-editor
     mumble
     scrot
-    multimc
-    mangohud
 
+    lutris
+    mangohud
+    multimc
     cpkgs.games.badlion-client
+    cpkgs.games.grapejuice
   ];
 
   xdg.configFile = {
