@@ -60,7 +60,7 @@ in
     hunspellDicts.en-us
 
     cpkgs.tools.cemu
-    (grapejuice.override { wine = wineWowPackages.staging; })
+    cpkgs.games.grapejuice
   ] ++ lib.optionals isLaptop [
     # set thermal modes
     libsmbios
