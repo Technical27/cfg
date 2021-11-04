@@ -50,8 +50,8 @@ in
     gimp
     pavucontrol
 
-    # easyeffects
-    # libreoffice
+    easyeffects
+    libreoffice
 
     # read files from phone
     libimobiledevice
