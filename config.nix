@@ -13,6 +13,7 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    # TODO: Fix server to act as a cache
     # binaryCaches = [
     #   "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
     # ];
@@ -144,6 +145,7 @@ in
 
   security.apparmor = {
     enable = true;
+    # TODO: Fix apparmor profiles
     # profiles = import ./apparmor.nix device pkgs;
   };
 
@@ -201,8 +203,7 @@ in
       PCIE_ASPM_ON_BAT = "powersupersave";
     };
   };
-  # services.auto-cpufreq.enable = isLaptop;
-  # services.power-profiles-daemon.enable = true;
+
   services.throttled.enable = false;
   services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
@@ -344,10 +345,6 @@ in
     wireguard-tools
     polkit_gnome
 
-    # power-profiles-daemon
-
-    # libreoffice
-
     cpkgs.tools.wgvpn
   ];
 
@@ -405,12 +402,12 @@ in
     };
   };
 
-  # security.pam.services = mkDesktop {
-  #   i3lock.enableGnomeKeyring = true;
-  #   i3lock-color.enableGnomeKeyring = true;
-  #   login.enableGnomeKeyring = true;
-  #   lightdm.enableGnomeKeyring = true;
-  # };
+  security.pam.services = mkDesktop {
+    i3lock.enableGnomeKeyring = true;
+    i3lock-color.enableGnomeKeyring = true;
+    login.enableGnomeKeyring = true;
+    lightdm.enableGnomeKeyring = true;
+  };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
@@ -418,48 +415,23 @@ in
     builtins.map mkPatch [
       "openrgb"
       "futex_waitv"
-      # "winesync"
-      # "fsync"
     ]
   );
 
-  # systemd.user.services.rgb-restore = mkDesktop {
-  #   description = "restore rgb effects";
-  #   wants = [ "dbus.service" "openrazer-daemon.service" ];
-  #   after = [ "dbus.service" "openrazer-daemon.service" ];
-  #   wantedBy = [ "graphical-session.target" ];
-  #   serviceConfig = {
-  #     Type = "oneshot";
-  #     ExecStart = [
-  #       "${config.nix.package}/bin/nix-shell --run 'python /home/aamaruvi/git/razer/main.py' /home/aamaruvi/git/razer/shell.nix"
-  #       "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
-  #       "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
-  #     ];
-  #   };
-  # };
+  systemd.user.services.rgb-restore = mkDesktop {
+    description = "restore rgb effects";
+    wants = [ "dbus.service" "openrazer-daemon.service" ];
+    after = [ "dbus.service" "openrazer-daemon.service" "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = [
+        "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
+      ];
+    };
+  };
 
   nixpkgs.overlays = [
-    # (
-    #   self: super: {
-    #     power-profiles-daemon = super.power-profiles-daemon.overrideAttrs (
-    #       old: rec {
-    #         version = "0.9.0";
-    #         src = super.fetchFromGitLab {
-    #           domain = "gitlab.freedesktop.org";
-    #           owner = "hadess";
-    #           repo = "power-profiles-daemon";
-    #           rev = version;
-    #           sha256 = "sha256-HIt45zNZ7w52Obnsr0uUOJosrTTM1GJ1JTCbwm8jZdA=";
-    #         };
-    #       }
-    #     );
-    #   }
-    # )
-    # (
-    #   self: super: {
-    #     cadence = super.cadence.override { libjack2 = super.pipewire.jack; };
-    #   }
-    # )
     (
       self: super: {
         discord = super.discord.overrideAttrs (
@@ -499,24 +471,6 @@ in
             };
           }
         );
-      }
-    )
-    (
-      self: super: {
-        # tracker = super.tracker.overrideAttrs (
-        #   old: rec {
-        #     patches = old.patches ++ super.lib.optionals (super.stdenv.hostPlatform.isi686) [
-        #       # Upstream: https://gitlab.gnome.org/GNOME/tracker/-/issues/332
-        #       (
-        #         super.fetchpatch {
-        #           name = "i686-test.patch";
-        #           url = "https://gitlab.gnome.org/GNOME/tracker/-/commit/af707181a2c492a794daec7ce3f3062d67ffd9dc.patch";
-        #           sha256 = "sha256-KOdkTy79w3oiQILrPG00UVrv+VBjAk4Y868I8jtifqk=";
-        #         }
-        #       )
-        #     ];
-        #   }
-        # );
       }
     )
   ];
