@@ -4,7 +4,22 @@ require('packer').startup(function()
 
   use 'sheerun/vim-polyglot'
 
-  use 'nvim-treesitter/nvim-treesitter'
+  use {
+   'nvim-treesitter/nvim-treesitter',
+    config = function()
+      require 'nvim-treesitter.configs'.setup {
+        indent = {
+          enable = true
+        },
+        highlight = {
+          enable = true
+        }
+      }
+
+      vim.o.foldmethod = 'expr'
+      vim.cmd 'set foldexpr=nvim_treesitter#foldexpr()'
+    end
+  }
 
   use {
     'nvim-telescope/telescope.nvim',
@@ -38,12 +53,6 @@ require('packer').startup(function()
   use 'ryanoasis/vim-devicons'
   use 'vim-airline/vim-airline'
 
-  -- use {
-  --   'famiu/feline.nvim',
-  --   requires = { 'kyazdani42/nvim-web-devicons' },
-  --   config = function() require('statusline') end
-  -- }
-
   use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
@@ -51,14 +60,14 @@ require('packer').startup(function()
   }
 
   use {
-    "folke/todo-comments.nvim",
-    requires = "nvim-lua/plenary.nvim",
-    config = function() require("todo-comments").setup {} end
+    'folke/todo-comments.nvim',
+    requires = 'nvim-lua/plenary.nvim',
+    config = function() require('todo-comments').setup {} end
   }
 
   use {
-    "gbrlsnchs/telescope-lsp-handlers.nvim",
-    requires = "nvim-telescope/telescope.nvim",
+    'gbrlsnchs/telescope-lsp-handlers.nvim',
+    requires = 'nvim-telescope/telescope.nvim',
     config = function() require('telescope').load_extension('lsp_handlers') end
   }
 
@@ -86,24 +95,9 @@ require('packer').startup(function()
   use 'lervag/vimtex'
 
   use 'vimwiki/vimwiki'
-
-  use {
-    "jose-elias-alvarez/buftabline.nvim",
-    requires = { "kyazdani42/nvim-web-devicons" },
-    config = function()
-      require("buftabline").setup {
-        tab_format = " #{b}#{i} ",
-        go_to_maps = false,
-        icon_colors = true,
-        start_hidden = true
-      }
-    end
-  }
 end)
 
-vim.cmd('source ' .. vim.fn.glob('~/.config/nvim/ts.vim'))
-
-vim.o.fillchars = "fold: "
+vim.o.fillchars = 'fold: '
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
@@ -146,22 +140,12 @@ cmp.setup {
   },
 }
 
-vim.cmd 'filetype plugin indent on'
 
-require 'nvim-treesitter.configs'.setup {
-  indent = {
-    enable = true
-  },
-  highlight = {
-    enable = true
-  }
-}
-
-vim.g["airline#extensions#tabline#enabled"] = 1
-vim.g["airline#extensions#nvimlsp#enabled"] = 1
-vim.g["airline#extensions#tabline#tab_nr_type"] = 1
-vim.g["airline_powerline_fonts"] = 1
-vim.g["airline#extensions#tabline#formatter"] = 'unique_tail_improved'
+vim.g['airline#extensions#tabline#enabled'] = 1
+vim.g['airline#extensions#nvimlsp#enabled'] = 1
+vim.g['airline#extensions#tabline#tab_nr_type'] = 1
+vim.g['airline_powerline_fonts'] = 1
+vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
 
 vim.g.tex_flavor = 'latex'
 vim.g.vimtex_compiler_method = 'tectonic'
@@ -178,15 +162,8 @@ function _G.tex_settings()
   }
 end
 
-vim.cmd [[
-  augroup Latex
-    autocmd!
-    autocmd FileType tex call v:lua.tex_settings()
-  augroup END
-]]
-
-vim.api.nvim_set_keymap("n", "T", "<cmd>bprev<cr>", { noremap = true })
-vim.api.nvim_set_keymap("n", "Y", "<cmd>bnext<cr>", { noremap = true })
+vim.api.nvim_set_keymap('n', 'T', '<cmd>bprev<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'Y', '<cmd>bnext<cr>', { noremap = true })
 
 vim.g.vim_svelte_plugin_load_full_syntax = 1
 
@@ -196,7 +173,6 @@ vim.o.showmode = false
 vim.g.gruvbox_italic = 1
 
 vim.o.background = 'dark'
-vim.cmd 'colorscheme gruvbox'
 
 vim.o.number = true
 vim.o.hidden = true
@@ -232,10 +208,6 @@ vim.o.clipboard = 'unnamedplus'
 vim.o.incsearch = true
 vim.o.hlsearch = true
 
-vim.o.foldmethod = 'expr'
-vim.cmd 'set foldexpr=nvim_treesitter#foldexpr()'
-vim.g.EasyMotion_smartcase = 1
-
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-o>', '<cmd>Telescope buffers<cr>', { noremap = true })
 
@@ -248,6 +220,16 @@ function _G.clear_whitespace()
 end
 
 vim.api.nvim_exec([[
+  colorscheme gruvbox
+  filetype plugin indent on
+
+  source /home/aamaruvi/.config/nvim/ts.vim
+
+  augroup Latex
+    autocmd!
+    autocmd FileType tex call v:lua.tex_settings()
+  augroup END
+
   augroup Buffer
     autocmd!
     autocmd BufWritePre * call v:lua.clear_whitespace()

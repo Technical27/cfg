@@ -72,7 +72,7 @@ in
     # VEX
     cpkgs.tools.pros
     gnumake
-    # latest version has some weird ld issues
+    # TODO: latest version has some weird ld issues, check if that is still the case
     gcc-arm-embedded-9
 
     # FRC
@@ -114,6 +114,7 @@ in
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
+      # TODO: check if this is broken
       # "${pkgs.haskell-language-server}"
       ""
       "${pkgs.clojure-lsp}"
@@ -123,7 +124,6 @@ in
       "${pkgs.ccls}"
     ]
       (builtins.readFile ./nvim/lsp.lua);
-    "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
   };
 
   programs.direnv.enable = true;
