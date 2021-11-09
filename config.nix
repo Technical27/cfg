@@ -225,7 +225,18 @@ in
       };
     };
   };
-  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.1.2"}" = [ "yogs.tech" ];
+  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
+
+  systemd.services.autovpn = mkLaptop {
+    description = "autovpn";
+    after = [ "iwd.service" "systemd-networkd.socket" ];
+    wants = [ "iwd.service" "systemd-networkd.socket" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.cpkgs.tools.autovpn}/bin/autovpn";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
