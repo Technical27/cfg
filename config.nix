@@ -13,11 +13,10 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    # TODO: Fix server to act as a cache
-    # binaryCaches = [
-    #   "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
-    # ];
-    # requireSignedBinaryCaches = false;
+    binaryCaches = [
+      "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
+    ];
+    requireSignedBinaryCaches = false;
     gc = {
       dates = "weekly";
       automatic = true;
@@ -220,9 +219,8 @@ in
   networking.wireless.iwd = mkLaptop {
     enable = true;
     settings = {
-      Settings = {
-        AlwaysRandomizeAddress = true;
-      };
+      General.AddressRandomization = "network";
+      Network.EnableIPv6 = true;
     };
   };
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
@@ -233,7 +231,7 @@ in
     wants = [ "iwd.service" "systemd-networkd.socket" ];
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.cpkgs.tools.autovpn}/bin/autovpn";
+      ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
     };
     wantedBy = [ "multi-user.target" ];
   };
@@ -356,7 +354,7 @@ in
     wireguard-tools
     polkit_gnome
 
-    cpkgs.tools.wgvpn
+    cpkgs.wgvpn
   ];
 
   programs.java = {
@@ -443,19 +441,6 @@ in
   };
 
   nixpkgs.overlays = [
-    (
-      self: super: {
-        discord = super.discord.overrideAttrs (
-          old: rec {
-            version = "0.0.16";
-            src = super.fetchurl {
-              url = "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
-              sha256 = "UTVKjs/i7C/m8141bXBsakQRFd/c//EmqqhKhkr1OOk=";
-            };
-          }
-        );
-      }
-    )
     (
       self: super: {
         vscodium = super.vscodium.overrideAttrs (

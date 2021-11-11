@@ -70,14 +70,14 @@ in
     zoom-us
 
     # VEX
-    cpkgs.tools.pros
+    cpkgs.pros
     gnumake
     # TODO: latest version has some weird ld issues, check if that is still the case
     gcc-arm-embedded-9
 
     # FRC
     gradle
-    vscodium
+    cpkgs.vscodium
     python3
     slack
   ] ++ lib.optionals isDesktop [
@@ -93,8 +93,8 @@ in
     lutris
     mangohud
     multimc
-    cpkgs.games.badlion-client
-    cpkgs.games.grapejuice
+    cpkgs.badlion-client
+    cpkgs.grapejuice
   ];
 
   xdg.configFile = {
@@ -270,7 +270,7 @@ in
       cat = "bat";
       grep = "rg";
     };
-    functions.fish_greeting = "${cpkgs.tools.info}/bin/info";
+    functions.fish_greeting = "${cpkgs.info}/bin/info";
   };
 
   gtk = {
@@ -436,7 +436,7 @@ in
           notification = false;
         }
         {
-          command = "${cpkgs.tools.polybar}/bin/polybar main";
+          command = "${cpkgs.polybar}/bin/polybar main";
           notification = false;
         }
         {
@@ -514,7 +514,7 @@ in
 
   services.polybar = mkDesktop {
     enable = true;
-    package = cpkgs.tools.polybar;
+    package = cpkgs.polybar;
     config = {
       "bar/main" = {
         width = "100%";
@@ -558,7 +558,7 @@ in
       };
       "module/nixos" = {
         type = "custom/script";
-        exec = "${cpkgs.tools.info}/bin/info --polybar";
+        exec = "${cpkgs.info}/bin/info --polybar";
         interval = 600;
       };
     };
@@ -651,13 +651,11 @@ in
           "custom/nixos" = {
             return-type = "json";
             interval = 600;
-            exec = "${cpkgs.tools.info}/bin/info --waybar";
+            exec = "${cpkgs.info}/bin/info --waybar";
           };
           "custom/vpn" = {
             return-type = "json";
-            exec = "echo '{\"class\": \"connected\", \"text\": \"VPN \"}'";
-            exec-if = "${cpkgs.tools.wgvpn}/bin/wgvpn status";
-            interval = 10;
+            exec = "${cpkgs.wgvpn}/bin/wgvpn bar";
           };
         };
       }
