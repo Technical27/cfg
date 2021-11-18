@@ -14,7 +14,10 @@ in
       experimental-features = nix-command flakes
     '';
     binaryCaches = [
-      "ssh-ng://nix-ssh@yogs.tech?ssh-key=/home/aamaruvi/.ssh/id_rsa"
+      "http://yogs.tech:9000/"
+    ];
+    binaryCachePublicKeys = [
+      "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
     ];
     requireSignedBinaryCaches = false;
     gc = {
@@ -200,6 +203,11 @@ in
     settings = {
       DISK_DEVICES = "nvme0n1";
       PCIE_ASPM_ON_BAT = "powersupersave";
+      NMI_WATCHDOG = 0;
+      USB_AUTOSUSPEND = 1;
+      RUNTIME_PM_ON_BAT = "auto";
+      ENERGY_PERF_POLICY_ON_BAT = "powersave";
+      SCHED_POWERSAVE_ON_BAT = 1;
     };
   };
 

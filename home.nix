@@ -46,6 +46,7 @@ in
 
     discord
     gimp
+    cpkgs.grapejuice
     pavucontrol
 
     easyeffects
@@ -68,6 +69,8 @@ in
     pulsemixer
     wl-clipboard
     zoom-us
+    htop
+    qutebrowser
 
     # VEX
     cpkgs.pros
@@ -94,7 +97,7 @@ in
     mangohud
     multimc
     cpkgs.badlion-client
-    cpkgs.grapejuice
+    # cpkgs.grapejuice
   ];
 
   xdg.configFile = {

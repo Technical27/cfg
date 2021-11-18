@@ -86,6 +86,8 @@ require('packer').startup(function()
     config = function() require('luasnip/loaders/from_vscode').lazy_load() end
   }
 
+  use 'mbbill/undotree'
+
   use 'saadparwaiz1/cmp_luasnip'
 
   use 'ThePrimeagen/vim-be-good'
@@ -210,6 +212,7 @@ vim.o.hlsearch = true
 
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-o>', '<cmd>Telescope buffers<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true })
 
 function _G.clear_whitespace()
   if not vim.b.noclear then
