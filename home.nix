@@ -75,8 +75,8 @@ in
     # VEX
     cpkgs.pros
     gnumake
-    # TODO: latest version has some weird ld issues, check if that is still the case
-    gcc-arm-embedded-9
+    gcc-arm-embedded
+    chromium
 
     # FRC
     gradle
@@ -132,7 +132,14 @@ in
   programs.direnv.enable = true;
   programs.fzf.enable = true;
   programs.bat.enable = true;
-  programs.firefox.enable = true;
+  programs.firefox = {
+    enable = true;
+    package = mkLaptop pkgs.firefox.override {
+      extraNativeMessagingHosts = [
+        cpkgs.robotmeshnative
+      ];
+    };
+  };
 
   programs.zathura = {
     enable = true;

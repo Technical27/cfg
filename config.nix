@@ -363,6 +363,7 @@ in
     polkit_gnome
 
     cpkgs.wgvpn
+    cpkgs.robotmeshnative
   ];
 
   programs.java = {
@@ -403,11 +404,16 @@ in
     };
   };
 
-  environment.etc = mkDesktop {
-    "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
-    "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
-    "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
-  };
+  environment.etc = lib.recursiveUpdate
+    (mkDesktop {
+      "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
+      "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
+      "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
+    })
+    (mkLaptop {
+      "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+      "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+    });
 
   services.picom = mkDesktop {
     enable = true;
@@ -480,7 +486,7 @@ in
   ];
 
   services.udev = {
-    packages = mkDesktop [ pkgs.openrgb ];
+    packages = lib.recursiveUpdate (mkDesktop [ pkgs.openrgb ]) (mkLaptop [ pkgs.cpkgs.robotmeshnative ]);
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"
