@@ -134,11 +134,14 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = mkLaptop (pkgs.firefox.override {
-      extraNativeMessagingHosts = [
-        cpkgs.robotmeshnative
-      ];
-    });
+    # TODO: using firefox bin as a temp workaround for firefox crashing on webp images
+    package =
+      if isLaptop then
+        (pkgs.firefox-bin.override {
+          extraNativeMessagingHosts = [
+            cpkgs.robotmeshnative
+          ];
+        }) else pkgs.firefox-bin;
   };
 
   programs.zathura = {
