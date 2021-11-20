@@ -404,16 +404,17 @@ in
     };
   };
 
-  environment.etc = lib.recursiveUpdate
-    (mkDesktop {
-      "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
-      "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
-      "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
-    })
-    (mkLaptop {
-      "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-      "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-    });
+  environment.etc =
+    if isDesktop then
+      ({
+        "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
+        "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
+        "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
+      }) else
+      ({
+        "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+        "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+      });
 
   services.picom = mkDesktop {
     enable = true;

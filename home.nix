@@ -134,11 +134,11 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = mkLaptop pkgs.firefox.override {
+    package = mkLaptop (pkgs.firefox.override {
       extraNativeMessagingHosts = [
         cpkgs.robotmeshnative
       ];
-    };
+    });
   };
 
   programs.zathura = {
