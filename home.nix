@@ -97,7 +97,6 @@ in
     mangohud
     multimc
     cpkgs.badlion-client
-    # cpkgs.grapejuice
   ];
 
   xdg.configFile = {
