@@ -101,6 +101,7 @@ in
 
   xdg.configFile = {
     "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
+    "wofi/style.css" = mkLaptop { source = ./themes/wofi/style.css; };
 
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
@@ -116,9 +117,7 @@ in
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
-      # TODO: check if this is broken
-      # "${pkgs.haskell-language-server}"
-      ""
+      "${pkgs.haskell-language-server}"
       "${pkgs.clojure-lsp}"
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
