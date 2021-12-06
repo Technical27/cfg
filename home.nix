@@ -117,7 +117,9 @@ in
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
-      "${pkgs.haskell-language-server}"
+      # "${pkgs.haskell-language-server}"
+      # TODO: still seems broken
+      ""
       "${pkgs.clojure-lsp}"
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
@@ -132,14 +134,11 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    # TODO: using firefox bin as a temp workaround for firefox crashing on webp images
-    package =
-      if isLaptop then
-        (pkgs.firefox-bin.override {
-          extraNativeMessagingHosts = [
-            cpkgs.robotmeshnative
-          ];
-        }) else pkgs.firefox-bin;
+    package = mkLaptop (pkgs.firefox.override {
+      extraNativeMessagingHosts = [
+        cpkgs.robotmeshnative
+      ];
+    });
   };
 
   programs.zathura = {
