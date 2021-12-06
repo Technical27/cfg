@@ -35,7 +35,7 @@ in
     nix-index
     neofetch
     bpytop
-    # sage
+    sage
 
     texlive.combined.scheme-small
 
@@ -51,6 +51,7 @@ in
 
     easyeffects
     libreoffice
+    openscad
 
     # read files from phone
     libimobiledevice
@@ -97,6 +98,7 @@ in
     mangohud
     multimc
     cpkgs.badlion-client
+    freecad
   ];
 
   xdg.configFile = {
