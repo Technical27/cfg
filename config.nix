@@ -145,11 +145,7 @@ in
 
   system.stateVersion = "20.09";
 
-  security.apparmor = {
-    enable = true;
-    # TODO: Fix apparmor profiles
-    # profiles = import ./apparmor.nix device pkgs;
-  };
+  security.apparmor.enable = true;
 
   programs.dconf.enable = true;
   programs.tilp2.enable = true;
@@ -265,7 +261,10 @@ in
     mkLaptop {
       home = {
         subvolume = "/home";
-        extraConfig = "ALLOW_USERS=aamaruvi\n" + timelineConfig;
+        extraConfig = ''
+          ${timelineConfig}
+          ALLOW_USERS=aamaruvi
+        '';
       };
       root = {
         subvolume = "/";
@@ -347,15 +346,15 @@ in
     networkConfig.DNSDefaultRoute = "no";
   };
 
-  xdg.portal = mkLaptop {
+  xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-wlr
       xdg-desktop-portal-gtk
+      (mkLaptop xdg-desktop-portal-wlr)
     ];
     gtkUsePortal = true;
   };
-  services.flatpak.enable = isLaptop;
+  services.flatpak.enable = true;
 
   environment.systemPackages = with pkgs; mkLaptop [
     wireguard
