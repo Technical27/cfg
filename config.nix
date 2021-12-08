@@ -388,8 +388,12 @@ in
     };
   };
 
-  # NOTE: not on a beta now
-  # hardware.nvidia.package = mkDesktop config.boot.kernelPackages.nvidiaPackages.beta;
+  hardware.nvidia = mkDesktop {
+    modesetting.enable = true;
+    powerManagement.enable = true;
+    # NOTE: not on a beta now, uncomment when a beta is available
+    # package = config.boot.kernelPackages.nvidiaPackages.beta;
+  };
 
   services.xserver = mkDesktop {
     enable = true;
