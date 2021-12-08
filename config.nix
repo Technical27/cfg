@@ -430,6 +430,7 @@ in
 
   security.pam.services = mkDesktop {
     sddm.enableGnomeKeyring = true;
+    i3lock.enableGnomeKeyring = true;
   };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];

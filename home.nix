@@ -245,10 +245,12 @@ in
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-      set TTY1 (tty)
-      if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
-        exec sway
-      end
+      ${if isLaptop then ''
+        set TTY1 (tty)
+        if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
+          exec sway
+        end
+      '' else ""}
 
       set -g fish_color_autosuggestion '555'  'brblack'
       set -g fish_color_cancel -r
@@ -413,21 +415,7 @@ in
   xsession.windowManager.i3 = mkDesktop {
     enable = true;
     package = pkgs.i3-gaps;
-    extraConfig = ''
-      default_border none
-
-      workspace 1 output primary
-      workspace 2 output primary
-      workspace 3 output primary
-      workspace 4 output primary
-      workspace 5 output primary
-
-      workspace 6 output HDMI-0
-      workspace 7 output HDMI-0
-      workspace 8 output HDMI-0
-      workspace 9 output HDMI-0
-      workspace 10 output HDMI-0
-    '';
+    extraConfig = "default_border none";
     config = {
       modifier = "Mod4";
       menu = "rofi -show drun";
@@ -448,15 +436,7 @@ in
           notification = false;
         }
         {
-          command = "${cpkgs.polybar}/bin/polybar main";
-          notification = false;
-        }
-        {
           command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-          notification = false;
-        }
-        {
-          command = "${pkgs.xorg.setxkbmap}/bin/setxkbmap -option 'caps:swapescape,compose:ralt'";
           notification = false;
         }
       ];
@@ -496,7 +476,7 @@ in
         "Escape" = "mode default";
         "Return" = "mode default";
       };
-      bars = [ ];
+      bars = [{ command = "${cpkgs.polybar}/bin/polybar main"; }];
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }
