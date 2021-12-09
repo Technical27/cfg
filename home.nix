@@ -57,10 +57,7 @@ in
     libimobiledevice
     ifuse
     # get libreoffice spellchecking
-    hunspellDicts.en-us
-  ] ++ lib.optionals isLaptop [
-    # set thermal modes
-    libsmbios
+
     #sway stuff
     sway-contrib.grimshot
     swaylock-effects
@@ -69,6 +66,10 @@ in
     brightnessctl
     pulsemixer
     wl-clipboard
+    hunspellDicts.en-us
+  ] ++ lib.optionals isLaptop [
+    # set thermal modes
+    libsmbios
     zoom-us
     htop
     qutebrowser
@@ -102,8 +103,8 @@ in
   ];
 
   xdg.configFile = {
-    "wofi/config" = mkLaptop { text = "drun-print_command=true"; };
-    "wofi/style.css" = mkLaptop { source = ./themes/wofi/style.css; };
+    "wofi/config" = { text = "drun-print_command=true"; };
+    "wofi/style.css" = { source = ./themes/wofi/style.css; };
 
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
@@ -136,11 +137,13 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = mkLaptop (pkgs.firefox.override {
-      extraNativeMessagingHosts = [
-        cpkgs.robotmeshnative
-      ];
-    });
+    package =
+      if isLaptop then
+        (pkgs.firefox.override {
+          extraNativeMessagingHosts = [
+            cpkgs.robotmeshnative
+          ];
+        }) else pkgs.firefox-bin;
   };
 
   programs.zathura = {
@@ -165,7 +168,7 @@ in
     };
   };
 
-  programs.mako = mkLaptop {
+  programs.mako = {
     enable = true;
     borderSize = 5;
     defaultTimeout = 3000;
@@ -206,7 +209,7 @@ in
     };
   };
 
-  services."${if isLaptop then "gammastep" else "redshift"}" = {
+  services.gammastep = {
     enable = true;
     latitude = "33.748";
     longitude = "-84.387";
@@ -245,12 +248,10 @@ in
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-      ${if isLaptop then ''
-        set TTY1 (tty)
-        if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
-          exec sway
-        end
-      '' else ""}
+      set TTY1 (tty)
+      if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
+        exec sway
+      end
 
       set -g fish_color_autosuggestion '555'  'brblack'
       set -g fish_color_cancel -r
@@ -297,17 +298,19 @@ in
     };
   };
 
-  wayland.windowManager.sway = mkLaptop {
+  wayland.windowManager.sway = {
     enable = true;
+    extraOptions = mkDesktop [ "--my-next-gpu-wont-be-nvidia" ];
     extraSessionCommands = ''
       export _JAVA_AWT_WM_NONREPARENTING=1
       export LIBVA_DRIVER_NAME=i965
       export MOZ_ENABLE_WAYLAND=1
       export QT_QPA_PLATFORM=wayland-egl
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+      ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''
-      seat seat0 xcursor_theme WhiteSur-cursors 48
+      seat seat0 xcursor_theme WhiteSur-cursors ${if isLaptop then "48" else "24"}
       default_border none
     '';
     wrapperFeatures = {
@@ -318,9 +321,19 @@ in
 
     config = {
       output = {
-        "eDP-1" = {
+        "eDP-1" = mkLaptop {
           scale = "2";
           subpixel = "rgb";
+        };
+        "DP-1" = mkDesktop {
+          mode = "2560x1440@144Hz";
+          subpixel = "rgb";
+          position = "0,0";
+        };
+        "HDMI-A-1" = mkDesktop {
+          mode = "1366x768@60Hz";
+          subpixel = "rgb";
+          position = "2560,672";
         };
         "*".bg = "~/Pictures/wallpaper.png fill";
       };
@@ -331,14 +344,20 @@ in
           pointer_accel = "0.3";
           dwt = "disabled";
         };
-        "*".xkb_options = "compose:ralt,caps:swapescape";
+        "*" = {
+          xkb_options = "compose:ralt,caps:swapescape";
+          pointer_accel = "0";
+        };
       };
       gaps.inner = 10;
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
       bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
-      floating.criteria = [{ title = "^Firefox — Sharing Indicator$"; }];
+      floating.criteria = [
+        { title = "^Firefox — Sharing Indicator$"; }
+        { instance = "origin.exe"; }
+      ];
       startup =
         let
           swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
@@ -356,9 +375,9 @@ in
           {
             command = "${pkgs.udiskie}/bin/udiskie -a -n --appindicator";
           }
-          {
+          (mkLaptop {
             command = "${pkgs.blueman}/bin/blueman-applet";
-          }
+          })
           {
             command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
           }
@@ -407,13 +426,13 @@ in
   };
 
   programs.rofi = mkDesktop {
-    enable = true;
+    # enable = true;
     font = "JetBrainsMono Nerd Font Mono 13";
     terminal = "kitty";
   };
 
   xsession.windowManager.i3 = mkDesktop {
-    enable = true;
+    # enable = true;
     package = pkgs.i3-gaps;
     extraConfig = "default_border none";
     config = {
@@ -485,7 +504,7 @@ in
   };
 
   services.dunst = mkDesktop {
-    enable = true;
+    # enable = true;
     settings = {
       global = {
         geometry = "0x20-10+38";
@@ -505,7 +524,7 @@ in
   };
 
   services.polybar = mkDesktop {
-    enable = true;
+    # enable = true;
     package = cpkgs.polybar;
     config = {
       "bar/main" = {
@@ -559,7 +578,7 @@ in
 
   services.mpris-proxy.enable = isLaptop;
 
-  programs.waybar = mkLaptop {
+  programs.waybar = {
     enable = true;
     style = builtins.readFile ./themes/waybar/style.css;
     settings = [
@@ -568,7 +587,7 @@ in
         position = "top";
         height = 30;
         modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
-        modules-right = [ "idle_inhibitor" "custom/nixos" "network" "custom/vpn" "cpu" "memory" "temperature" "pulseaudio" "backlight" "battery" "clock" "tray" ];
+        modules-right = [ "idle_inhibitor" "custom/nixos" "network" (mkLaptop "custom/vpn") "cpu" "memory" "temperature" "pulseaudio" (mkLaptop "backlight") (mkLaptop "battery") "clock" "tray" ];
         modules = {
           "sway/workspaces".disable-scroll = true;
           "sway/mode".format = "<span style=\"italic\">{}</span>";
@@ -599,7 +618,7 @@ in
             format = "{temperatureC}°C";
             interval = 5;
             # The actual cpu temperature as reported by BIOS
-            hwmon-path = "/sys/class/hwmon/hwmon5/temp1_input";
+            hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "5" else "3"}/temp1_input";
           };
           backlight = {
             format = "{percent}% {icon}";

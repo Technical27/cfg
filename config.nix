@@ -117,8 +117,6 @@ in
   environment.variables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
-    MOZ_USE_XINPUT2 = "1";
-    MOZ_X11_EGL = "1";
   };
 
   services.gnome.gnome-keyring.enable = true;
@@ -218,7 +216,7 @@ in
 
   powerManagement.enable = isLaptop;
 
-  programs.sway.enable = isLaptop;
+  programs.sway.enable = true;
 
   networking.wireless.iwd = mkLaptop {
     enable = true;
@@ -350,7 +348,7 @@ in
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
-      (mkLaptop xdg-desktop-portal-wlr)
+      xdg-desktop-portal-wlr
     ];
     gtkUsePortal = true;
   };
@@ -393,25 +391,26 @@ in
     powerManagement.enable = true;
     # NOTE: not on a beta now, uncomment when a beta is available
     # package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   services.xserver = mkDesktop {
-    enable = true;
+    # enable = true;
     videoDrivers = [ "nvidia" ];
-    displayManager.defaultSession = "none+i3";
-    windowManager.i3 = {
-      enable = true;
-      package = pkgs.i3-gaps;
-    };
-    displayManager.sddm.enable = true;
+    # displayManager.defaultSession = "none+i3";
+    # windowManager.i3 = {
+    #   enable = true;
+    #   package = pkgs.i3-gaps;
+    # };
+    # displayManager.sddm.enable = true;
   };
 
   environment.etc =
     if isDesktop then
       ({
-        "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
-        "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
-        "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
+        # "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
+        # "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
+        # "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
       }) else
       ({
         "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
@@ -419,7 +418,7 @@ in
       });
 
   services.picom = mkDesktop {
-    enable = true;
+    # enable = true;
     backend = "glx";
     experimentalBackends = true;
     settings = {
@@ -429,8 +428,8 @@ in
   };
 
   security.pam.services = mkDesktop {
-    sddm.enableGnomeKeyring = true;
-    i3lock.enableGnomeKeyring = true;
+    # sddm.enableGnomeKeyring = true;
+    # i3lock.enableGnomeKeyring = true;
   };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
