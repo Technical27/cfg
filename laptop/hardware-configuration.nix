@@ -5,52 +5,51 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "rtsx_pci_sdmmc" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+    {
+      device = "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
       fsType = "btrfs";
       options = [ "subvol=@" ];
     };
 
+  fileSystems."/home" =
+    {
+      device = "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
+      fsType = "btrfs";
+      options = [ "subvol=@home" ];
+    };
+
   fileSystems."/nix" =
-    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+    {
+      device = "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
       fsType = "btrfs";
       options = [ "subvol=@nix" ];
     };
 
   fileSystems."/swap" =
-    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+    {
+      device = "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
       fsType = "btrfs";
       options = [ "subvol=@swap" ];
     };
 
-  fileSystems."/var" =
-    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
-      fsType = "btrfs";
-      options = [ "subvol=@var" ];
-    };
-
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
-      fsType = "btrfs";
-      options = [ "subvol=@home" ];
-    };
-
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/96AD-CC08";
+    {
+      device = "/dev/disk/by-uuid/189D-9B2F";
       fsType = "vfat";
     };
 
-  swapDevices = [ ];
-
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   # high-resolution display
   hardware.video.hidpi.enable = lib.mkDefault true;
 }

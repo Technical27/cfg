@@ -28,7 +28,7 @@
     in
     {
       nixosConfigurations.laptop = mkSystem "laptop" [
-        nixos-hardware.nixosModules.dell-xps-13-9370
+        # nixos-hardware.nixosModules.dell-xps-13-9370
       ];
       nixosConfigurations.desktop = mkSystem "desktop" [
         # seems to do nothin

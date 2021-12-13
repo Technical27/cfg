@@ -45,12 +45,11 @@ in
     mkLaptop {
       "/".options = default_opts;
       "/nix".options = default_opts;
-      "/var".options = default_opts;
       "/home".options = default_opts;
       "/swap".options = swap_opts;
     };
 
-  swapDevices = [{ device = "/swap/file"; }];
+  swapDevices = mkDesktop [{ device = "/swap/file"; }];
 
   networking.hostName = device;
 
@@ -60,26 +59,18 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      "resume_offset=18382314"
+      # "resume_offset=18382314"
       "i915.enable_guc=2"
-      "mem_sleep_default=s2idle"
+      # "mem_sleep_default=s2idle"
     ]
   );
 
-  boot.kernel.sysctl = lib.recursiveUpdate
-    (
-      mkDesktop {
-        "net.ipv6.conf.all.forwarding" = 1;
-        "net.ipv6.conf.default.forwarding" = 1;
-        "net.ipv4.ip_forward" = 1;
-        "vm.swappiness" = 10;
-      }
-    )
-    (
-      mkLaptop {
-        "vm.swappiness" = 60;
-      }
-    );
+  boot.kernel.sysctl = mkDesktop {
+    "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.conf.default.forwarding" = 1;
+    "net.ipv4.ip_forward" = 1;
+    "vm.swappiness" = 10;
+  };
 
   systemd.network.enable = true;
   services.resolved = {
@@ -112,7 +103,7 @@ in
   programs.steam.enable = true;
 
   hardware.cpu.intel.updateMicrocode = true;
-  hardware.enableAllFirmware = true;
+  hardware.enableRedistributableFirmware = true;
 
   environment.variables = {
     EDITOR = "nvim";
@@ -141,7 +132,7 @@ in
     shell = pkgs.fish;
   };
 
-  system.stateVersion = "20.09";
+  system.stateVersion = if isLaptop then "22.05" else "20.09";
 
   security.apparmor.enable = true;
 
@@ -188,8 +179,9 @@ in
   };
 
   # Laptop specific things
-  boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+  # boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
   boot.plymouth.enable = isLaptop;
+  services.fprintd.enable = isLaptop;
 
   services.upower.enable = isLaptop;
   services.tlp = mkLaptop {
@@ -266,10 +258,6 @@ in
       };
       root = {
         subvolume = "/";
-        extraConfig = timelineConfig;
-      };
-      var = {
-        subvolume = "/var";
         extraConfig = timelineConfig;
       };
     };
@@ -427,9 +415,10 @@ in
     };
   };
 
-  security.pam.services = mkDesktop {
-    # sddm.enableGnomeKeyring = true;
-    # i3lock.enableGnomeKeyring = true;
+  security.pam.services = mkLaptop {
+    login.fprintAuth = lib.mkForce false;
+    swaylock.fprintAuth = true;
+    sudo.fprintAuth = true;
   };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];

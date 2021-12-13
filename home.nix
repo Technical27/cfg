@@ -29,6 +29,7 @@ in
     unzip
     zip
     gh
+    xdg_utils
 
     neovim-nightly
     killall
@@ -53,6 +54,9 @@ in
     libreoffice
     openscad
 
+    multimc
+    mangohud
+
     # read files from phone
     libimobiledevice
     ifuse
@@ -64,6 +68,7 @@ in
     swayidle
     wofi
     brightnessctl
+    playerctl
     pulsemixer
     wl-clipboard
     hunspellDicts.en-us
@@ -96,8 +101,6 @@ in
     scrot
 
     lutris
-    mangohud
-    multimc
     cpkgs.badlion-client
     freecad
   ];
@@ -187,8 +190,9 @@ in
         outputs = [
           {
             criteria = "eDP-1";
+            mode = "2256x1504@60Hz";
             status = "enable";
-            scale = 2.0;
+            scale = 1.4;
           }
         ];
       };
@@ -199,10 +203,10 @@ in
             status = "disable";
           }
           {
-            criteria = "Dell Inc. Dell S2716DG JCVN089S0K9Q";
+            criteria = "Dell Inc. Dell S2716DG #ASPkS9dwX3zd";
             status = "enable";
             scale = 1.0;
-            mode = "2560x1440@60Hz";
+            mode = "2560x1440@144Hz";
           }
         ];
       };
@@ -294,7 +298,7 @@ in
     iconTheme = { name = "gruvbox-dark"; package = cpkgs.gruvbox.icons; };
     gtk3.extraConfig = {
       gtk-cursor-theme-name = "WhiteSur-cursors";
-      gtk-cursor-theme-size = if isLaptop then 48 else 24;
+      gtk-cursor-theme-size = 24;
     };
   };
 
@@ -310,7 +314,7 @@ in
       ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''
-      seat seat0 xcursor_theme WhiteSur-cursors ${if isLaptop then "48" else "24"}
+      seat seat0 xcursor_theme WhiteSur-cursors 24
       default_border none
     '';
     wrapperFeatures = {
@@ -322,7 +326,8 @@ in
     config = {
       output = {
         "eDP-1" = mkLaptop {
-          scale = "2";
+          mode = "2256x1504@60Hz";
+          scale = "1.4";
           subpixel = "rgb";
         };
         "DP-1" = mkDesktop {
@@ -338,7 +343,7 @@ in
         "*".bg = "~/Pictures/wallpaper.png fill";
       };
       input = {
-        "1739:30383:DELL07E6:00_06CB:76AF_Touchpad" = {
+        "2362:628:PIXA3854:00_093A:0274_Touchpad" = mkLaptop {
           tap = "enabled";
           natural_scroll = "enabled";
           pointer_accel = "0.3";
@@ -389,10 +394,13 @@ in
         let
           pmixer = str: "exec pulsemixer --max-volume 100 ${str}";
           brctl = str: "exec brightnessctl set ${str}";
+          playerctl = str: "exec playerctl ${str}";
         in
         lib.mkOptionDefault {
           "XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +10";
           "XF86AudioLowerVolume" = pmixer "--unmute --change-volume -10";
+          "Shift+XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +5";
+          "Shift+XF86AudioLowerVolume" = pmixer "--unmute --change-volume -5";
           "XF86AudioMute" = pmixer "--toggle-mute";
 
           "Mod4+s" = "nop";
@@ -403,6 +411,10 @@ in
 
           "Shift+XF86MonBrightnessUp" = brctl "5%+";
           "Shift+XF86MonBrightnessDown" = brctl "5%-";
+
+          "XF86AudioPlay" = playerctl "play-pause";
+          "XF86AudioNext" = playerctl "next";
+          "XF86AudioPrev" = playerctl "previous";
 
           "Mod4+e" = "exec firefox";
           "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
@@ -588,86 +600,85 @@ in
         height = 30;
         modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
         modules-right = [ "idle_inhibitor" "custom/nixos" "network" (mkLaptop "custom/vpn") "cpu" "memory" "temperature" "pulseaudio" (mkLaptop "backlight") (mkLaptop "battery") "clock" "tray" ];
-        modules = {
-          "sway/workspaces".disable-scroll = true;
-          "sway/mode".format = "<span style=\"italic\">{}</span>";
-          idle_inhibitor = {
-            format = "{icon}";
-            format-icons = {
-              activated = "";
-              deactivated = "";
-            };
+        "sway/workspaces".disable-scroll = true;
+        "sway/mode".format = "<span style=\"italic\">{}</span>";
+        tray.spacing = 10;
+        idle_inhibitor = {
+          format = "{icon}";
+          format-icons = {
+            activated = "";
+            deactivated = "";
           };
-          tray.spacing = 10;
-          clock = {
-            format = "{:%I:%M %p}";
-            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-            format-alt = "{:%Y-%m-%d}";
+        };
+        clock = {
+          format = "{:%I:%M %p}";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          format-alt = "{:%Y-%m-%d}";
+        };
+        cpu = {
+          format = "{usage}% ";
+          tooltip = false;
+          interval = 5;
+        };
+        memory = {
+          format = "{}% ";
+          interval = 5;
+        };
+        temperature = {
+          critical-threshold = 80;
+          format = "{temperatureC}°C";
+          interval = 5;
+          # The actual cpu temperature as reported by BIOS
+          hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "5" else "3"}/temp1_input";
+        };
+        backlight = {
+          format = "{percent}% {icon}";
+          format-icons = [ "" "" ];
+        };
+        battery = {
+          states = {
+            warning = 20;
+            critical = 10;
           };
-          cpu = {
-            format = "{usage}% ";
-            tooltip = false;
-            interval = 3;
+          format = "{capacity}% {icon}";
+          format-charging = "{capacity}% ";
+          format-plugged = "{capacity}% ";
+          format-tooltip = "{time} {icon}";
+          format-icons = [ "" "" "" "" "" ];
+        };
+        network = {
+          format-wifi = "{essid} ({signalStrength}%) ";
+          format-ethernet = "{ifname}: {ipaddr} ";
+          format-linked = "{ifname} (No IP) ";
+          format-disconnected = "Disconnected ⚠";
+          tooltip-format-ethernet = "{ipaddr}";
+          tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
+          interface = mkLaptop "wlan0";
+          interval = 10;
+        };
+        pulseaudio = {
+          scroll-step = 0;
+          format = "{volume}% {icon}";
+          format-bluetooth = "{volume}% {icon}";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [ "" "" "" ];
           };
-          memory = {
-            format = "{}% ";
-            interval = 3;
-          };
-          temperature = {
-            critical-threshold = 80;
-            format = "{temperatureC}°C";
-            interval = 5;
-            # The actual cpu temperature as reported by BIOS
-            hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "5" else "3"}/temp1_input";
-          };
-          backlight = {
-            format = "{percent}% {icon}";
-            format-icons = [ "" "" ];
-          };
-          battery = {
-            states = {
-              warning = 20;
-              critical = 10;
-            };
-            format = "{capacity}% {icon}";
-            format-charging = "{capacity}% ";
-            format-plugged = "{capacity}% ";
-            format-tooltip = "{time} {icon}";
-            format-icons = [ "" "" "" "" "" ];
-          };
-          network = {
-            format-wifi = "{essid} ({signalStrength}%) ";
-            format-ethernet = "{ifname}: {ipaddr} ";
-            format-linked = "{ifname} (No IP) ";
-            format-disconnected = "Disconnected ⚠";
-            tooltip-format-ethernet = "{ipaddr}";
-            tooltip-format-wifi = "{ipaddr} {signaldBm}dBm";
-            interval = 5;
-          };
-          pulseaudio = {
-            scroll-step = 0;
-            format = "{volume}% {icon}";
-            format-bluetooth = "{volume}% {icon}";
-            format-icons = {
-              headphone = "";
-              hands-free = "";
-              headset = "";
-              phone = "";
-              portable = "";
-              car = "";
-              default = [ "" "" "" ];
-            };
-            on-click = "pavucontrol";
-          };
-          "custom/nixos" = {
-            return-type = "json";
-            interval = 600;
-            exec = "${cpkgs.info}/bin/info --waybar";
-          };
-          "custom/vpn" = {
-            return-type = "json";
-            exec = "${cpkgs.wgvpn}/bin/wgvpn bar";
-          };
+          on-click = "pavucontrol";
+        };
+        "custom/nixos" = {
+          return-type = "json";
+          interval = 600;
+          exec = "${cpkgs.info}/bin/info --waybar";
+        };
+        "custom/vpn" = {
+          return-type = "json";
+          exec = "${cpkgs.wgvpn}/bin/wgvpn bar";
         };
       }
     ];
@@ -681,5 +692,5 @@ in
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "20.09";
+  home.stateVersion = "21.11";
 }
