@@ -73,8 +73,11 @@ in
     wl-clipboard
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
+    wireguard-tools
+    cpkgs.wgvpn
     # set thermal modes
     libsmbios
+
     zoom-us
     htop
     qutebrowser
@@ -371,9 +374,11 @@ in
           {
             command = ''
               swayidle -w \
-                timeout 300 '${swaylock}' \
-                timeout 600 'swaymsg "output * dpms off"' \
+                timeout 180 '${swaylock}' \
+                timeout 300 'swaymsg "output * dpms off"' \
+                timeout 600 'systemctl hibernate' \
                   resume 'swaymsg "output * dpms on"' \
+                before-sleep 'playerctl pause' \
                 before-sleep '${swaylock}'
             '';
           }
@@ -399,8 +404,10 @@ in
         lib.mkOptionDefault {
           "XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +10";
           "XF86AudioLowerVolume" = pmixer "--unmute --change-volume -10";
+
           "Shift+XF86AudioRaiseVolume" = pmixer "--unmute --change-volume +5";
           "Shift+XF86AudioLowerVolume" = pmixer "--unmute --change-volume -5";
+
           "XF86AudioMute" = pmixer "--toggle-mute";
 
           "Mod4+s" = "nop";

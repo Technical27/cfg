@@ -49,7 +49,7 @@ in
       "/swap".options = swap_opts;
     };
 
-  swapDevices = mkDesktop [{ device = "/swap/file"; }];
+  swapDevices = [{ device = "/swap/file"; }];
 
   networking.hostName = device;
 
@@ -60,17 +60,21 @@ in
     ++ (
     lib.optionals isLaptop [
       # "resume_offset=18382314"
+      "resume_offset=14313573"
       "i915.enable_guc=2"
-      # "mem_sleep_default=s2idle"
+      # "mem_sleep_default=deep"
     ]
   );
 
-  boot.kernel.sysctl = mkDesktop {
-    "net.ipv6.conf.all.forwarding" = 1;
-    "net.ipv6.conf.default.forwarding" = 1;
-    "net.ipv4.ip_forward" = 1;
-    "vm.swappiness" = 10;
-  };
+  boot.kernel.sysctl = lib.recursiveUpdate
+    (mkDesktop {
+      "net.ipv6.conf.all.forwarding" = 1;
+      "net.ipv6.conf.default.forwarding" = 1;
+      "net.ipv4.ip_forward" = 1;
+    })
+    {
+      "vm.swappiness" = 10;
+    };
 
   systemd.network.enable = true;
   services.resolved = {
@@ -179,9 +183,22 @@ in
   };
 
   # Laptop specific things
-  # boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/4a95b4e5-a240-4754-9101-3e966627449d";
+  boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
   boot.plymouth.enable = isLaptop;
   services.fprintd.enable = isLaptop;
+
+  services.logind = mkLaptop {
+    lidSwitch = "suspend-then-hibernate";
+    lidSwitchExternalPower = "suspend";
+    extraConfig = ''
+      HandlePowerKey=hibernate
+    '';
+  };
+
+  systemd.sleep.extraConfig = mkLaptop ''
+    HibernateDelaySec=10m
+  '';
+
 
   services.upower.enable = isLaptop;
   services.tlp = mkLaptop {
@@ -194,6 +211,8 @@ in
       RUNTIME_PM_ON_BAT = "auto";
       ENERGY_PERF_POLICY_ON_BAT = "powersave";
       SCHED_POWERSAVE_ON_BAT = 1;
+      START_CHARGE_THRESH_BAT1 = 75;
+      STOP_CHARGE_THRESH_BAT1 = 80;
     };
   };
 
@@ -208,7 +227,11 @@ in
 
   powerManagement.enable = isLaptop;
 
-  programs.sway.enable = true;
+  programs.sway = {
+    enable = true;
+    # managed with home manager
+    extraPackages = lib.mkForce [ ];
+  };
 
   networking.wireless.iwd = mkLaptop {
     enable = true;
@@ -220,7 +243,7 @@ in
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
 
   systemd.services.autovpn = mkLaptop {
-    description = "autovpn";
+    description = "Automatic WireGuard VPN Activation";
     after = [ "iwd.service" "systemd-networkd.socket" ];
     wants = [ "iwd.service" "systemd-networkd.socket" ];
     serviceConfig = {
@@ -343,11 +366,6 @@ in
   services.flatpak.enable = true;
 
   environment.systemPackages = with pkgs; mkLaptop [
-    wireguard
-    wireguard-tools
-    polkit_gnome
-
-    cpkgs.wgvpn
     cpkgs.robotmeshnative
   ];
 
