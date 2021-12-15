@@ -191,14 +191,13 @@ in
 
   services.logind = mkLaptop {
     lidSwitch = "suspend-then-hibernate";
-    lidSwitchExternalPower = "suspend";
     extraConfig = ''
       HandlePowerKey=hibernate
     '';
   };
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=10m
+    HibernateDelaySec=30m
   '';
 
 
@@ -376,6 +375,41 @@ in
     package = mkLaptop pkgs.jdk11;
   };
 
+  networking.nftables = mkLaptop {
+    enable = true;
+    ruleset = ''
+      table inet filter {
+        chain input {
+          type filter hook input priority 0;
+
+          # accept any localhost traffic
+          iifname lo accept
+
+          # accept traffic originated from us
+          ct state {established, related} accept
+
+          ip6 nexthdr icmpv6 icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
+          ip protocol icmp icmp type { destination-unreachable, router-advertisement, time-exceeded, parameter-problem } accept
+
+          ip6 nexthdr icmpv6 icmpv6 type echo-request accept
+          ip protocol icmp icmp type echo-request accept
+
+          counter drop
+        }
+
+        chain output {
+          type filter hook output priority 0;
+          accept
+        }
+
+        chain forward {
+          type filter hook forward priority 0;
+          accept
+        }
+      }
+    '';
+  };
+
   # Desktop specific things
   services.sshd.enable = isDesktop;
   services.fstrim.enable = isDesktop;
@@ -436,8 +470,25 @@ in
   };
 
   security.pam.services = mkLaptop {
+    # get gnome-keyring to unlock on boot
     login.fprintAuth = lib.mkForce false;
-    swaylock.fprintAuth = lib.mkForce false;
+    # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
+    swaylock.text = ''
+      # Account management.
+      account required pam_unix.so
+
+      # Authentication management.
+      auth sufficient pam_unix.so nullok likeauth try_first_pass
+      auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so
+      auth required pam_deny.so
+
+      # Password management.
+      password sufficient pam_unix.so nullok sha512
+
+      # Session management.
+      session required pam_env.so conffile=/etc/pam/environment readenv=0
+      session required pam_unix.so
+    '';
     sudo.fprintAuth = true;
   };
 
