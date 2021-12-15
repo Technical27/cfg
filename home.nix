@@ -718,6 +718,10 @@ in
       hwdec = "vaapi";
       vo = "gpu";
       gpu-context = "wayland";
+      profile = "gpu-hq";
+      scale = "ewa_lanczossharp";
+      cscale = "ewa_lanczossharp";
+      ytdl-format = "bestvideo[height<=?1440]+bestaudio/best";
     };
     bindings = {
       WHEEL_UP = "ignore";
