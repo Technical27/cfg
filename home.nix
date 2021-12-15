@@ -72,6 +72,7 @@ in
     playerctl
     pulsemixer
     wl-clipboard
+    clipman
     hunspellDicts.en-us
   ] ++ lib.optionals isLaptop [
     wireguard-tools
@@ -405,6 +406,9 @@ in
           {
             command = "fcitx5";
           }
+          {
+            command = "wl-paste -t text --watch clipman store --no-persist";
+          }
         ];
       keybindings =
         let
@@ -705,6 +709,20 @@ in
         };
       }
     ];
+  };
+
+  programs.mpv = {
+    enable = true;
+    scripts = [ pkgs.mpvScripts.mpris ];
+    config = {
+      hwdec = "vaapi";
+      vo = "gpu";
+      gpu-context = "wayland";
+    };
+    bindings = {
+      WHEEL_UP = "ignore";
+      WHEEL_DOWN = "ignore";
+    };
   };
 
 
