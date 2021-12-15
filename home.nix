@@ -16,6 +16,7 @@ in
   home.sessionVariablesExtra = ''
     export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS"
   '';
+  home.sessionVariables.XDG_PICTURES_DIR = "${config.home.homeDirectory}/Pictures";
 
   home.packages = with pkgs; [
     ripgrep
@@ -77,6 +78,7 @@ in
     cpkgs.wgvpn
     # set thermal modes
     libsmbios
+    aircrack-ng
 
     zoom-us
     htop
@@ -126,9 +128,7 @@ in
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
-      # "${pkgs.haskell-language-server}"
-      # TODO: still seems broken
-      ""
+      "${pkgs.haskell-language-server}"
       "${pkgs.clojure-lsp}"
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
@@ -145,7 +145,7 @@ in
     enable = true;
     package =
       if isLaptop then
-        (pkgs.firefox.override {
+        (pkgs.firefox-new-bin.override {
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
@@ -297,8 +297,14 @@ in
 
   gtk = {
     enable = true;
-    theme = { name = "gruvbox-dark"; package = cpkgs.gruvbox.theme; };
-    iconTheme = { name = "gruvbox-dark"; package = cpkgs.gruvbox.icons; };
+    theme = {
+      name = "gruvbox-dark";
+      package = cpkgs.gruvbox.theme;
+    };
+    iconTheme = {
+      name = "gruvbox-dark";
+      package = cpkgs.gruvbox.icons;
+    };
     gtk3.extraConfig = {
       gtk-cursor-theme-name = "WhiteSur-cursors";
       gtk-cursor-theme-size = 24;
@@ -310,10 +316,14 @@ in
     extraOptions = mkDesktop [ "--my-next-gpu-wont-be-nvidia" ];
     extraSessionCommands = ''
       export _JAVA_AWT_WM_NONREPARENTING=1
-      export LIBVA_DRIVER_NAME=i965
-      export MOZ_ENABLE_WAYLAND=1
       export QT_QPA_PLATFORM=wayland-egl
       export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+
+      export MOZ_ENABLE_WAYLAND=1
+      export MOZ_USE_XINPUT2=1
+
+      # HACK: these both literally suck and shouldn't be required
+      ${if isLaptop then "export MOZ_DISABLE_RDD_SANDBOX=1" else ""}
       ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''
@@ -351,6 +361,7 @@ in
           natural_scroll = "enabled";
           pointer_accel = "0.3";
           dwt = "disabled";
+          events = "disabled_on_external_mouse";
         };
         "*" = {
           xkb_options = "compose:ralt,caps:swapescape";
@@ -422,6 +433,10 @@ in
           "XF86AudioPlay" = playerctl "play-pause";
           "XF86AudioNext" = playerctl "next";
           "XF86AudioPrev" = playerctl "previous";
+
+          "XF86RFKill" = "rfkill toggle all";
+          "Print" = "grimshot copy area";
+          "Shift+Print" = "grimshot save area";
 
           "Mod4+e" = "exec firefox";
           "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
@@ -685,6 +700,7 @@ in
         };
         "custom/vpn" = {
           return-type = "json";
+          interval = 10;
           exec = "${cpkgs.wgvpn}/bin/wgvpn bar";
         };
       }

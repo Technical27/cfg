@@ -99,9 +99,11 @@ in
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
-    extraPackages = with pkgs; mkDesktop [
-      vaapiVdpau
+    extraPackages = with pkgs; [
+      intel-media-driver
       libvdpau-va-gl
+      vaapiVdpau
+      intel-ocl
     ];
   };
   programs.steam.enable = true;
@@ -435,7 +437,7 @@ in
 
   security.pam.services = mkLaptop {
     login.fprintAuth = lib.mkForce false;
-    swaylock.fprintAuth = true;
+    swaylock.fprintAuth = lib.mkForce false;
     sudo.fprintAuth = true;
   };
 
@@ -464,30 +466,13 @@ in
   nixpkgs.overlays = [
     (
       self: super: {
-        vscodium = super.vscodium.overrideAttrs (
-          old: rec {
-            desktopItem = super.makeDesktopItem {
-              name = "codium";
-              desktopName = "VSCodium";
-              comment = "Code Editing. Redefined.";
-              genericName = "Text Editor";
-              exec = "codium --enable-features=UseOzonePlatform --ozone-platform=wayland %F";
-              icon = "code";
-              startupNotify = "true";
-              categories = "Utility;TextEditor;Development;IDE;";
-              mimeType = "text/plain;inode/directory;";
-              extraEntries = ''
-                StartupWMClass=vscodium
-                Actions=new-empty-window;
-                Keywords=vscode;
-                [Desktop Action new-empty-window]
-                Name=New Empty Window
-                Exec=codium --new-window --enable-features=UseOzonePlatform --ozone-platform=wayland %F
-                Icon=code
-              '';
-            };
-          }
-        );
+        vscodium = super.vscodium.overrideAttrs (old: rec {
+          preFixup = old.preFixup + ''
+            gappsWrapperArgs+=(
+              --add-flags "--enable-features=UseOzonePlatform --ozone-platform=wayland"
+            )
+          '';
+        });
       }
     )
   ];
@@ -497,6 +482,8 @@ in
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"
+      // Allows user rfkill access
+      KERNEL=="rfkill", MODE="0664", TAG+="uaccess"
     '';
   };
 }
