@@ -20,7 +20,7 @@
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = false;
+              home-manager.useUserPackages = true;
               home-manager.users.aamaruvi = import ./home.nix device;
             }
           ] ++ extraModules;
@@ -31,9 +31,6 @@
       nixosConfigurations.laptop = mkSystem "laptop" [
         ({ nixpkgs.overlays = [ (self: super: { firefox-new-bin = nixpkgs-firefox.legacyPackages.x86_64-linux.pkgs.firefox-beta-bin; }) ]; })
       ];
-      nixosConfigurations.desktop = mkSystem "desktop" [
-        # seems to do nothin
-        # ({ nixpkgs.overlays = [ cpkgs.overlays.nvidia ]; })
-      ];
+      nixosConfigurations.desktop = mkSystem "desktop" [ ];
     };
 }

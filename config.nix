@@ -316,7 +316,16 @@ in
     ];
   };
 
-  systemd.network.networks."20-wg0" = mkLaptop {
+  systemd.network.networks."10-ethernet" = mkLaptop {
+    name = "enp*";
+    DHCP = "yes";
+    networkConfig = {
+      IPv6AcceptRA = "yes";
+      IPv6PrivacyExtensions = "yes";
+    };
+  };
+
+  systemd.network.networks."10-wg0" = mkLaptop {
     name = "wg0";
     DHCP = "no";
     address = [ "10.200.200.2/32" "fd37:994c:6708:de39::2/128" ];
