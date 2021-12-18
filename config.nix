@@ -80,6 +80,7 @@ in
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
+    extraConfig = "MulticastDNS=yes";
   };
   networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
   systemd.services.dhcpcd.enable = !isLaptop;
@@ -119,11 +120,6 @@ in
   services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
   systemd.services.cups-browsed.enable = false;
-  services.avahi = {
-    enable = true;
-    nssmdns = true;
-    reflector = true;
-  };
 
   services.usbmuxd.enable = true;
 
@@ -292,6 +288,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      MulticastDNS = "yes";
     };
   };
 
@@ -322,6 +319,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      MulticastDNS = "yes";
     };
   };
 
@@ -362,7 +360,10 @@ in
         };
       }
     ];
-    networkConfig.DNSDefaultRoute = "no";
+    networkConfig = {
+      DNSDefaultRoute = "no";
+      MulticastDNS = "yes";
+    };
   };
 
   xdg.portal = {
@@ -403,6 +404,8 @@ in
           ip6 nexthdr icmpv6 icmpv6 type echo-request accept
           ip protocol icmp icmp type echo-request accept
 
+          udp dport 5353 accept
+
           counter drop
         }
 
@@ -434,6 +437,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      MulticastDNS = "yes";
     };
   };
 
