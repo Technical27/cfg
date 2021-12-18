@@ -492,6 +492,7 @@ in
 
       # Authentication management.
       auth sufficient pam_unix.so nullok likeauth try_first_pass
+      auth optional ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
       auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so
       auth required pam_deny.so
 
