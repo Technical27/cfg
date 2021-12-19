@@ -48,7 +48,6 @@ in
     noto-fonts-cjk
     noto-fonts-emoji
 
-    # discord
     gimp
     cpkgs.grapejuice
     pavucontrol
@@ -73,6 +72,7 @@ in
     libsmbios
     aircrack-ng
 
+    discord
     zoom-us
     htop
     qutebrowser
