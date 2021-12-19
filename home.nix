@@ -59,6 +59,8 @@ in
     multimc
     mangohud
 
+    kdenlive
+
     # read files from phone
     libimobiledevice
     ifuse
