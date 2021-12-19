@@ -48,7 +48,7 @@ in
     noto-fonts-cjk
     noto-fonts-emoji
 
-    discord
+    # discord
     gimp
     cpkgs.grapejuice
     pavucontrol
