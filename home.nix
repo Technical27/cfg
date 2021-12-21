@@ -138,11 +138,11 @@ in
     enable = true;
     package =
       if isLaptop then
-        (pkgs.firefox-new-bin.override {
+        (pkgs.firefox.override {
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
-        }) else pkgs.firefox-bin;
+        }) else pkgs.firefox;
   };
 
   programs.zathura = {

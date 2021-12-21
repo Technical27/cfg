@@ -139,22 +139,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-firefox": {
-      "locked": {
-        "lastModified": 1639140339,
-        "narHash": "sha256-FzBTJP/x0hhKnElULZq9j1X0HEXWwXJx76kHL5AnUmY=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "259625d3a71a1e984c744b26c4580f3df06335eb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "259625d3a71a1e984c744b26c4580f3df06335eb",
-        "type": "github"
-      }
-    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1640044964,
@@ -223,8 +207,7 @@
         "home-manager": "home-manager",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
         "nixos-hardware": "nixos-hardware",
-        "nixpkgs": "nixpkgs_5",
-        "nixpkgs-firefox": "nixpkgs-firefox"
+        "nixpkgs": "nixpkgs_5"
       }
     }
   },

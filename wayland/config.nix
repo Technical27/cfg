@@ -14,6 +14,13 @@
   nixpkgs.overlays = [
     (
       self: super: {
+        discord = super.discord.overrideAttrs (old: rec {
+          preFixup = ''
+            gappsWrapperArgs+=(
+              --add-flags "--enable-features=UseOzonePlatform --ozone-platform=wayland"
+            )
+          '';
+        });
         vscodium = super.vscodium.overrideAttrs (old: rec {
           preFixup = old.preFixup + ''
             gappsWrapperArgs+=(
