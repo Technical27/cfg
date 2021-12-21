@@ -265,6 +265,8 @@ in
       icat = "kitty +kitten icat";
       cat = "bat";
       grep = "rg";
+      ls = "exa --git --git-ignore --icons";
+      tree = "exa --git --git-ignore --icons --tree";
     };
     functions.fish_greeting = "${cpkgs.info}/bin/info";
   };

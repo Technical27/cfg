@@ -8,6 +8,9 @@ let
   mkPatch = name: { inherit name; patch = ./desktop + "/${name}.patch"; };
 in
 {
+
+  imports = [ ./wayland/config.nix ];
+
   nix = {
     package = pkgs.nixUnstable;
     extraOptions = ''
@@ -173,8 +176,6 @@ in
   ];
   systemd.user.services.pipewire-pulse.serviceConfig.LimitMEMLOCK = "131072";
 
-  services.earlyoom.enable = true;
-
   i18n.inputMethod = {
     enabled = "fcitx5";
     fcitx5.addons = [ pkgs.fcitx5-m17n ];
@@ -213,7 +214,6 @@ in
     };
   };
 
-  services.throttled.enable = false;
   services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
 
@@ -223,12 +223,6 @@ in
   systemd.user.services.telephony_client.enable = false;
 
   powerManagement.enable = isLaptop;
-
-  programs.sway = {
-    enable = true;
-    # managed with home manager
-    extraPackages = lib.mkForce [ ];
-  };
 
   networking.wireless.iwd = mkLaptop {
     enable = true;
@@ -370,7 +364,6 @@ in
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
-      xdg-desktop-portal-wlr
     ];
     gtkUsePortal = true;
   };
@@ -501,20 +494,6 @@ in
       ];
     };
   };
-
-  nixpkgs.overlays = [
-    (
-      self: super: {
-        vscodium = super.vscodium.overrideAttrs (old: rec {
-          preFixup = old.preFixup + ''
-            gappsWrapperArgs+=(
-              --add-flags "--enable-features=UseOzonePlatform --ozone-platform=wayland"
-            )
-          '';
-        });
-      }
-    )
-  ];
 
   services.udev = {
     packages = lib.recursiveUpdate (mkDesktop [ pkgs.openrgb ]) (mkLaptop [ pkgs.cpkgs.robotmeshnative ]);
