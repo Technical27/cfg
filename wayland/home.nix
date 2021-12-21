@@ -230,7 +230,7 @@ in
 
   programs.waybar = {
     enable = true;
-    style = builtins.readFile ./themes/waybar/style.css;
+    style = builtins.readFile ../themes/waybar/style.css;
     settings = [
       {
         layer = "top";
@@ -325,6 +325,6 @@ in
 
   xdg.configFile = {
     "wofi/config" = { text = "drun-print_command=true"; };
-    "wofi/style.css" = { source = ./themes/wofi/style.css; };
+    "wofi/style.css" = { source = ../themes/wofi/style.css; };
   };
 }

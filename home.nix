@@ -11,7 +11,7 @@ in
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  imports = [ (import ./wayland.nix device) ];
+  imports = [ (import ./wayland/home.nix device) ];
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
@@ -33,6 +33,8 @@ in
     zip
     gh
     xdg_utils
+    fd
+    exa
 
     neovim-nightly
     killall
@@ -170,8 +172,31 @@ in
 
   programs.starship = {
     enable = true;
-    # annoying
-    settings.nix_shell.disabled = true;
+    settings = {
+      # annoying
+      nix_shell.disabled = true;
+
+      # symbols
+      conda.symbol = " ";
+      dart.symbol = " ";
+      directory.read_only = " ";
+      docker_context.symbol = " ";
+      elixir.symbol = " ";
+      elm.symbol = " ";
+      git_branch.symbol = " ";
+      golang.symbol = " ";
+      hg_branch.symbol = " ";
+      java.symbol = " ";
+      julia.symbol = " ";
+      memory_usage.symbol = " ";
+      nim.symbol = " ";
+      package.symbol = " ";
+      python.symbol = " ";
+      ruby.symbol = " ";
+      rust.symbol = " ";
+      scala.symbol = " ";
+      shlvl.symbol = " ";
+    };
   };
 
   programs.kitty = with import ./kitty.nix; {

@@ -1,4 +1,4 @@
-local lspconfig = require 'lspconfig'
+local lspconfig = require('lspconfig')
 
 local function lsp_on_attach(client, bufnr)
   local function buf_set_keymap(mode, key, cmd)

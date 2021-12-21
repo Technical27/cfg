@@ -7,7 +7,7 @@ require('packer').startup(function()
   use {
    'nvim-treesitter/nvim-treesitter',
     config = function()
-      require 'nvim-treesitter.configs'.setup {
+      require('nvim-treesitter.configs').setup {
         indent = {
           enable = true
         },
@@ -39,7 +39,7 @@ require('packer').startup(function()
 
   use {
     'neovim/nvim-lspconfig',
-    config = function() require 'lsp' end
+    config = function() require('lsp') end
   }
 
   use 'tpope/vim-fugitive'
@@ -102,7 +102,7 @@ end)
 vim.o.fillchars = 'fold: '
 
 -- nvim-cmp setup
-local cmp = require 'cmp'
+local cmp = require('cmp')
 local luasnip = require('luasnip')
 cmp.setup {
   snippet = {

@@ -449,37 +449,11 @@ in
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  services.xserver = mkDesktop {
-    # enable = true;
-    videoDrivers = [ "nvidia" ];
-    # displayManager.defaultSession = "none+i3";
-    # windowManager.i3 = {
-    #   enable = true;
-    #   package = pkgs.i3-gaps;
-    # };
-    # displayManager.sddm.enable = true;
-  };
+  services.xserver.videoDrivers = mkDesktop [ "nvidia" ];
 
-  environment.etc =
-    if isDesktop then
-      ({
-        # "X11/xorg.conf.d/10-nvidia.conf".source = ./desktop/10-nvidia.conf;
-        # "X11/xorg.conf.d/50-mouse-accel.conf".source = ./desktop/50-mouse-accel.conf;
-        # "X11/xorg.conf.d/90-kbd.conf".source = ./desktop/90-kbd.conf;
-      }) else
-      ({
-        "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-        "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-      });
-
-  services.picom = mkDesktop {
-    # enable = true;
-    backend = "glx";
-    experimentalBackends = true;
-    settings = {
-      unredir-if-possible = false;
-      xrender-sync-fence = true;
-    };
+  environment.etc = mkLaptop {
+    "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+    "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
   };
 
   security.pam.services = mkLaptop {
