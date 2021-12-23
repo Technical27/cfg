@@ -79,15 +79,13 @@ in
       "vm.swappiness" = 10;
     };
 
+  networking.dhcpcd.enable = false;
   systemd.network.enable = true;
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
     extraConfig = "MulticastDNS=yes";
   };
-  networking.dhcpcd.denyInterfaces = mkLaptop [ "wg*" "wlan*" ];
-  systemd.services.dhcpcd.enable = !isLaptop;
-  networking.dhcpcd.enable = lib.mkForce isLaptop;
 
   programs.gnupg.agent = {
     enable = true;
@@ -112,7 +110,6 @@ in
   };
   programs.steam.enable = true;
 
-  hardware.cpu.intel.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
 
   environment.variables = {
@@ -129,7 +126,7 @@ in
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/New_York";
 
-  users.extraUsers.aamaruvi = {
+  users.users.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
       ++ lib.optionals isDesktop [ "openrazer" ]

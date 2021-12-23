@@ -29,12 +29,12 @@ in
     gcc
     jq
     file
-    unzip
-    zip
     gh
     xdg_utils
     fd
     exa
+    rustup
+    ouch
 
     neovim-nightly
     killall
@@ -55,6 +55,7 @@ in
     pavucontrol
 
     easyeffects
+    cpkgs.soundux
     libreoffice
     openscad
 
