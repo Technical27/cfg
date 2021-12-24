@@ -35,6 +35,7 @@ in
     exa
     rustup
     ouch
+    cpkgs.neo
 
     neovim-nightly
     killall

@@ -206,8 +206,6 @@ in
       RUNTIME_PM_ON_BAT = "auto";
       ENERGY_PERF_POLICY_ON_BAT = "powersave";
       SCHED_POWERSAVE_ON_BAT = 1;
-      START_CHARGE_THRESH_BAT1 = 75;
-      STOP_CHARGE_THRESH_BAT1 = 80;
     };
   };
 
