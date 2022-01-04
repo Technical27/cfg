@@ -42,7 +42,6 @@ in
     nix-index
     neofetch
     bpytop
-    sage
 
     texlive.combined.scheme-small
 
@@ -80,6 +79,7 @@ in
 
     discord
     zoom-us
+    teams
     htop
     qutebrowser
 
