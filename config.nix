@@ -491,7 +491,7 @@ in
   };
 
   services.udev = {
-    packages = lib.recursiveUpdate (mkDesktop [ pkgs.openrgb ]) (mkLaptop [ pkgs.cpkgs.robotmeshnative ]);
+    packages = [ pkgs.qmk-udev-rules (lib.recursiveUpdate (mkDesktop pkgs.openrgb) (mkLaptop pkgs.cpkgs.robotmeshnative)) ];
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"

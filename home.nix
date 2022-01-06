@@ -36,6 +36,7 @@ in
     rustup
     ouch
     cpkgs.neo
+    qmk
 
     neovim-nightly
     killall
