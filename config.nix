@@ -22,7 +22,6 @@ in
     binaryCachePublicKeys = [
       "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
     ];
-    requireSignedBinaryCaches = false;
     gc = {
       dates = "weekly";
       automatic = true;
@@ -62,10 +61,8 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      # "resume_offset=18382314"
       "resume_offset=14313573"
       "i915.enable_guc=2"
-      # "mem_sleep_default=deep"
     ]
   );
 
@@ -81,10 +78,17 @@ in
 
   networking.dhcpcd.enable = false;
   systemd.network.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns = true;
+  };
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
-    extraConfig = "MulticastDNS=yes";
+    extraConfig = ''
+      LLMNR=yes
+      MulticastDNS=yes
+    '';
   };
 
   programs.gnupg.agent = {
@@ -102,11 +106,12 @@ in
     enable = true;
     driSupport32Bit = true;
     extraPackages = with pkgs; [
-      intel-media-driver
       libvdpau-va-gl
       vaapiVdpau
+    ] ++ (lib.optionals isLaptop [
       intel-ocl
-    ];
+      intel-media-driver
+    ]);
   };
   programs.steam.enable = true;
 
@@ -119,7 +124,7 @@ in
 
   services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
-  systemd.services.cups-browsed.enable = false;
+  # systemd.services.cups-browsed.enable = false;
 
   services.usbmuxd.enable = true;
 
@@ -191,7 +196,7 @@ in
   };
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=30m
+    HibernateDelaySec=1h
   '';
 
 
@@ -277,6 +282,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      LLMNR = "yes";
       MulticastDNS = "yes";
     };
   };
@@ -308,6 +314,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      LLMNR = "yes";
       MulticastDNS = "yes";
     };
   };
@@ -351,6 +358,7 @@ in
     ];
     networkConfig = {
       DNSDefaultRoute = "no";
+      LLMNR = "yes";
       MulticastDNS = "yes";
     };
   };
@@ -393,6 +401,8 @@ in
           ip protocol icmp icmp type echo-request accept
 
           udp dport 5353 accept
+          tcp dport 5355 accept
+          udp dport 5355 accept
 
           counter drop
         }
@@ -425,6 +435,7 @@ in
     networkConfig = {
       IPv6AcceptRA = "yes";
       IPv6PrivacyExtensions = "yes";
+      LLMNR = "yes";
       MulticastDNS = "yes";
     };
   };
@@ -491,7 +502,7 @@ in
   };
 
   services.udev = {
-    packages = [ pkgs.qmk-udev-rules (lib.recursiveUpdate (mkDesktop pkgs.openrgb) (mkLaptop pkgs.cpkgs.robotmeshnative)) ];
+    packages = [ ] ++ (lib.optionals isDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ]) ++ (lib.optionals isLaptop [ pkgs.cpkgs.robotmeshnative ]);
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"

@@ -96,6 +96,7 @@ in
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }
+        { title = "^Zoom Cloud Meetings$"; }
       ];
       startup =
         let
@@ -105,10 +106,10 @@ in
           {
             command = ''
               swayidle -w \
-                timeout 180 'playerctl pause && ${swaylock}' \
+                timeout 180 'playerctl pause 2>/dev/null; ${swaylock}' \
                 timeout 240 'swaymsg "output * dpms off"' \
                   resume 'swaymsg "output * dpms on"' \
-                before-sleep 'playerctl pause && ${swaylock}'
+                before-sleep 'playerctl pause 2>/dev/null; ${swaylock}'
             '';
           }
           {

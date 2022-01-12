@@ -52,12 +52,33 @@ lspconfig.tsserver.setup {
 }
 
 lspconfig.jdtls.setup {
-  cmd = { "/home/aamaruvi/.local/share/jdt/launch.sh" },
-  cmd_env = {
-    JAVA_HOME = '/home/aamaruvi/wpilib/2021/jdk/',
-    WORKSPACE = '/home/aamaruvi/wpilib/2021/jdt/workspace/',
-    GRADLE_HOME = '/home/aamaruvi/wpilib/2021/'
-  }
+  cmd = {
+    "java",
+    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+    "-Dosgi.bundles.defaultStartLevel=4",
+    "-Declipse.product=org.eclipse.jdt.ls.core.product",
+    "-Dlog.protocol=true",
+    "-Dlog.level=ALL",
+    "-Xms1g",
+    "-Xmx2G",
+    "--add-modules=ALL-SYSTEM",
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED",
+    "-jar",
+    "/home/aamaruvi/.local/share/jdt/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar",
+    "-configuration",
+    "/home/aamaruvi/.local/share/jdt/config_linux",
+    "-data",
+    "/home/aamaruvi/.local/share/jdt/workspace",
+  },
+  on_attach = lsp_on_attach
+  -- cmd_env = {
+  --   JAVA_HOME = '/home/aamaruvi/wpilib/2021/jdk/',
+  --   WORKSPACE = '/home/aamaruvi/wpilib/2021/jdt/workspace/',
+  --   GRADLE_HOME = '/home/aamaruvi/wpilib/2021/'
+  -- }
 }
 
 lspconfig.ccls.setup {
