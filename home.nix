@@ -48,7 +48,7 @@ in
 
     noto-fonts
     noto-fonts-extra
-    noto-fonts-cjk
+    # noto-fonts-cjk
     noto-fonts-emoji
 
     gimp
@@ -60,7 +60,7 @@ in
     libreoffice
     openscad
 
-    multimc
+    polymc
     mangohud
 
     kdenlive

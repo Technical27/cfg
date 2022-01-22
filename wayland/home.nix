@@ -32,8 +32,7 @@ in
       export MOZ_ENABLE_WAYLAND=1
       export MOZ_USE_XINPUT2=1
 
-      # HACK: these both literally suck and shouldn't be required
-      ${if isLaptop then "export MOZ_DISABLE_RDD_SANDBOX=1" else ""}
+      # HACK: don't know why i need this
       ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''

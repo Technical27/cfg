@@ -17,10 +17,12 @@ in
       experimental-features = nix-command flakes
     '';
     binaryCaches = [
-      "http://yogs.tech:9000/"
+      # TODO: Server broken
+      # "http://yogs.tech:9000/"
     ];
     binaryCachePublicKeys = [
-      "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
+      # TODO: Same as above
+      # "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
     ];
     gc = {
       dates = "weekly";
@@ -116,6 +118,7 @@ in
   programs.steam.enable = true;
 
   hardware.enableRedistributableFirmware = true;
+  hardware.wirelessRegulatoryDatabase = true;
 
   environment.variables = {
     EDITOR = "nvim";
@@ -124,7 +127,7 @@ in
 
   services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
-  # systemd.services.cups-browsed.enable = false;
+  systemd.services.cups-browsed.enable = false;
 
   services.usbmuxd.enable = true;
 
@@ -196,7 +199,7 @@ in
   };
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=1h
+    HibernateDelaySec=20m
   '';
 
 
@@ -234,6 +237,7 @@ in
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
 
   systemd.services.autovpn = mkLaptop {
+    enable = false; # TODO: Server broken, fix later
     description = "Automatic WireGuard VPN Activation";
     after = [ "iwd.service" "systemd-networkd.socket" ];
     wants = [ "iwd.service" "systemd-networkd.socket" ];
@@ -443,9 +447,9 @@ in
   hardware.nvidia = mkDesktop {
     modesetting.enable = true;
     powerManagement.enable = true;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     # NOTE: not on a beta now, uncomment when a beta is available
-    # package = config.boot.kernelPackages.nvidiaPackages.beta;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   services.xserver.videoDrivers = mkDesktop [ "nvidia" ];
@@ -477,6 +481,7 @@ in
       session required pam_unix.so
     '';
     sudo.fprintAuth = true;
+    cups.fprintAuth = false;
   };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
