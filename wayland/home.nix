@@ -23,7 +23,7 @@ in
 
   wayland.windowManager.sway = {
     enable = true;
-    extraOptions = mkDesktop [ "--my-next-gpu-wont-be-nvidia" ];
+    extraOptions = mkDesktop [ "--unsupported-gpu" ];
     extraSessionCommands = ''
       export _JAVA_AWT_WM_NONREPARENTING=1
       export QT_QPA_PLATFORM=wayland-egl

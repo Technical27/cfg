@@ -17,12 +17,10 @@ in
       experimental-features = nix-command flakes
     '';
     binaryCaches = [
-      # TODO: Server broken
-      # "http://yogs.tech:9000/"
+      "http://yogs.tech:9000/"
     ];
     binaryCachePublicKeys = [
-      # TODO: Same as above
-      # "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
+      "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
     ];
     gc = {
       dates = "weekly";
@@ -93,10 +91,7 @@ in
     '';
   };
 
-  programs.gnupg.agent = {
-    enable = true;
-    pinentryFlavor = "curses";
-  };
+  programs.gnupg.agent.enable = true;
   programs.fish.enable = true;
 
   nixpkgs.config = {
@@ -134,11 +129,12 @@ in
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/New_York";
 
+  users.groups.ancs4linux = { };
   users.users.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
       ++ lib.optionals isDesktop [ "openrazer" ]
-      ++ lib.optionals isLaptop [ "dialout" ];
+      ++ lib.optionals isLaptop [ "dialout" "ancs4linux" ];
     shell = pkgs.fish;
   };
 
@@ -237,7 +233,6 @@ in
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
 
   systemd.services.autovpn = mkLaptop {
-    enable = false; # TODO: Server broken, fix later
     description = "Automatic WireGuard VPN Activation";
     after = [ "iwd.service" "systemd-networkd.socket" ];
     wants = [ "iwd.service" "systemd-networkd.socket" ];
@@ -378,6 +373,7 @@ in
 
   environment.systemPackages = with pkgs; mkLaptop [
     cpkgs.robotmeshnative
+    cpkgs.ancs4linux
   ];
 
   programs.java = {
@@ -431,7 +427,8 @@ in
 
   networking.firewall = {
     enable = !isLaptop;
-    allowedTCPPorts = mkDesktop [ 22 ];
+    allowedTCPPorts = mkDesktop [ 22 27036 27037 ];
+    allowedUDPPorts = mkDesktop [ 27036 27031 27036 ];
   };
   systemd.network.networks."00-ethernet" = mkDesktop {
     name = "eno1";
@@ -486,12 +483,9 @@ in
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = mkDesktop (
-    builtins.map mkPatch [
-      "openrgb"
-      "futex_waitv"
-    ]
-  );
+  boot.kernelPatches = mkDesktop [
+    (mkPatch "openrgb")
+  ];
 
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";
@@ -515,4 +509,10 @@ in
       KERNEL=="rfkill", MODE="0664", TAG+="uaccess"
     '';
   };
+
+  systemd.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
+  systemd.services.ancs4linux-advertising.wantedBy = mkLaptop [ "default.target" ];
+  systemd.services.ancs4linux-observer.wantedBy = mkLaptop [ "default.target" ];
+  systemd.user.services.ancs4linux-desktop-integration.wantedBy = mkLaptop [ "graphical-session.target" ];
+  services.dbus.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
 }
