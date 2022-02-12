@@ -27,6 +27,7 @@ in
     imv
     tectonic
     gcc
+    binutils
     jq
     file
     gh
@@ -37,6 +38,7 @@ in
     ouch
     cpkgs.neo
     qmk
+    bitwarden-cli
 
     neovim-nightly
     killall
@@ -48,7 +50,7 @@ in
 
     noto-fonts
     noto-fonts-extra
-    # noto-fonts-cjk
+    noto-fonts-cjk
     noto-fonts-emoji
 
     gimp
@@ -71,18 +73,25 @@ in
     # get libreoffice spellchecking
 
     hunspellDicts.en-us
+    hashcat
   ] ++ lib.optionals isLaptop [
     wireguard-tools
     cpkgs.wgvpn
     # set thermal modes
     libsmbios
+
     aircrack-ng
+    hcxdumptool
+    hcxtools
+    metasploit
 
     discord
     zoom-us
     teams
     htop
     qutebrowser
+    pcem
+    lynx
 
     # VEX
     cpkgs.pros
@@ -125,7 +134,9 @@ in
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
-      "${pkgs.clojure-lsp}"
+      # NOTE: broken
+      # "${pkgs.clojure-lsp}"
+      ""
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
@@ -147,6 +158,8 @@ in
           ];
         }) else pkgs.firefox;
   };
+
+  programs.neomutt.enable = true;
 
   programs.zathura = {
     enable = true;
@@ -258,6 +271,7 @@ in
       set -g fish_color_selection 'white' '--bold'  '--background=brblack'
       set -g fish_color_user brgreen
       set -g fish_color_valid_path --underline
+      set -ag fish_user_paths '${config.home.homeDirectory}/.cargo/bin'
 
       set -g fish_cursor_insert line
       set -g fish_cursor_default block

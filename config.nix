@@ -16,15 +16,13 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
-    binaryCaches = [
-      "http://yogs.tech:9000/"
-    ];
-    binaryCachePublicKeys = [
-      "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA="
-    ];
     gc = {
       dates = "weekly";
       automatic = true;
+    };
+    settings = {
+      substituters = [ "http://yogs.tech:9000/" ];
+      trusted-public-keys = [ "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA=" ];
     };
   };
 
@@ -106,7 +104,7 @@ in
       libvdpau-va-gl
       vaapiVdpau
     ] ++ (lib.optionals isLaptop [
-      intel-ocl
+      intel-compute-runtime
       intel-media-driver
     ]);
   };
@@ -134,7 +132,7 @@ in
     isNormalUser = true;
     extraGroups = [ "wheel" ]
       ++ lib.optionals isDesktop [ "openrazer" ]
-      ++ lib.optionals isLaptop [ "dialout" "ancs4linux" ];
+      ++ lib.optionals isLaptop [ "dialout" "ancs4linux" "vboxusers" ];
     shell = pkgs.fish;
   };
 
@@ -143,7 +141,7 @@ in
   security.apparmor.enable = true;
 
   programs.dconf.enable = true;
-  programs.tilp2.enable = true;
+  # programs.tilp2.enable = true;
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -154,12 +152,13 @@ in
       support32Bit = true;
     };
     jack.enable = true;
-    media-session = mkLaptop {
+    wireplumber.enable = true;
+    media-session.enable = false /* = mkLaptop {
       config.bluez-monitor.properties = {
-        "bluez5.msbc-support" = true;
-        "bluez5.sbc-xq-support" = true;
+      "bluez5.msbc-support" = true;
+      "bluez5.sbc-xq-support" = true;
       };
-    };
+      }*/;
   };
   security.pam.loginLimits = [
     {
@@ -177,10 +176,10 @@ in
   ];
   systemd.user.services.pipewire-pulse.serviceConfig.LimitMEMLOCK = "131072";
 
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = [ pkgs.fcitx5-m17n ];
-  };
+  # i18n.inputMethod = {
+  #   enabled = "fcitx5";
+  #   fcitx5.addons = [ pkgs.fcitx5-m17n ];
+  # };
 
   # Laptop specific things
   boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
@@ -191,8 +190,35 @@ in
     lidSwitch = "suspend-then-hibernate";
     extraConfig = ''
       HandlePowerKey=hibernate
+      IdleAction=suspend-then-hibernate
+      IdleActionSec=300
     '';
   };
+
+  nixpkgs.overlays = mkLaptop [
+    (self: super: {
+      linux-firmware = super.linux-firmware.overrideAttrs (old: rec {
+        version = "eb8ea1b46893c42edbd516f971a93b4d097730ab";
+        src = super.fetchgit {
+          url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
+          rev = "eb8ea1b46893c42edbd516f971a93b4d097730ab";
+          sha256 = "sha256-1nDrAcq5kSpyDcIgpCibru/BcXfKHkFCwbo4xc0c9g4=";
+        };
+        outputHash = "sha256-Prl9z+jD5v9QnlQ9sdvA79IIroZz6bSk4O8ylsb/jqQ=";
+      });
+      swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
+        src = super.fetchFromGitHub {
+          owner = "mortie";
+          repo = old.pname;
+          rev = "a8fc557b86e70f2f7a30ca9ff9b3124f89e7f204";
+          sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
+        };
+      });
+      pcem = super.pcem.overrideAttrs (old: rec {
+        patches = [ ./pcem.patch ];
+      });
+    })
+  ];
 
   systemd.sleep.extraConfig = mkLaptop ''
     HibernateDelaySec=20m

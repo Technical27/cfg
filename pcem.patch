@@ -1,0 +1,13 @@
+diff --git a/src/386_dynarec.c b/src/386_dynarec.c
+index 9dedf44..650060b 100644
+--- a/src/386_dynarec.c
++++ b/src/386_dynarec.c
+@@ -301,7 +301,7 @@ static inline void exec_interpreter(void)
+         cpu_end_block_after_ins = 0;
+ }
+ 
+-static inline void exec_recompiler(void)
++static inline void __attribute__((optimize("O0"))) exec_recompiler(void)
+ {
+         uint32_t phys_addr = get_phys(cs+cpu_state.pc);
+         int hash = HASH(phys_addr);

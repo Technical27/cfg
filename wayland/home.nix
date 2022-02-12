@@ -79,7 +79,6 @@ in
           tap = "enabled";
           natural_scroll = "enabled";
           pointer_accel = "0.3";
-          dwt = "disabled";
           events = "disabled_on_external_mouse";
         };
         "*" = {
@@ -119,9 +118,6 @@ in
           })
           {
             command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-          }
-          {
-            command = "fcitx5";
           }
           {
             command = "wl-paste -t text --watch clipman store --no-persist";
