@@ -308,11 +308,11 @@ in
 
   programs.mpv = {
     enable = true;
-    scripts = [ pkgs.mpvScripts.mpris ];
+    scripts = with pkgs.mpvScripts; [ mpris ];
     config = {
-      hwdec = "vaapi";
+      hwdec = mkLaptop "vaapi";
       vo = "gpu";
-      gpu-context = "wayland";
+      gpu-context = mkLaptop "wayland";
       profile = "gpu-hq";
       scale = "ewa_lanczossharp";
       cscale = "ewa_lanczossharp";
@@ -320,8 +320,8 @@ in
       keep-open = "yes";
     };
     bindings = {
-      WHEEL_UP = "ignore";
-      WHEEL_DOWN = "ignore";
+      WHEEL_UP = mkLaptop "ignore";
+      WHEEL_DOWN = mkLaptop "ignore";
     };
   };
 

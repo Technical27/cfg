@@ -151,9 +151,11 @@ in
           "XF86AudioNext" = playerctl "next";
           "XF86AudioPrev" = playerctl "previous";
 
-          "XF86RFKill" = "rfkill toggle all";
-          "Print" = "grimshot copy area";
-          "Shift+Print" = "grimshot save area";
+          "XF86RFKill" = "exec rfkill toggle all";
+          "Print" = "exec grimshot copy area";
+          "Shift+Print" = "exec grimshot save area";
+
+          "XF86AudioMedia" = "exec systemctl suspend";
 
           "Mod4+e" = "exec firefox";
           "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
@@ -201,6 +203,12 @@ in
             status = "enable";
             scale = 1.0;
             mode = "2560x1440@144Hz";
+          }
+          {
+            criteria = "Samsung Electric Company SME1920 H9NZ911701";
+            status = "enable";
+            scale = 0.9;
+            mode = "1366x768@59.790Hz";
           }
         ];
       };
