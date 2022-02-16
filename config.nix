@@ -216,9 +216,6 @@ in
           sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
         };
       });
-      pcem = super.pcem.overrideAttrs (old: rec {
-        patches = [ ./pcem.patch ];
-      });
     })
   ];
 

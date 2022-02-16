@@ -91,7 +91,7 @@ in
     teams
     htop
     qutebrowser
-    pcem
+    cpkgs.pcem
     lynx
 
     # VEX
@@ -110,7 +110,7 @@ in
     openrgb
     liquidctl
     obs-studio
-    olive-editor
+    cpksg.olive
     mumble
     scrot
 
