@@ -79,6 +79,7 @@ in
     cpkgs.wgvpn
     # set thermal modes
     libsmbios
+    intel-gpu-tools
 
     aircrack-ng
     hcxdumptool
@@ -152,7 +153,7 @@ in
     enable = true;
     package =
       if isLaptop then
-        (pkgs.firefox.override {
+        (pkgs.firefox-nightly.override {
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
@@ -312,10 +313,10 @@ in
     config = {
       hwdec = mkLaptop "vaapi";
       vo = "gpu";
-      gpu-context = mkLaptop "wayland";
-      profile = "gpu-hq";
-      scale = "ewa_lanczossharp";
-      cscale = "ewa_lanczossharp";
+      # TODO: maybe for desktop
+      # profile = "gpu-hq";
+      # scale = "ewa_lanczossharp";
+      # cscale = "ewa_lanczossharp";
       ytdl-format = "bestvideo[height<=?1440]+bestaudio/best";
       keep-open = "yes";
     };

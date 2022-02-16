@@ -21,6 +21,8 @@ in
     clipman
   ];
 
+  programs.mpv.config.gpu-context = "wayland";
+
   wayland.windowManager.sway = {
     enable = true;
     extraOptions = mkDesktop [ "--unsupported-gpu" ];
@@ -270,7 +272,7 @@ in
           format = "{temperatureC}°C";
           interval = 5;
           # The actual cpu temperature as reported by BIOS
-          hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "5" else "3"}/temp1_input";
+          hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "4" else "3"}/temp1_input";
         };
         backlight = {
           format = "{percent}% {icon}";
