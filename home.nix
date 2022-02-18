@@ -35,7 +35,9 @@ in
     fd
     exa
     rustup
-    ouch
+    zip
+    unzip
+    p7zip
     cpkgs.neo
     qmk
     bitwarden-cli
@@ -119,6 +121,11 @@ in
     freecad
   ];
 
+  xdg.dataFile."fusion360/wine" = mkLaptop {
+    source = "${cpkgs.fusion360-wine}/bin/wine";
+    executable = true;
+  };
+
   xdg.configFile = {
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
@@ -135,9 +142,7 @@ in
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
       "${pkgs.haskell-language-server}"
-      # NOTE: broken
-      # "${pkgs.clojure-lsp}"
-      ""
+      "${pkgs.clojure-lsp}"
       "${pkgs.nodePackages.svelte-language-server}"
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
@@ -157,7 +162,7 @@ in
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
-        }) else pkgs.firefox;
+        }) else pkgs.firefox-nightly;
   };
 
   programs.neomutt.enable = true;
@@ -313,11 +318,10 @@ in
     config = {
       hwdec = mkLaptop "vaapi";
       vo = "gpu";
-      # TODO: maybe for desktop
-      # profile = "gpu-hq";
-      # scale = "ewa_lanczossharp";
-      # cscale = "ewa_lanczossharp";
-      ytdl-format = "bestvideo[height<=?1440]+bestaudio/best";
+      profile = "gpu-hq";
+      scale = mkDesktop "ewa_lanczossharp";
+      cscale = mkDesktop "ewa_lanczossharp";
+      ytdl-format = "bestvideo[height<=?${if isLaptop then "1440" else "2160"}]+bestaudio/best";
       keep-open = "yes";
     };
     bindings = {

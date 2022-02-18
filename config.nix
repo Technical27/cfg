@@ -200,15 +200,16 @@ in
   nixpkgs.overlays = mkLaptop [
     (self: super: {
       linux-firmware = super.linux-firmware.overrideAttrs (old: rec {
-        version = "eb8ea1b46893c42edbd516f971a93b4d097730ab";
+        version = "20220209";
         src = super.fetchgit {
           url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
-          rev = "eb8ea1b46893c42edbd516f971a93b4d097730ab";
-          sha256 = "sha256-1nDrAcq5kSpyDcIgpCibru/BcXfKHkFCwbo4xc0c9g4=";
+          rev = "refs/tags/${version}";
+          sha256 = "sha256-QWGnaGQrDUQeYUIBq0/63YdHZgyaF4s9fdyLA9bb6qs=";
         };
-        outputHash = "sha256-Prl9z+jD5v9QnlQ9sdvA79IIroZz6bSk4O8ylsb/jqQ=";
+        outputHash = "sha256-ahXZK13wrcZW/8ZCgUTHU6N4QKsL3NV98eRbYGBp3jw=";
       });
       swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
+        version = "unstable-2022-02-18";
         src = super.fetchFromGitHub {
           owner = "mortie";
           repo = old.pname;
@@ -216,11 +217,19 @@ in
           sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
         };
       });
+      discord = super.discord.overrideAttrs (old: rec {
+        version = "0.0.17";
+        src = super.fetchurl {
+          url =
+            "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
+          sha256 = "058k0cmbm4y572jqw83bayb2zzl2fw2aaz0zj1gvg6sxblp76qil";
+        };
+      });
     })
   ];
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=20m
+    HibernateDelaySec=1h
   '';
 
 
