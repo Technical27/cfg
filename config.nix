@@ -484,7 +484,7 @@ in
 
   security.pam.services = {
     # get gnome-keyring to unlock on boot
-    login.fprintAuth = mkLaptop lib.mkForce false;
+    login.fprintAuth = mkLaptop (lib.mkForce false);
     # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
     swaylock.text = mkLaptop ''
       # Account management.
@@ -504,7 +504,7 @@ in
       session required pam_unix.so
     '';
     sudo.fprintAuth = mkLaptop true;
-    cups.fprintAuth = mkLapotp false;
+    cups.fprintAuth = mkLaptop false;
     sddm.enableGnomeKeyring = mkDesktop true;
   };
 
