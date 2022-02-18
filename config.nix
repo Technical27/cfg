@@ -9,7 +9,7 @@ let
 in
 {
 
-  imports = [ ./wayland/config.nix ];
+  imports = [ (if isLaptop then ./wayland/config.nix else ./x11/config.nix) ];
 
   nix = {
     package = pkgs.nixUnstable;
@@ -129,7 +129,7 @@ in
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/New_York";
 
-  users.groups.ancs4linux = { };
+  users.groups.ancs4linux = mkLaptop { };
   users.users.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
@@ -215,14 +215,6 @@ in
           repo = old.pname;
           rev = "a8fc557b86e70f2f7a30ca9ff9b3124f89e7f204";
           sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
-        };
-      });
-      discord = super.discord.overrideAttrs (old: rec {
-        version = "0.0.17";
-        src = super.fetchurl {
-          url =
-            "https://dl.discordapp.net/apps/linux/${version}/discord-${version}.tar.gz";
-          sha256 = "058k0cmbm4y572jqw83bayb2zzl2fw2aaz0zj1gvg6sxblp76qil";
         };
       });
     })
@@ -478,9 +470,9 @@ in
   hardware.nvidia = mkDesktop {
     modesetting.enable = true;
     powerManagement.enable = true;
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     # NOTE: not on a beta now, uncomment when a beta is available
-    # package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # package = config.boot.kernelPackages.nvidiaPackages.beta;
   };
 
   services.xserver.videoDrivers = mkDesktop [ "nvidia" ];
@@ -490,11 +482,11 @@ in
     "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
   };
 
-  security.pam.services = mkLaptop {
+  security.pam.services = {
     # get gnome-keyring to unlock on boot
-    login.fprintAuth = lib.mkForce false;
+    login.fprintAuth = mkLaptop lib.mkForce false;
     # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
-    swaylock.text = ''
+    swaylock.text = mkLaptop ''
       # Account management.
       account required pam_unix.so
 
@@ -511,8 +503,9 @@ in
       session required pam_env.so conffile=/etc/pam/environment readenv=0
       session required pam_unix.so
     '';
-    sudo.fprintAuth = true;
-    cups.fprintAuth = false;
+    sudo.fprintAuth = mkLaptop true;
+    cups.fprintAuth = mkLapotp false;
+    sddm.enableGnomeKeyring = mkDesktop true;
   };
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];

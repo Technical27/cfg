@@ -37,6 +37,10 @@ in
           command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
           notification = false;
         }
+        {
+          command = "${pkgs.cpkgs.polybar}/bin/polybar main";
+          notification = false;
+        }
       ];
       keybindings = lib.mkOptionDefault {
         "Mod4+e" = "exec firefox";

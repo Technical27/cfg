@@ -11,7 +11,7 @@ in
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  imports = [ (import ./wayland/home.nix device) ];
+  imports = [ (import (if isLaptop then ./wayland/home.nix else ./x11/home.nix) device) ];
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
@@ -58,6 +58,7 @@ in
     gimp
     cpkgs.grapejuice
     pavucontrol
+    discord
 
     easyeffects
     cpkgs.soundux
@@ -88,7 +89,6 @@ in
     hcxtools
     metasploit
 
-    discord
     zoom-us
     teams
     htop
@@ -112,16 +112,16 @@ in
     openrgb
     liquidctl
     obs-studio
-    cpksg.olive
+    cpkgs.olive
     mumble
     scrot
 
     lutris
     cpkgs.badlion-client
-    freecad
+    # freecad
   ];
 
-  xdg.dataFile."fusion360/wine" = mkLaptop {
+  xdg.dataFile."fusion360/wine" = {
     source = "${cpkgs.fusion360-wine}/bin/wine";
     executable = true;
   };
@@ -316,7 +316,7 @@ in
     enable = true;
     scripts = with pkgs.mpvScripts; [ mpris ];
     config = {
-      hwdec = mkLaptop "vaapi";
+      hwdec = if isLaptop then "vaapi" else "nvdec";
       vo = "gpu";
       profile = "gpu-hq";
       scale = mkDesktop "ewa_lanczossharp";
