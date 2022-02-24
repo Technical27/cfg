@@ -69,6 +69,7 @@ in
     mangohud
 
     kdenlive
+    cpkgs.olive
 
     # read files from phone
     libimobiledevice
@@ -112,7 +113,6 @@ in
     openrgb
     liquidctl
     obs-studio
-    cpkgs.olive
     mumble
     scrot
 

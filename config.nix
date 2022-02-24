@@ -30,16 +30,16 @@ in
     let
       default_opts = [
         "noatime"
-        "nodiratime"
         "compress-force=zstd:5"
         "ssd"
         "space_cache"
         "autodefrag"
+        "discard=async"
       ];
       swap_opts = [
         "noatime"
-        "nodiratime"
         "ssd"
+        "discard=async"
       ];
     in
     mkLaptop {
@@ -193,21 +193,12 @@ in
     extraConfig = ''
       HandlePowerKey=hibernate
       IdleAction=suspend-then-hibernate
-      IdleActionSec=300
+      IdleActionSec=180
     '';
   };
 
   nixpkgs.overlays = mkLaptop [
     (self: super: {
-      linux-firmware = super.linux-firmware.overrideAttrs (old: rec {
-        version = "20220209";
-        src = super.fetchgit {
-          url = "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git";
-          rev = "refs/tags/${version}";
-          sha256 = "sha256-QWGnaGQrDUQeYUIBq0/63YdHZgyaF4s9fdyLA9bb6qs=";
-        };
-        outputHash = "sha256-ahXZK13wrcZW/8ZCgUTHU6N4QKsL3NV98eRbYGBp3jw=";
-      });
       swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
         version = "unstable-2022-02-18";
         src = super.fetchFromGitHub {
