@@ -35,6 +35,8 @@ in
     fd
     exa
     rustup
+    nodejs
+    yarn
     zip
     unzip
     p7zip
@@ -70,6 +72,8 @@ in
 
     kdenlive
     cpkgs.olive
+
+    cpkgs.n-link
 
     # read files from phone
     libimobiledevice
@@ -291,7 +295,7 @@ in
       ls = "exa --git --git-ignore --icons";
       tree = "exa --git --git-ignore --icons --tree";
     };
-    functions.fish_greeting = "${cpkgs.info}/bin/info";
+    # functions.fish_greeting = "${cpkgs.info}/bin/info";
   };
 
   gtk = {

@@ -54,6 +54,7 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
+  boot.loader.timeout = mkLaptop 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
   boot.kernelParams = [ ]
@@ -111,6 +112,7 @@ in
     ]);
   };
   programs.steam.enable = true;
+  programs.steam.remotePlay.openFirewall = isDesktop;
 
   hardware.enableRedistributableFirmware = true;
   hardware.wirelessRegulatoryDatabase = true;
@@ -199,6 +201,7 @@ in
 
   nixpkgs.overlays = mkLaptop [
     (self: super: {
+      steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
       swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
         version = "unstable-2022-02-18";
         src = super.fetchFromGitHub {
@@ -227,6 +230,13 @@ in
       RUNTIME_PM_ON_BAT = "auto";
       ENERGY_PERF_POLICY_ON_BAT = "powersave";
       SCHED_POWERSAVE_ON_BAT = 1;
+
+      INTEL_GPU_MIN_FREQ_ON_AC = 100;
+      INTEL_GPU_MIN_FREQ_ON_BAT = 100;
+      INTEL_GPU_MAX_FREQ_ON_AC = 1300;
+      INTEL_GPU_MAX_FREQ_ON_BAT = 500;
+      INTEL_GPU_BOOST_FREQ_ON_AC = 1300;
+      INTEL_GPU_BOOST_FREQ_ON_BAT = 1100;
     };
   };
 
@@ -421,6 +431,8 @@ in
           tcp dport 5355 accept
           udp dport 5355 accept
 
+          tcp dport 3000 accept
+
           counter drop
         }
 
@@ -444,8 +456,7 @@ in
 
   networking.firewall = {
     enable = !isLaptop;
-    allowedTCPPorts = mkDesktop [ 22 27036 27037 ];
-    allowedUDPPorts = mkDesktop [ 27036 27031 27036 ];
+    allowedTCPPorts = mkDesktop [ 22 ];
   };
   systemd.network.networks."00-ethernet" = mkDesktop {
     name = "eno1";

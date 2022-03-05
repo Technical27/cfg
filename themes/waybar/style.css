@@ -24,7 +24,6 @@ window#waybar {
   color: @gruvbox-fg;
   transition-property: background-color;
   transition-duration: 0.5s;
-  /* border: 2px solid #8ec07c; */
 }
 
 window#waybar.hidden {
@@ -54,7 +53,6 @@ window#waybar.hidden {
 
 #mode {
   color: @gruvbox-blue;
-  padding: 0 10px;
   margin: 0 4px;
 }
 
@@ -91,14 +89,12 @@ window#waybar.hidden {
   }
 }
 
+#battery.warning:not(.charging) {
+  color: @gruvbox-yellow;
+}
+
 #battery.critical:not(.charging) {
-  background-color: @gruvbox-red;
-  color: @gruvbox-fg;
-  animation-name: blink;
-  animation-duration: 0.5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+  color: @gruvbox-red;
 }
 
 #network.disconnected {
@@ -114,13 +110,7 @@ window#waybar.hidden {
 }
 
 #custom-nixos.error {
-  background-color: @gruvbox-red;
-  color: @gruvbox-fg;
-  animation-name: blink;
-  animation-duration: 0.5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+  color: @gruvbox-red;
 }
 
 #custom-nixos.offline {

@@ -79,9 +79,9 @@ in
       input = {
         "2362:628:PIXA3854:00_093A:0274_Touchpad" = mkLaptop {
           tap = "enabled";
+          dwt = "disabled";
           natural_scroll = "enabled";
           pointer_accel = "0.3";
-          events = "disabled_on_external_mouse";
         };
         "*" = {
           xkb_options = "compose:ralt,caps:swapescape";
@@ -206,12 +206,6 @@ in
             scale = 1.0;
             mode = "2560x1440@144Hz";
           }
-          {
-            criteria = "Samsung Electric Company SME1920 H9NZ911701";
-            status = "enable";
-            scale = 0.9;
-            mode = "1366x768@59.790Hz";
-          }
         ];
       };
     };
@@ -242,7 +236,7 @@ in
         position = "top";
         height = 30;
         modules-left = [ "sway/workspaces" "sway/window" "sway/mode" ];
-        modules-right = [ "idle_inhibitor" "custom/nixos" "network" (mkLaptop "custom/vpn") "cpu" "memory" "temperature" "pulseaudio" (mkLaptop "backlight") (mkLaptop "battery") "clock" "tray" ];
+        modules-right = [ "idle_inhibitor" "network" (mkLaptop "custom/vpn") "pulseaudio" (mkLaptop "backlight") (mkLaptop "battery") "clock" "tray" ];
         "sway/workspaces".disable-scroll = true;
         "sway/mode".format = "<span style=\"italic\">{}</span>";
         tray.spacing = 10;
@@ -258,35 +252,19 @@ in
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
           format-alt = "{:%Y-%m-%d}";
         };
-        cpu = {
-          format = "{usage}% ";
-          tooltip = false;
-          interval = 5;
-        };
-        memory = {
-          format = "{}% ";
-          interval = 5;
-        };
-        temperature = {
-          critical-threshold = 80;
-          format = "{temperatureC}°C";
-          interval = 5;
-          # The actual cpu temperature as reported by BIOS
-          hwmon-path = "/sys/class/hwmon/hwmon${if isLaptop then "4" else "3"}/temp1_input";
-        };
         backlight = {
           format = "{percent}% {icon}";
           format-icons = [ "" "" ];
         };
         battery = {
           states = {
-            warning = 20;
+            warning = 25;
             critical = 10;
           };
           format = "{capacity}% {icon}";
           format-charging = "{capacity}% ";
           format-plugged = "{capacity}% ";
-          format-tooltip = "{time} {icon}";
+          format-tooltip = "{time}";
           format-icons = [ "" "" "" "" "" ];
         };
         network = {
@@ -313,11 +291,6 @@ in
             default = [ "" "" "" ];
           };
           on-click = "pavucontrol";
-        };
-        "custom/nixos" = {
-          return-type = "json";
-          interval = 600;
-          exec = "${cpkgs.info}/bin/info --waybar";
         };
         "custom/vpn" = {
           return-type = "json";
