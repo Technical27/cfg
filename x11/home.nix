@@ -121,7 +121,7 @@ in
         module-margin = 1;
         background = "#282828";
         foreground = "#ebdbb2";
-        monitor = "DP-0";
+        monitor = "DP-4";
         tray-position = "right";
         tray-detached = false;
         tray-padding = 3;

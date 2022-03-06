@@ -105,10 +105,11 @@ in
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       libvdpau-va-gl
-      vaapiVdpau
     ] ++ (lib.optionals isLaptop [
       intel-compute-runtime
       intel-media-driver
+    ]) ++ (lib.optionals isDesktop [
+      nvidia-vaapi-driver
     ]);
   };
   programs.steam.enable = true;

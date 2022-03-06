@@ -20,11 +20,28 @@
       fsType = "ext4";
     };
 
-  fileSystems."/media/ssd" =
-    {
-      device = "/dev/disk/by-uuid/034782cc-bc82-4940-bfa8-be7e656fc9ad";
-      fsType = "ext4";
-    };
+  fileSystems."/media/hdd" = {
+    device = "/dev/disk/by-uuid/6f12f68c-bd0e-456a-926a-59d1ffd5cbe6";
+    fsType = "btrfs";
+    options = [
+      "noatime"
+      "compress-force=zstd:5"
+      "space_cache"
+      "autodefrag"
+    ];
+  };
+
+  fileSystems."/media/ssd" = {
+    device = "/dev/disk/by-uuid/add4b883-33d6-4982-9938-41622577f382";
+    fsType = "btrfs";
+    options = [
+      "ssd"
+      "noatime"
+      "compress-force=zstd:5"
+      "space_cache"
+      "autodefrag"
+    ];
+  };
 
   fileSystems."/boot" =
     {
@@ -32,11 +49,13 @@
       fsType = "vfat";
     };
 
-  fileSystems."/media/hdd" =
-    {
-      device = "/dev/disk/by-uuid/cb1cdd76-7b53-4acd-8357-388562abb590";
-      fsType = "ext4";
-    };
+  swapDevices = [ ];
+
+  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
+  # Per-interface useDHCP will be mandatory in the future, so this generated config
+  # replicates the default behaviour.
+  networking.useDHCP = lib.mkDefault false;
+  networking.interfaces.eno1.useDHCP = lib.mkDefault true;
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

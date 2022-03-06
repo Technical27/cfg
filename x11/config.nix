@@ -17,6 +17,12 @@
     "X11/xorg.conf.d/90-kbd.conf".source = ../desktop/90-kbd.conf;
   };
 
+  environment.sessionVariables = {
+    "MOZ_X11_EGL" = "1";
+    "MOZ_DISABLE_RDD_SANDBOX" = "1";
+    "LIBVA_DRIVER_NAME" = "nvidia";
+  };
+
   services.picom = {
     enable = true;
     backend = "glx";
