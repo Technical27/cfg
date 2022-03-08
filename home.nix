@@ -295,7 +295,6 @@ in
       ls = "exa --git --git-ignore --icons";
       tree = "exa --git --git-ignore --icons --tree";
     };
-    # functions.fish_greeting = "${cpkgs.info}/bin/info";
   };
 
   gtk = {

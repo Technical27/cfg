@@ -64,6 +64,7 @@ in
       "i915.enable_guc=2"
       "i915.enable_fbc=1"
       "i915.enable_psr=1"
+      "workqueue.power_efficient=1"
     ]
   );
 
@@ -194,7 +195,8 @@ in
   services.logind = mkLaptop {
     lidSwitch = "suspend-then-hibernate";
     extraConfig = ''
-      HandlePowerKey=hibernate
+      HandlePowerKey=suspend-then-hibernate
+      HandlePowerKeyLongPress=hibernate
       IdleAction=suspend-then-hibernate
       IdleActionSec=180
     '';
@@ -216,7 +218,7 @@ in
   ];
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=1h
+    HibernateDelaySec=2h
   '';
 
 
