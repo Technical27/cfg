@@ -30,10 +30,9 @@ in
     let
       default_opts = [
         "noatime"
-        "compress-force=zstd:5"
+        "compress=zstd:5"
         "ssd"
         "space_cache"
-        "autodefrag"
         "discard=async"
       ];
       swap_opts = [
@@ -144,10 +143,7 @@ in
 
   system.stateVersion = if isLaptop then "22.05" else "20.09";
 
-  security.apparmor.enable = true;
-
   programs.dconf.enable = true;
-  # programs.tilp2.enable = true;
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -159,12 +155,7 @@ in
     };
     jack.enable = true;
     wireplumber.enable = true;
-    media-session.enable = false /* = mkLaptop {
-      config.bluez-monitor.properties = {
-      "bluez5.msbc-support" = true;
-      "bluez5.sbc-xq-support" = true;
-      };
-      }*/;
+    media-session.enable = false;
   };
   security.pam.loginLimits = [
     {
@@ -195,8 +186,7 @@ in
   services.logind = mkLaptop {
     lidSwitch = "suspend-then-hibernate";
     extraConfig = ''
-      HandlePowerKey=suspend-then-hibernate
-      HandlePowerKeyLongPress=hibernate
+      HandlePowerKey=hibernate
       IdleAction=suspend-then-hibernate
       IdleActionSec=180
     '';
@@ -228,9 +218,11 @@ in
     settings = {
       DISK_DEVICES = "nvme0n1";
       PCIE_ASPM_ON_BAT = "powersupersave";
+      PCIE_ASPM_ON_AC = "powersupersave";
       NMI_WATCHDOG = 0;
       USB_AUTOSUSPEND = 1;
       RUNTIME_PM_ON_BAT = "auto";
+      RUNTIME_PM_ON_AC = "auto";
       ENERGY_PERF_POLICY_ON_BAT = "powersave";
       SCHED_POWERSAVE_ON_BAT = 1;
 
@@ -337,17 +329,6 @@ in
     ];
   };
 
-  systemd.network.networks."10-ethernet" = mkLaptop {
-    name = "enp*";
-    DHCP = "yes";
-    networkConfig = {
-      IPv6AcceptRA = "yes";
-      IPv6PrivacyExtensions = "yes";
-      LLMNR = "yes";
-      MulticastDNS = "yes";
-    };
-  };
-
   systemd.network.networks."10-wg0" = mkLaptop {
     name = "wg0";
     DHCP = "no";
@@ -404,6 +385,7 @@ in
   environment.systemPackages = with pkgs; mkLaptop [
     cpkgs.robotmeshnative
     cpkgs.ancs4linux
+    config.boot.kernelPackages.turbostat
   ];
 
   programs.java = {
@@ -434,8 +416,6 @@ in
           tcp dport 5355 accept
           udp dport 5355 accept
 
-          tcp dport 3000 accept
-
           counter drop
         }
 
@@ -461,8 +441,8 @@ in
     enable = !isLaptop;
     allowedTCPPorts = mkDesktop [ 22 ];
   };
-  systemd.network.networks."00-ethernet" = mkDesktop {
-    name = "eno1";
+  systemd.network.networks."00-ethernet" = {
+    matchConfig.Type = "ether";
     DHCP = "yes";
     networkConfig = {
       IPv6AcceptRA = "yes";
@@ -536,9 +516,9 @@ in
     packages = [ ] ++ (lib.optionals isDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ]) ++ (lib.optionals isLaptop [ pkgs.cpkgs.robotmeshnative ]);
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
-      ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", GROUP="users"
+      ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", TAG+="uaccess"
       // Allows user rfkill access
-      KERNEL=="rfkill", MODE="0664", TAG+="uaccess"
+      KERNEL=="rfkill", TAG+="uaccess"
     '';
   };
 

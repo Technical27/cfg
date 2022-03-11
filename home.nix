@@ -85,11 +85,17 @@ in
   ] ++ lib.optionals isLaptop [
     wireguard-tools
     cpkgs.wgvpn
-    # set thermal modes
-    libsmbios
     intel-gpu-tools
+    traceroute
+    nvme-cli
+    pciutils
+    usbutils
+    powertop
+    libqalculate
+    qalculate-gtk
 
     aircrack-ng
+    iw
     hcxdumptool
     hcxtools
     metasploit
@@ -287,6 +293,11 @@ in
       set -g fish_cursor_default block
       fish_vi_key_bindings
     '';
+
+    functions = {
+      "nvm".body = "bass source ~/.nvm/nvm.sh --no-use ';' nvm $argv";
+      "nvm_find_nvmrc".body = "bass source ~/.nvm/nvm.sh --no-use ';' nvm_find_nvmrc";
+    };
     shellAliases = {
       make = "make -j8";
       icat = "kitty +kitten icat";
@@ -295,6 +306,27 @@ in
       ls = "exa --git --git-ignore --icons";
       tree = "exa --git --git-ignore --icons --tree";
     };
+
+    plugins = [
+      {
+        name = "fenv";
+        src = pkgs.fetchFromGitHub {
+          owner = "oh-my-fish";
+          repo = "plugin-foreign-env";
+          rev = "master";
+          sha256 = "sha256-er1KI2xSUtTlQd9jZl1AjqeArrfBxrgBLcw5OqinuAM=";
+        };
+      }
+      {
+        name = "bass";
+        src = pkgs.fetchFromGitHub {
+          owner = "edc";
+          repo = "bass";
+          rev = "master";
+          sha256 = "sha256-fl4/Pgtkojk5AE52wpGDnuLajQxHoVqyphE90IIPYFU=";
+        };
+      }
+    ];
   };
 
   gtk = {
