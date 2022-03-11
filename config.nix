@@ -64,6 +64,7 @@ in
       "i915.enable_fbc=1"
       "i915.enable_psr=1"
       "workqueue.power_efficient=1"
+      "nvme.noacpi=1"
     ]
   );
 
