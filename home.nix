@@ -26,17 +26,26 @@ in
     tldr
     imv
     tectonic
+
     gcc
+    pwndbg
+    radare2
+    ghidra
+    patchelf
+    wireshark
     binutils
+    virtualenv
+    python3Packages.ipython
+    rustup
+    nodejs
+    yarn
+
     jq
     file
     gh
     xdg_utils
     fd
     exa
-    rustup
-    nodejs
-    yarn
     zip
     unzip
     p7zip
@@ -148,6 +157,7 @@ in
       "@TSSERVER_PATH@"
       "@TYPESCIRPT_PATH@"
       "@CCLS_PATH@"
+      "@PYLSP_PATH@"
     ] [
       "${pkgs.rnix-lsp}"
       "${pkgs.rust-analyzer}"
@@ -157,6 +167,7 @@ in
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
       "${pkgs.ccls}"
+      "${pkgs.python3Packages.python-lsp-server}"
     ]
       (builtins.readFile ./nvim/lsp.lua);
   };
@@ -294,10 +305,6 @@ in
       fish_vi_key_bindings
     '';
 
-    functions = {
-      "nvm".body = "bass source ~/.nvm/nvm.sh --no-use ';' nvm $argv";
-      "nvm_find_nvmrc".body = "bass source ~/.nvm/nvm.sh --no-use ';' nvm_find_nvmrc";
-    };
     shellAliases = {
       make = "make -j8";
       icat = "kitty +kitten icat";
@@ -306,6 +313,13 @@ in
       ls = "exa --git --git-ignore --icons";
       tree = "exa --git --git-ignore --icons --tree";
     };
+
+    functions.fish_title.body = ''
+      set -q argv[1]; or set argv fish
+      set -l realhome ~
+      set -l dir (string replace -r '^'"$realhome"'($|/)' '~$1' $PWD)
+      echo "$dir: $argv"
+    '';
 
     plugins = [
       {

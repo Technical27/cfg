@@ -133,12 +133,13 @@ in
   i18n.defaultLocale = "en_US.UTF-8";
   time.timeZone = "America/New_York";
 
-  users.groups.ancs4linux = mkLaptop { };
+  # users.groups.ancs4linux = mkLaptop { };
   users.users.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" ]
       ++ lib.optionals isDesktop [ "openrazer" ]
-      ++ lib.optionals isLaptop [ "dialout" "ancs4linux" "vboxusers" ];
+      # "ancs4linux"
+      ++ lib.optionals isLaptop [ "dialout" ];
     shell = pkgs.fish;
   };
 
@@ -187,9 +188,9 @@ in
   services.logind = mkLaptop {
     lidSwitch = "suspend-then-hibernate";
     extraConfig = ''
-      HandlePowerKey=hibernate
       IdleAction=suspend-then-hibernate
-      IdleActionSec=180
+      HandlePowerKey=hibernate
+      IdleActionSec=300
     '';
   };
 
@@ -385,7 +386,7 @@ in
 
   environment.systemPackages = with pkgs; mkLaptop [
     cpkgs.robotmeshnative
-    cpkgs.ancs4linux
+    # cpkgs.ancs4linux
     config.boot.kernelPackages.turbostat
   ];
 
@@ -494,6 +495,10 @@ in
     sddm.enableGnomeKeyring = mkDesktop true;
   };
 
+  security.sudo.extraConfig = ''
+    Defaults pwfeedback
+  '';
+
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
   boot.kernelPatches = mkDesktop [
@@ -519,13 +524,13 @@ in
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", TAG+="uaccess"
       // Allows user rfkill access
-      KERNEL=="rfkill", TAG+="uaccess"
+      KERNEL=="rfkill", MODE=664, TAG+="uaccess"
     '';
   };
 
-  systemd.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
-  systemd.services.ancs4linux-advertising.wantedBy = mkLaptop [ "default.target" ];
-  systemd.services.ancs4linux-observer.wantedBy = mkLaptop [ "default.target" ];
-  systemd.user.services.ancs4linux-desktop-integration.wantedBy = mkLaptop [ "graphical-session.target" ];
-  services.dbus.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
+  # systemd.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
+  # systemd.services.ancs4linux-advertising.wantedBy = mkLaptop [ "default.target" ];
+  # systemd.services.ancs4linux-observer.wantedBy = mkLaptop [ "default.target" ];
+  # systemd.user.services.ancs4linux-desktop-integration.wantedBy = mkLaptop [ "graphical-session.target" ];
+  # services.dbus.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
 }

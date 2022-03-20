@@ -106,8 +106,8 @@ in
           {
             command = ''
               swayidle -w \
-                timeout 120 'playerctl pause 2>/dev/null; ${swaylock}' \
-                timeout 150 'swaymsg "output * dpms off"' \
+                timeout 240 'playerctl pause 2>/dev/null; ${swaylock}' \
+                timeout 270 'swaymsg "output * dpms off"' \
                   resume 'swaymsg "output * dpms on"' \
                 before-sleep 'playerctl pause 2>/dev/null; ${swaylock}'
             '';

@@ -85,3 +85,8 @@ lspconfig.ccls.setup {
   cmd = { "@CCLS_PATH@/bin/ccls" },
   on_attach = lsp_on_attach
 }
+
+lspconfig.pylsp.setup {
+  cmd = { "@PYLSP_PATH@/bin/pylsp" },
+  on_attach = lsp_on_attach
+}
