@@ -78,7 +78,7 @@ in
         "Escape" = "mode default";
         "Return" = "mode default";
       };
-      bars = [{ command = "${cpkgs.polybar}/bin/polybar main"; }];
+      bars = [{ command = "${cpkgs.polybar}/bin/polybar main"; colors.background = "#bada55"; }];
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }

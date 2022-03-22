@@ -67,7 +67,7 @@ in
     noto-fonts-emoji
 
     gimp
-    cpkgs.grapejuice
+    grapejuice
     pavucontrol
     discord
 
