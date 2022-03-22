@@ -92,7 +92,13 @@ in
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
-      bars = [{ command = "${pkgs.waybar}/bin/waybar"; }];
+      bars = [
+        {
+          command = "${pkgs.waybar}/bin/waybar";
+          # need to define some color for whatever reason
+          colors.background = "#bada55";
+        }
+      ];
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }
