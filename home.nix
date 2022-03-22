@@ -91,8 +91,8 @@ in
 
     hunspellDicts.en-us
     hashcat
-  ] ++ lib.optionals isLaptop [
     wireguard-tools
+  ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
     traceroute
@@ -137,6 +137,7 @@ in
 
     lutris
     cpkgs.badlion-client
+    transmission-gtk
     # freecad
   ];
 
@@ -363,7 +364,7 @@ in
 
   programs.mpv = {
     enable = true;
-    scripts = with pkgs.mpvScripts; [ mpris ];
+    scripts = with pkgs.mpvScripts; [ mpris thumbnail ];
     config = {
       hwdec = if isLaptop then "vaapi" else "nvdec";
       vo = "gpu";
@@ -372,6 +373,7 @@ in
       cscale = mkDesktop "ewa_lanczossharp";
       ytdl-format = "bestvideo[height<=?${if isLaptop then "1440" else "2160"}]+bestaudio/best";
       keep-open = "yes";
+      osc = "no";
     };
     bindings = {
       WHEEL_UP = mkLaptop "ignore";

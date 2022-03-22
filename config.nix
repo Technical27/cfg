@@ -310,35 +310,35 @@ in
     };
   };
 
-  systemd.network.netdevs."10-wg0" = mkLaptop {
+  systemd.network.netdevs."10-wg0" = {
     netdevConfig = {
       Name = "wg0";
       Kind = "wireguard";
       Description = "WireGuard Tunnel wg0";
     };
     wireguardConfig = {
-      PrivateKeyFile = "/etc/wireguard/laptop.key";
-      FirewallMark = 51000;
+      PrivateKeyFile = "/etc/wireguard/${device}.key";
+      FirewallMark = mkLaptop 51000;
     };
     wireguardPeers = [
       {
         wireguardPeerConfig = {
           PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
-          Endpoint = "aamaruvi.ddns.net:51820";
-          AllowedIPs = "0.0.0.0/0, ::/0";
+          Endpoint = "${if isLaptop then "aamaruvi.ddns.net" else "192.168.0.2"}:51820";
+          AllowedIPs = if isLaptop then "0.0.0.0/0, ::/0" else "10.200.200.0/24, fd37:994c:6708:de39::/64";
         };
       }
     ];
   };
 
-  systemd.network.networks."10-wg0" = mkLaptop {
+  systemd.network.networks."10-wg0" = {
     name = "wg0";
     DHCP = "no";
-    address = [ "10.200.200.2/32" "fd37:994c:6708:de39::2/128" ];
-    dns = [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
+    address = if isLaptop then [ "10.200.200.2/32" "fd37:994c:6708:de39::2/128" ] else [ "10.200.200.7/32" "fd37:994c:6708:de39::7/128" ];
+    dns = mkLaptop [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
     routes = [
       {
-        routeConfig = {
+        routeConfig = mkLaptop {
           Gateway = "10.200.200.1";
           Destination = "0.0.0.0/0";
           GatewayOnLink = true;
@@ -353,7 +353,7 @@ in
         };
       }
       {
-        routeConfig = {
+        routeConfig = mkLaptop {
           Gateway = "fd37:994c:6708:de39::1";
           Destination = "::/0";
           GatewayOnLink = true;
@@ -395,7 +395,9 @@ in
     package = mkLaptop pkgs.jdk11;
   };
 
-  networking.nftables = mkLaptop {
+  services.jellyfin.enable = true;
+
+  networking.nftables = {
     enable = true;
     ruleset = ''
       table inet filter {
@@ -417,6 +419,17 @@ in
           udp dport 5353 accept
           tcp dport 5355 accept
           udp dport 5355 accept
+
+          ${if isDesktop then ''
+            # jellyfin
+            tcp dport 8096 accept
+            tcp dport 8920 accept
+            udp dport 1900 accept
+            udp dport 7359 accept
+
+            tcp dport 22 accept
+            tcp dport 5100 accept
+          '' else ""}
 
           counter drop
         }
@@ -440,8 +453,8 @@ in
   hardware.openrazer.enable = isDesktop;
 
   networking.firewall = {
-    enable = !isLaptop;
-    allowedTCPPorts = mkDesktop [ 22 ];
+    enable = false;
+    allowedTCPPorts = mkDesktop [ 22 5100 ];
   };
   systemd.network.networks."00-ethernet" = {
     matchConfig.Type = "ether";

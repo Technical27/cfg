@@ -158,7 +158,7 @@ function _G.tex_settings()
   vim.opt_local.spell = true
   cmp.setup.buffer {
     sources = {
-      { name = 'vsnip' },
+      { name = 'luasnip' },
       { name = 'spell' },
     },
   }

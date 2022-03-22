@@ -27,7 +27,6 @@
       "noatime"
       "compress-force=zstd:5"
       "space_cache"
-      "autodefrag"
     ];
   };
 
