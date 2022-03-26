@@ -37,6 +37,7 @@ in
     virtualenv
     python3Packages.ipython
     rustup
+    (lib.setPrio (20) llvmPackages.bintools)
     nodejs
     yarn
 
