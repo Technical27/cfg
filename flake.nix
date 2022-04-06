@@ -3,7 +3,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     cpkgs.url = "github:technical27/pkgs";
-    home-manager.url = "github:nix-community/home-manager";
+    home-manager.url = "github:technical27/home-manager";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     firefox-nightly.url = "github:/colemickens/flake-firefox-nightly";
   };

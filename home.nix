@@ -37,6 +37,7 @@ in
     virtualenv
     python3Packages.ipython
     rustup
+    zig
     (lib.setPrio (20) llvmPackages.bintools)
     nodejs
     yarn
@@ -181,17 +182,18 @@ in
     enable = true;
     package =
       if isLaptop then
-        (pkgs.firefox-nightly.override {
+        (pkgs.firefox-beta-bin.override {
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
-        }) else pkgs.firefox-nightly;
+        }) else
+        pkgs.firefox-beta-bin;
   };
 
   programs.neomutt.enable = true;
 
   programs.zathura = {
-    enable = true;
+    # enable = true;
     options = {
       font = "'JetBrains Mono NerdFont' 13";
       statusbar-home-tilde = true;

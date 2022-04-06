@@ -246,6 +246,7 @@ in
   systemd.user.services.telephony_client.enable = false;
 
   powerManagement.enable = isLaptop;
+  hardware.sensor.iio.enable = isLaptop;
 
   networking.wireless.iwd = mkLaptop {
     enable = true;
@@ -258,9 +259,29 @@ in
 
   systemd.services.autovpn = mkLaptop {
     description = "Automatic WireGuard VPN Activation";
-    after = [ "iwd.service" "systemd-networkd.socket" ];
-    wants = [ "iwd.service" "systemd-networkd.socket" ];
+    after = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+    wants = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+    environment.RUST_LOG = "warn";
     serviceConfig = {
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+      RestrictSUIDSGID = true;
+      SystemCallArchitectures = "native";
+      RestrictAddressFamilies = [ "AF_NETLINK" "AF_UNIX" ];
+      ProtectHostname = true;
+      ProtectKernelLogs = true;
+      ProtectKernelModules = true;
+      ProtectKernelTunables = true;
+      ProtectControlGroups = true;
+      RestrictNamespaces = true;
+      ProtectHome = true;
+      ProtectSystem = true;
+      RestrictRealtime = true;
+      ProtectClock = true;
+      MemoryDenyWriteExecute = true;
+      LockPersonality = true;
+      CapabilityBoundingSet = "CAP_NET_ADMIN";
+      SystemCallFilter = [ "@system-service" "~@mount" "~@cpu-emulation" "~@debug" "~@keyring" "~@obsolete" "~@privileged" "~@setuid" ];
       Type = "simple";
       ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
     };
