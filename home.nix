@@ -112,7 +112,7 @@ in
     metasploit
 
     zoom-us
-    teams
+    # teams
     htop
     qutebrowser
     cpkgs.pcem
@@ -129,6 +129,8 @@ in
     cpkgs.vscodium
     python3
     slack
+
+    mindustry-wayland
   ] ++ lib.optionals isDesktop [
     razergenie
     openrgb
@@ -136,6 +138,7 @@ in
     obs-studio
     mumble
     scrot
+    mindustry
 
     lutris
     cpkgs.badlion-client
@@ -193,7 +196,7 @@ in
   programs.neomutt.enable = true;
 
   programs.zathura = {
-    # enable = true;
+    enable = true;
     options = {
       font = "'JetBrains Mono NerdFont' 13";
       statusbar-home-tilde = true;

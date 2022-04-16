@@ -33,12 +33,10 @@ in
         "compress=zstd:5"
         "ssd"
         "space_cache"
-        "discard=async"
       ];
       swap_opts = [
         "noatime"
         "ssd"
-        "discard=async"
       ];
     in
     mkLaptop {
@@ -416,7 +414,7 @@ in
     package = mkLaptop pkgs.jdk11;
   };
 
-  services.jellyfin.enable = true;
+  services.jellyfin.enable = isDesktop;
 
   networking.nftables = {
     enable = true;
@@ -477,6 +475,7 @@ in
     enable = false;
     allowedTCPPorts = mkDesktop [ 22 5100 ];
   };
+
   systemd.network.networks."00-ethernet" = {
     matchConfig.Type = "ether";
     DHCP = "yes";

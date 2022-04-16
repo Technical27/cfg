@@ -111,15 +111,19 @@ cmp.setup {
     end,
   },
   mapping = {
-    ['<C-j>'] = function(fallback)
-        if luasnip.jumpable(1) then
+    ['<C-n>'] = function(fallback)
+        if cmp.visible() then
+            cmp.select_next_item()
+        elseif luasnip.jumpable(1) then
             vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-jump-next', true, true, true), '')
         else
             fallback()
         end
     end,
-    ['<C-k>'] = function(fallback)
-        if luasnip.jumpable(-1) then
+    ['<C-p>'] = function(fallback)
+        if cmp.visible() then
+            cmp.select_prev_item()
+        elseif luasnip.jumpable(-1) then
             vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-jump-prev', true, true, true), '')
         else
             fallback()
@@ -212,6 +216,7 @@ vim.o.hlsearch = true
 
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-o>', '<cmd>Telescope buffers<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<C-t>', '<cmd>TodoTelescope<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true })
 
 function _G.clear_whitespace()

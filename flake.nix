@@ -3,24 +3,25 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware";
     cpkgs.url = "github:technical27/pkgs";
-    home-manager.url = "github:technical27/home-manager";
+    home-manager.url = "github:nix-community/home-manager";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-    firefox-nightly.url = "github:/colemickens/flake-firefox-nightly";
+    # TODO: broken right now
+    # firefox-nightly.url = "github:/colemickens/flake-firefox-nightly";
   };
-  outputs = { self, nixpkgs, cpkgs, nixos-hardware, home-manager, neovim-nightly-overlay, firefox-nightly }:
+  outputs = { self, nixpkgs, cpkgs, nixos-hardware, home-manager, neovim-nightly-overlay }:
     let
       mkSystem = device: (
         nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             ({ nixpkgs.overlays = [ neovim-nightly-overlay.overlay ]; })
-            ({
-              nixpkgs.overlays = [
-                (self: super: {
-                  firefox-nightly = firefox-nightly.packages.x86_64-linux.firefox-nightly-bin;
-                })
-              ];
-            })
+            # ({
+            #   nixpkgs.overlays = [
+            #     (self: super: {
+            #       firefox-nightly = firefox-nightly.packages.x86_64-linux.firefox-nightly-bin;
+            #     })
+            #   ];
+            # })
             (./. + "/${device}/hardware-configuration.nix")
             (import ./config.nix device)
             cpkgs.nixosModule
