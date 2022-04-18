@@ -120,6 +120,8 @@ in
   environment.variables = {
     EDITOR = "nvim";
     VISUAL = "nvim";
+    NIX_AUTO_RUN = "1";
+    NIX_AUTO_RUN_INTERACTIVE = "1";
   };
 
   services.gnome.gnome-keyring.enable = true;
