@@ -141,7 +141,7 @@ in
     mindustry
 
     lutris
-    cpkgs.badlion-client
+    # cpkgs.badlion-client
     transmission-gtk
     # freecad
   ];
