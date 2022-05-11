@@ -41,15 +41,15 @@ in
       seat seat0 xcursor_theme WhiteSur-cursors 24
       default_border none
     '' + (if isDesktop then
-      ''workspace 1 output DP-1
-        workspace 2 output DP-1
-        workspace 3 output DP-1
-        workspace 4 output DP-1
-        workspace 5 output DP-1
-        workspace 6 output HDMI-A-1 DP-1
-        workspace 7 output HDMI-A-1 DP-1
-        workspace 8 output HDMI-A-1 DP-1
-        workspace 9 output HDMI-A-1 DP-1''
+      ''workspace 1 output DP-3
+        workspace 2 output DP-3
+        workspace 3 output DP-3
+        workspace 4 output DP-3
+        workspace 5 output DP-3
+        workspace 6 output HDMI-A-1 DP-3
+        workspace 7 output HDMI-A-1 DP-3
+        workspace 8 output HDMI-A-1 DP-3
+        workspace 9 output HDMI-A-1 DP-3''
     else "");
     wrapperFeatures = {
       base = true;
@@ -64,7 +64,7 @@ in
           scale = "1.4";
           subpixel = "rgb";
         };
-        "DP-1" = mkDesktop {
+        "DP-3" = mkDesktop {
           mode = "2560x1440@144Hz";
           subpixel = "rgb";
           position = "0,0";
@@ -72,6 +72,7 @@ in
         "HDMI-A-1" = mkDesktop {
           mode = "1366x768@60Hz";
           subpixel = "rgb";
+          scale = "0.8";
           position = "2560,672";
         };
         "*".bg = "~/Pictures/wallpaper.png fill";
@@ -86,6 +87,7 @@ in
         "*" = {
           xkb_options = "compose:ralt,caps:swapescape";
           pointer_accel = "0";
+          accel_profile = "flat";
         };
       };
       gaps.inner = 10;
@@ -167,7 +169,7 @@ in
 
           "Mod4+e" = "exec firefox";
           "Mod4+Shift+r" = "exec swaynag -t warning -m 'Do you really want to reboot?' -b 'Yes, reboot' 'systemctl reboot'";
-          "Mod4+Shift+o" = "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
+          "Mod4+Shift+o" = mkLaptop "exec swaynag -t warning -m 'Do you really want to hibernate?' -b 'Yes, hibernate' 'systemctl hibernate && pkill swaynag'";
         };
       modes.resize = {
         "h" = "resize shrink width 10 px";

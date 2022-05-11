@@ -31,13 +31,12 @@
   };
 
   fileSystems."/media/ssd" = {
-    device = "/dev/disk/by-uuid/add4b883-33d6-4982-9938-41622577f382";
+    device = "/dev/disk/by-uuid/c339062f-4718-44fb-90c2-9286f37a3552";
     fsType = "btrfs";
     options = [
       "ssd"
       "noatime"
       "compress-force=zstd:5"
-      "space_cache"
       "discard=async"
     ];
   };

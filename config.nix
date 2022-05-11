@@ -21,7 +21,7 @@ in
       automatic = true;
     };
     settings = {
-      substituters = [ "http://yogs.tech:9000/" ];
+      # substituters = [ "http://yogs.tech:9000/" ];
       trusted-public-keys = [ "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA=" ];
     };
   };
