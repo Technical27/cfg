@@ -150,11 +150,11 @@ in
         type = "internal/xwindow";
         label-maxlen = 100;
       };
-      "module/nixos" = {
-        type = "custom/script";
-        exec = "${cpkgs.info}/bin/info --polybar";
-        interval = 600;
-      };
+      # "module/nixos" = {
+      #   type = "custom/script";
+      #   exec = "${cpkgs.info}/bin/info --polybar";
+      #   interval = 600;
+      # };
     };
   };
   systemd.user.services.polybar = lib.mkForce { };

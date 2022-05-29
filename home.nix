@@ -146,10 +146,10 @@ in
     # freecad
   ];
 
-  xdg.dataFile."fusion360/wine" = {
-    source = "${cpkgs.fusion360-wine}/bin/wine";
-    executable = true;
-  };
+  # xdg.dataFile."fusion360/wine" = {
+  #   source = "${cpkgs.fusion360-wine}/bin/wine";
+  #   executable = true;
+  # };
 
   xdg.configFile = {
     "nvim/init.lua".source = ./nvim/init.lua;
