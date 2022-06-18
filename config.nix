@@ -9,7 +9,7 @@ let
 in
 {
 
-  imports = [ (if isLaptop then ./wayland/config.nix else ./x11/config.nix) ];
+  imports = [ (if isLaptop then ./gnome/config.nix else ./x11/config.nix) ];
 
   nix = {
     package = pkgs.nixUnstable;
@@ -99,6 +99,8 @@ in
     allowUnfree = true;
   };
 
+  hardware.pulseaudio.enable = lib.mkForce false;
+
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -136,7 +138,7 @@ in
   # users.groups.ancs4linux = mkLaptop { };
   users.users.aamaruvi = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]
+    extraGroups = [ "wheel" "networkmanager" "input" ]
       ++ lib.optionals isDesktop [ "openrazer" ]
       # "ancs4linux"
       ++ lib.optionals isLaptop [ "dialout" ];
@@ -197,6 +199,7 @@ in
   nixpkgs.overlays = mkLaptop [
     (self: super: {
       steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
+
       swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
         version = "unstable-2022-02-18";
         src = super.fetchFromGitHub {
@@ -216,7 +219,7 @@ in
 
   services.upower.enable = isLaptop;
   services.tlp = mkLaptop {
-    enable = true;
+    # enable = true;
     settings = {
       DISK_DEVICES = "nvme0n1";
       PCIE_ASPM_ON_BAT = "powersupersave";
@@ -237,7 +240,7 @@ in
     };
   };
 
-  services.blueman.enable = isLaptop;
+  # services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
 
   hardware.bluetooth.enable = isLaptop;
@@ -257,36 +260,36 @@ in
   };
   networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
 
-  systemd.services.autovpn = mkLaptop {
-    description = "Automatic WireGuard VPN Activation";
-    after = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
-    wants = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
-    environment.RUST_LOG = "warn";
-    serviceConfig = {
-      PrivateTmp = true;
-      NoNewPrivileges = true;
-      RestrictSUIDSGID = true;
-      SystemCallArchitectures = "native";
-      RestrictAddressFamilies = [ "AF_NETLINK" "AF_UNIX" ];
-      ProtectHostname = true;
-      ProtectKernelLogs = true;
-      ProtectKernelModules = true;
-      ProtectKernelTunables = true;
-      ProtectControlGroups = true;
-      RestrictNamespaces = true;
-      ProtectHome = true;
-      ProtectSystem = true;
-      RestrictRealtime = true;
-      ProtectClock = true;
-      MemoryDenyWriteExecute = true;
-      LockPersonality = true;
-      CapabilityBoundingSet = "CAP_NET_ADMIN";
-      SystemCallFilter = [ "@system-service" "~@mount" "~@cpu-emulation" "~@debug" "~@keyring" "~@obsolete" "~@privileged" "~@setuid" ];
-      Type = "simple";
-      ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
-    };
-    wantedBy = [ "multi-user.target" ];
-  };
+  # systemd.services.autovpn = mkLaptop {
+  #   description = "Automatic WireGuard VPN Activation";
+  #   after = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+  #   wants = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+  #   environment.RUST_LOG = "warn";
+  #   serviceConfig = {
+  #     PrivateTmp = true;
+  #     NoNewPrivileges = true;
+  #     RestrictSUIDSGID = true;
+  #     SystemCallArchitectures = "native";
+  #     RestrictAddressFamilies = [ "AF_NETLINK" "AF_UNIX" ];
+  #     ProtectHostname = true;
+  #     ProtectKernelLogs = true;
+  #     ProtectKernelModules = true;
+  #     ProtectKernelTunables = true;
+  #     ProtectControlGroups = true;
+  #     RestrictNamespaces = true;
+  #     ProtectHome = true;
+  #     ProtectSystem = true;
+  #     RestrictRealtime = true;
+  #     ProtectClock = true;
+  #     MemoryDenyWriteExecute = true;
+  #     LockPersonality = true;
+  #     CapabilityBoundingSet = "CAP_NET_ADMIN";
+  #     SystemCallFilter = [ "@system-service" "~@mount" "~@cpu-emulation" "~@debug" "~@keyring" "~@obsolete" "~@privileged" "~@setuid" ];
+  #     Type = "simple";
+  #     ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
+  #   };
+  #   wantedBy = [ "multi-user.target" ];
+  # };
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
@@ -297,6 +300,15 @@ in
       ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
     };
     wantedBy = [ "graphical-session.target" ];
+  };
+
+  services.beesd.filesystems = {
+    root = {
+      spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
+      hashTableSizeMB = 4096;
+      verbosity = "crit";
+      extraOptions = [ "--loadavg-target" "5.0" ];
+    };
   };
 
   services.snapper.configs =
@@ -320,16 +332,16 @@ in
       };
     };
 
-  systemd.network.networks."00-wifi" = mkLaptop {
-    name = "wlan0";
-    DHCP = "yes";
-    networkConfig = {
-      IPv6AcceptRA = "yes";
-      IPv6PrivacyExtensions = "yes";
-      LLMNR = "yes";
-      MulticastDNS = "yes";
-    };
-  };
+  # systemd.network.networks."00-wifi" = mkLaptop {
+  #   name = "wlan0";
+  #   DHCP = "yes";
+  #   networkConfig = {
+  #     IPv6AcceptRA = "yes";
+  #     IPv6PrivacyExtensions = "yes";
+  #     LLMNR = "yes";
+  #     MulticastDNS = "yes";
+  #   };
+  # };
 
   systemd.network.netdevs."10-wg0" = {
     netdevConfig = {
@@ -398,9 +410,9 @@ in
 
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-    ];
+    # extraPortals = with pkgs; [
+    #   xdg-desktop-portal-gtk
+    # ];
     gtkUsePortal = true;
   };
   services.flatpak.enable = true;
@@ -478,16 +490,16 @@ in
     allowedTCPPorts = mkDesktop [ 22 5100 ];
   };
 
-  systemd.network.networks."00-ethernet" = {
-    matchConfig.Type = "ether";
-    DHCP = "yes";
-    networkConfig = {
-      IPv6AcceptRA = "yes";
-      IPv6PrivacyExtensions = "yes";
-      LLMNR = "yes";
-      MulticastDNS = "yes";
-    };
-  };
+  # systemd.network.networks."00-ethernet" = {
+  #   matchConfig.Type = "ether";
+  #   DHCP = "yes";
+  #   networkConfig = {
+  #     IPv6AcceptRA = "yes";
+  #     IPv6PrivacyExtensions = "yes";
+  #     LLMNR = "yes";
+  #     MulticastDNS = "yes";
+  #   };
+  # };
 
   hardware.nvidia = mkDesktop {
     modesetting.enable = true;
@@ -508,22 +520,36 @@ in
     # get gnome-keyring to unlock on boot
     login.fprintAuth = mkLaptop (lib.mkForce false);
     # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
-    swaylock.text = mkLaptop ''
-      # Account management.
-      account required pam_unix.so
+    # swaylock.text = mkLaptop ''
+    #   # Account management.
+    #   account required pam_unix.so
 
-      # Authentication management.
-      auth sufficient pam_unix.so nullok likeauth try_first_pass
-      auth optional ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
-      auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so
-      auth required pam_deny.so
+    #   # Authentication management.
+    #   auth sufficient pam_unix.so nullok likeauth try_first_pass
+    #   auth optional ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
+    #   auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so
+    #   auth required pam_deny.so
 
-      # Password management.
-      password sufficient pam_unix.so nullok sha512
+    #   # Password management.
+    #   password sufficient pam_unix.so nullok sha512
 
-      # Session management.
-      session required pam_env.so conffile=/etc/pam/environment readenv=0
-      session required pam_unix.so
+    #   # Session management.
+    #   session required pam_env.so conffile=/etc/pam/environment readenv=0
+    #   session required pam_unix.so
+    # '';
+    gdm-fingerprint.text = ''
+      auth     requisite      pam_nologin.so
+      auth     required       pam_env.so
+
+      auth     required       pam_succeed_if.so uid >= 1000 quiet
+      auth     required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
+      auth     optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
+
+      password required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
+
+      session  optional       pam_keyinit.so revoke
+      session  required       pam_limits.so
+      session  optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
     '';
     sudo.fprintAuth = mkLaptop true;
     cups.fprintAuth = mkLaptop false;

@@ -84,10 +84,12 @@ in
           natural_scroll = "enabled";
           pointer_accel = "0.3";
         };
-        "*" = {
-          xkb_options = "compose:ralt,caps:swapescape";
+        "type:pointer" = {
           pointer_accel = "0";
           accel_profile = "flat";
+        };
+        "type:keyboard" = {
+          xkb_options = "compose:ralt,caps:escape";
         };
       };
       gaps.inner = 10;
@@ -97,8 +99,6 @@ in
       bars = [
         {
           command = "${pkgs.waybar}/bin/waybar";
-          # need to define some color for whatever reason
-          colors.background = "#bada55";
         }
       ];
       floating.criteria = [

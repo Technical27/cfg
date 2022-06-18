@@ -11,7 +11,7 @@ in
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  imports = [ (import (if isLaptop then ./wayland/home.nix else ./x11/home.nix) device) ];
+  imports = [ (import (if isLaptop then ./gnome/home.nix else ./x11/home.nix) device) ];
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
@@ -94,6 +94,9 @@ in
     hunspellDicts.en-us
     hashcat
     wireguard-tools
+    yt-dlp
+    transmission-gtk
+    ncdu
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
@@ -113,24 +116,14 @@ in
 
     zoom-us
     # teams
-    htop
-    qutebrowser
     cpkgs.pcem
-    lynx
 
-    # VEX
-    cpkgs.pros
     gnumake
-    gcc-arm-embedded
     chromium
-
-    # FRC
-    gradle
     cpkgs.vscodium
     python3
-    slack
 
-    mindustry-wayland
+    mindustry # -wayland
   ] ++ lib.optionals isDesktop [
     razergenie
     openrgb
@@ -142,7 +135,6 @@ in
 
     lutris
     # cpkgs.badlion-client
-    transmission-gtk
     # freecad
   ];
 
@@ -185,12 +177,12 @@ in
     enable = true;
     package =
       if isLaptop then
-        (pkgs.firefox-beta-bin.override {
+        (pkgs.firefox-wayland.override {
           extraNativeMessagingHosts = [
             cpkgs.robotmeshnative
           ];
         }) else
-        pkgs.firefox-beta-bin;
+        pkgs.firefox;
   };
 
   programs.neomutt.enable = true;
@@ -278,10 +270,15 @@ in
 
   programs.fish = {
     enable = true;
+    #  set TTY1 (tty)
+    #  if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
+    #    exec sway
+    #  end
     interactiveShellInit = ''
-      set TTY1 (tty)
-      if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
-        exec sway
+      if set -q KITTY_INSTALLATION_DIR
+        set --global KITTY_SHELL_INTEGRATION enabled
+        source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
+        set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
       end
 
       set -g fish_color_autosuggestion '555'  'brblack'
