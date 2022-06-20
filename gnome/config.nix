@@ -6,6 +6,7 @@
     gnomeExtensions.removable-drive-menu
     gnomeExtensions.gnome-clipboard
     gnomeExtensions.freon
+    gnomeExtensions.system-action-hibernate
   ];
 
   services.udev.packages = [ pkgs.gnome.gnome-settings-daemon ];
@@ -17,6 +18,12 @@
       wayland = true;
     };
     desktopManager.gnome.enable = true;
+  };
+
+
+  i18n.inputMethod = {
+    enabled = "ibus";
+    ibus.engines = with pkgs.ibus-engines; [ uniemoji m17n ];
   };
 
   environment.gnome.excludePackages = (with pkgs.gnome; [

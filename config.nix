@@ -133,7 +133,6 @@ in
   services.usbmuxd.enable = true;
 
   i18n.defaultLocale = "en_US.UTF-8";
-  time.timeZone = "America/New_York";
 
   # users.groups.ancs4linux = mkLaptop { };
   users.users.aamaruvi = {

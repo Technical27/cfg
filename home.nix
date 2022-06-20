@@ -97,6 +97,8 @@ in
     yt-dlp
     transmission-gtk
     ncdu
+    lm_sensors
+    gnome.zenity
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
