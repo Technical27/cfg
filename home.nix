@@ -63,6 +63,10 @@ in
 
     texlive.combined.scheme-small
 
+    davinci-resolve
+    ffmpeg
+    hexyl
+
     noto-fonts
     noto-fonts-extra
     noto-fonts-cjk
@@ -272,10 +276,6 @@ in
 
   programs.fish = {
     enable = true;
-    #  set TTY1 (tty)
-    #  if test -z "$DISPLAY"; and test $TTY1 = "/dev/tty1"
-    #    exec sway
-    #  end
     interactiveShellInit = ''
       if set -q KITTY_INSTALLATION_DIR
         set --global KITTY_SHELL_INTEGRATION enabled
@@ -309,7 +309,14 @@ in
       set -g fish_cursor_insert line
       set -g fish_cursor_default block
       fish_vi_key_bindings
-    '';
+    ''
+      # + (if config.programs.sway.enable then ''
+      # set TTY1 (tty)
+      # if test -z "$WAYLAND_DISPLAY"; and test $TTY1 = "/dev/tty1"
+      #   exec sway
+      # end
+      # '' else "")
+    ;
 
     shellAliases = {
       make = "make -j8";
@@ -369,20 +376,32 @@ in
 
   programs.mpv = {
     enable = true;
-    scripts = with pkgs.mpvScripts; [ mpris thumbnail ];
+    scripts = with pkgs.mpvScripts; [ mpris ];
     config = {
       hwdec = if isLaptop then "vaapi" else "nvdec";
       vo = "gpu";
       profile = "gpu-hq";
+      fullscreen = "yes";
+      video-sync = "display-resample-vdrop";
+      save-position-on-quit = "yes";
       scale = mkDesktop "ewa_lanczossharp";
       cscale = mkDesktop "ewa_lanczossharp";
       ytdl-format = "bestvideo[height<=?${if isLaptop then "1440" else "2160"}]+bestaudio/best";
-      keep-open = "yes";
-      osc = "no";
     };
-    bindings = {
-      WHEEL_UP = mkLaptop "ignore";
-      WHEEL_DOWN = mkLaptop "ignore";
+    bindings = mkLaptop {
+      WHEEL_UP = "ignore";
+      WHEEL_DOWN = "ignore";
+      WHEEL_LEFT = "ignore";
+      WHEEL_RIGHT = "ignore";
+      "=" = "playlist-next";
+      "-" = "playlist-prev";
+      HOME = "seek 0 absolute-percent";
+      END = "seek 100 absolute-percent";
+    };
+    profiles."music" = {
+      profile-cond = "string.match(path, 'Music/') ~= nil or string.match(working_directory, '/home/aamaruvi/Music') ~= nil";
+      save-position-on-quit = "no";
+      resume-playback = "no";
     };
   };
 

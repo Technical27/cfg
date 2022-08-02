@@ -187,9 +187,9 @@ in
   services.fprintd.enable = isLaptop;
 
   services.logind = mkLaptop {
-    lidSwitch = "suspend-then-hibernate";
+    lidSwitch = "suspend";
     extraConfig = ''
-      IdleAction=suspend-then-hibernate
+      IdleAction=suspend
       HandlePowerKey=hibernate
       IdleActionSec=300
     '';
@@ -211,9 +211,9 @@ in
     })
   ];
 
-  systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=2h
-  '';
+  # systemd.sleep.extraConfig = mkLaptop ''
+  #   HibernateDelaySec=2h
+  # '';
 
 
   services.upower.enable = isLaptop;
@@ -301,14 +301,14 @@ in
     wantedBy = [ "graphical-session.target" ];
   };
 
-  services.beesd.filesystems = {
-    root = {
-      spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
-      hashTableSizeMB = 4096;
-      verbosity = "crit";
-      extraOptions = [ "--loadavg-target" "5.0" ];
-    };
-  };
+  # services.beesd.filesystems = {
+  #   root = {
+  #     spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
+  #     hashTableSizeMB = 4096;
+  #     verbosity = "crit";
+  #     # extraOptions = [ "--loadavg-target" "5.0" ];
+  #   };
+  # };
 
   services.snapper.configs =
     let
