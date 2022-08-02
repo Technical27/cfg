@@ -551,8 +551,12 @@ in
       session  optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
     '';
     sudo.fprintAuth = mkLaptop true;
+    # times out waiting for fingerprint with no feedback
     cups.fprintAuth = mkLaptop false;
+
     sddm.enableGnomeKeyring = mkDesktop true;
+    i3lock.enableGnomeKeyring = mkDesktop true;
+    i3lock-color.enableGnomeKeyring = mkDesktop true;
   };
 
   security.sudo.extraConfig = ''

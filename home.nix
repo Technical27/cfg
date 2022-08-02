@@ -54,6 +54,7 @@ in
     cpkgs.neo
     qmk
     bitwarden-cli
+    ffmpeg
 
     neovim-nightly
     killall
@@ -171,7 +172,8 @@ in
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
       "${pkgs.ccls}"
-      "${pkgs.python3Packages.python-lsp-server}"
+      # "${pkgs.python3Packages.python-lsp-server}"
+      ""
     ]
       (builtins.readFile ./nvim/lsp.lua);
   };
