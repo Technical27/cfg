@@ -489,16 +489,16 @@ in
     allowedTCPPorts = mkDesktop [ 22 5100 ];
   };
 
-  # systemd.network.networks."00-ethernet" = {
-  #   matchConfig.Type = "ether";
-  #   DHCP = "yes";
-  #   networkConfig = {
-  #     IPv6AcceptRA = "yes";
-  #     IPv6PrivacyExtensions = "yes";
-  #     LLMNR = "yes";
-  #     MulticastDNS = "yes";
-  #   };
-  # };
+  systemd.network.networks."00-ethernet" = {
+    matchConfig.Type = "ether";
+    DHCP = "yes";
+    networkConfig = {
+      IPv6AcceptRA = "yes";
+      IPv6PrivacyExtensions = "yes";
+      LLMNR = "yes";
+      MulticastDNS = "yes";
+    };
+  };
 
   hardware.nvidia = mkDesktop {
     modesetting.enable = true;

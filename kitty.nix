@@ -53,8 +53,5 @@
     bell_border_color #cc241d
     shell_integration disabled
     confirm_os_window_close -1
-
-    linux_display_server wayland
-    wayland_titlebar_color background
   '';
 }
