@@ -79,7 +79,7 @@ in
     discord
 
     easyeffects
-    cpkgs.soundux
+    # cpkgs.soundux
     libreoffice
     openscad
 
@@ -87,7 +87,7 @@ in
     mangohud
 
     kdenlive
-    cpkgs.olive
+    # cpkgs.olive
 
     cpkgs.n-link
 
@@ -123,7 +123,7 @@ in
 
     zoom-us
     # teams
-    cpkgs.pcem
+    # cpkgs.pcem
 
     gnumake
     chromium
