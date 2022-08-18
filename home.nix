@@ -11,7 +11,7 @@ in
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  imports = [ (import (if isLaptop then ./gnome/home.nix else ./x11/home.nix) device) ];
+  imports = [ (import (if isLaptop then ./wayland/home.nix else ./x11/home.nix) device) ];
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
@@ -104,6 +104,7 @@ in
     ncdu
     lm_sensors
     gnome.zenity
+    gnome.simple-scan
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
@@ -312,12 +313,12 @@ in
       set -g fish_cursor_default block
       fish_vi_key_bindings
     ''
-      # + (if config.programs.sway.enable then ''
-      # set TTY1 (tty)
-      # if test -z "$WAYLAND_DISPLAY"; and test $TTY1 = "/dev/tty1"
-      #   exec sway
-      # end
-      # '' else "")
+    + (if config.wayland.windowManager.sway.enable then ''
+      set TTY1 (tty)
+      if test -z "$WAYLAND_DISPLAY"; and test $TTY1 = "/dev/tty1"
+        exec sway
+      end
+    '' else "")
     ;
 
     shellAliases = {

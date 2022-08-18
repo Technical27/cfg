@@ -9,7 +9,7 @@ let
 in
 {
 
-  imports = [ (if isLaptop then ./gnome/config.nix else ./x11/config.nix) ];
+  imports = [ (if isLaptop then ./wayland/config.nix else ./x11/config.nix) ];
 
   nix = {
     package = pkgs.nixUnstable;
@@ -211,9 +211,9 @@ in
     })
   ];
 
-  # systemd.sleep.extraConfig = mkLaptop ''
-  #   HibernateDelaySec=2h
-  # '';
+  systemd.sleep.extraConfig = mkLaptop ''
+    HibernateDelaySec=2h
+  '';
 
 
   services.upower.enable = isLaptop;
@@ -239,7 +239,12 @@ in
     };
   };
 
-  # services.blueman.enable = isLaptop;
+  hardware.sane = {
+    enable = true;
+    extraBackends = [ pkgs.sane-airscan ];
+  };
+
+  services.blueman.enable = isLaptop;
   services.fwupd.enable = isLaptop;
 
   hardware.bluetooth.enable = isLaptop;
@@ -331,16 +336,16 @@ in
       };
     };
 
-  # systemd.network.networks."00-wifi" = mkLaptop {
-  #   name = "wlan0";
-  #   DHCP = "yes";
-  #   networkConfig = {
-  #     IPv6AcceptRA = "yes";
-  #     IPv6PrivacyExtensions = "yes";
-  #     LLMNR = "yes";
-  #     MulticastDNS = "yes";
-  #   };
-  # };
+  systemd.network.networks."00-wifi" = mkLaptop {
+    name = "wlan0";
+    DHCP = "yes";
+    networkConfig = {
+      IPv6AcceptRA = "yes";
+      IPv6PrivacyExtensions = "yes";
+      LLMNR = "yes";
+      MulticastDNS = "yes";
+    };
+  };
 
   systemd.network.netdevs."10-wg0" = {
     netdevConfig = {
