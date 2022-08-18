@@ -4,6 +4,8 @@ let
   inherit (pkgs) cpkgs;
 in
 {
+  home.packages = [ pkgs.xclip ];
+
   programs.rofi = {
     enable = true;
     font = "JetBrainsMono Nerd Font Mono 13";

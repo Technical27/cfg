@@ -25,7 +25,7 @@ in
     nerdfonts
     tldr
     imv
-    tectonic
+    (tectonic.override { biber = cpkgs.biber; })
 
     gcc
     pwndbg

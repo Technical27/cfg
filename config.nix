@@ -412,7 +412,7 @@ in
     # extraPortals = with pkgs; [
     #   xdg-desktop-portal-gtk
     # ];
-    gtkUsePortal = true;
+    # gtkUsePortal = true;
   };
   services.flatpak.enable = true;
 
