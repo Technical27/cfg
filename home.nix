@@ -25,7 +25,7 @@ in
     nerdfonts
     tldr
     imv
-    (tectonic.override { biber = cpkgs.biber; })
+    tectonic
 
     gcc
     pwndbg
@@ -198,6 +198,8 @@ in
 
   programs.zathura = {
     enable = true;
+    # TODO: remove this when fixed
+    package = cpkgs.zathura;
     options = {
       font = "'JetBrains Mono NerdFont' 13";
       statusbar-home-tilde = true;

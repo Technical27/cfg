@@ -148,6 +148,8 @@ in
 
   programs.dconf.enable = true;
 
+  services.udisks2.enable = true;
+
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -189,7 +191,7 @@ in
   services.logind = mkLaptop {
     lidSwitch = "suspend";
     extraConfig = ''
-      IdleAction=suspend
+      IdleAction=suspend-then-hibernate
       HandlePowerKey=hibernate
       IdleActionSec=300
     '';
@@ -412,13 +414,7 @@ in
     };
   };
 
-  xdg.portal = {
-    enable = true;
-    # extraPortals = with pkgs; [
-    #   xdg-desktop-portal-gtk
-    # ];
-    # gtkUsePortal = true;
-  };
+  xdg.portal.enable = true;
   services.flatpak.enable = true;
 
   environment.systemPackages = with pkgs; mkLaptop [
