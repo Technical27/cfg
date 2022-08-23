@@ -132,6 +132,10 @@ in
     python3
 
     mindustry # -wayland
+
+    # eclipse for comp sci and weird workaround
+    eclipses.eclipse-java
+    (lib.setPrio (-10) eclipse)
   ] ++ lib.optionals isDesktop [
     razergenie
     openrgb

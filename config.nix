@@ -210,6 +210,12 @@ in
           sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
         };
       });
+
+      eclipse = super.writeScriptBin "eclipse" ''
+        #!${super.runtimeShell}
+        export GDK_BACKEND=x11
+        exec ${super.eclipses.eclipse-java}/bin/eclipse "$@"
+      '';
     })
   ];
 
@@ -423,10 +429,7 @@ in
     config.boot.kernelPackages.turbostat
   ];
 
-  programs.java = {
-    enable = true;
-    package = mkLaptop pkgs.jdk11;
-  };
+  programs.java.enable = true;
 
   services.jellyfin.enable = isDesktop;
 
