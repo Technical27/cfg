@@ -194,22 +194,14 @@ in
       IdleAction=suspend-then-hibernate
       HandlePowerKey=hibernate
       IdleActionSec=300
+      HandleLidSwitch=suspend-then-hibernate
+      HandleLidSwitchExternalPower=suspend-then-hibernate
     '';
   };
 
   nixpkgs.overlays = mkLaptop [
     (self: super: {
       steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
-
-      swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
-        version = "unstable-2022-02-18";
-        src = super.fetchFromGitHub {
-          owner = "mortie";
-          repo = old.pname;
-          rev = "a8fc557b86e70f2f7a30ca9ff9b3124f89e7f204";
-          sha256 = "sha256-GN+cxzC11Dk1nN9wVWIyv+rCrg4yaHnCePRYS1c4JTk=";
-        };
-      });
 
       eclipse = super.writeScriptBin "eclipse" ''
         #!${super.runtimeShell}
@@ -523,37 +515,6 @@ in
     # get gnome-keyring to unlock on boot
     login.fprintAuth = mkLaptop (lib.mkForce false);
     # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
-    # swaylock.text = mkLaptop ''
-    #   # Account management.
-    #   account required pam_unix.so
-
-    #   # Authentication management.
-    #   auth sufficient pam_unix.so nullok likeauth try_first_pass
-    #   auth optional ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
-    #   auth sufficient ${pkgs.fprintd}/lib/security/pam_fprintd.so
-    #   auth required pam_deny.so
-
-    #   # Password management.
-    #   password sufficient pam_unix.so nullok sha512
-
-    #   # Session management.
-    #   session required pam_env.so conffile=/etc/pam/environment readenv=0
-    #   session required pam_unix.so
-    # '';
-    gdm-fingerprint.text = ''
-      auth     requisite      pam_nologin.so
-      auth     required       pam_env.so
-
-      auth     required       pam_succeed_if.so uid >= 1000 quiet
-      auth     required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
-      auth     optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
-
-      password required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
-
-      session  optional       pam_keyinit.so revoke
-      session  required       pam_limits.so
-      session  optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
-    '';
     sudo.fprintAuth = mkLaptop true;
     # times out waiting for fingerprint with no feedback
     cups.fprintAuth = mkLaptop false;

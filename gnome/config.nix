@@ -48,6 +48,21 @@
     };
   };
 
+  security.pam.services.gdm-fingerprint.text = ''
+    auth     requisite      pam_nologin.so
+    auth     required       pam_env.so
+
+    auth     required       pam_succeed_if.so uid >= 1000 quiet
+    auth     required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
+    auth     optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so
+
+    password required       ${pkgs.fprintd}/lib/security/pam_fprintd.so
+
+    session  optional       pam_keyinit.so revoke
+    session  required       pam_limits.so
+    session  optional       ${pkgs.gnome.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
+  '';
+
   nixpkgs.overlays = [
     (
       self: super: {

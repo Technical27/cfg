@@ -122,7 +122,7 @@ in
     hcxtools
     metasploit
 
-    zoom-us
+    # zoom-us
     # teams
     # cpkgs.pcem
 
@@ -136,6 +136,7 @@ in
     # eclipse for comp sci and weird workaround
     eclipses.eclipse-java
     (lib.setPrio (-10) eclipse)
+    gradle
   ] ++ lib.optionals isDesktop [
     razergenie
     openrgb

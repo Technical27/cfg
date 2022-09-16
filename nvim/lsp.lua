@@ -73,12 +73,11 @@ lspconfig.jdtls.setup {
     "-data",
     "/home/aamaruvi/.local/share/jdt/workspace",
   },
-  on_attach = lsp_on_attach
-  -- cmd_env = {
-  --   JAVA_HOME = '/home/aamaruvi/wpilib/2021/jdk/',
-  --   WORKSPACE = '/home/aamaruvi/wpilib/2021/jdt/workspace/',
-  --   GRADLE_HOME = '/home/aamaruvi/wpilib/2021/'
-  -- }
+  on_attach = lsp_on_attach,
+  cmd_env = {
+    WORKSPACE = '/home/aamaruvi/school/Documents/eclipse/',
+    GRADLE_HOME = '/home/aamaruvi/school/Documents/eclipse/'
+  }
 }
 
 lspconfig.ccls.setup {

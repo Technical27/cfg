@@ -102,9 +102,11 @@ in
         }
       ];
       floating.criteria = [
-        { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }
         { title = "^Zoom Cloud Meetings$"; }
+      ];
+      window.commands = [
+        { command = "kill"; criteria = { app_id = "firefox"; title = "Firefox — Sharing Indicator"; }; }
       ];
       startup =
         let
