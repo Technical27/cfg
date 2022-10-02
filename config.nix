@@ -245,7 +245,9 @@ in
   };
 
   services.blueman.enable = isLaptop;
-  services.fwupd.enable = isLaptop;
+  services.fwupd = mkLaptop {
+    enable = true;
+  };
 
   hardware.bluetooth.enable = isLaptop;
   hardware.bluetooth.hsphfpd.enable = isLaptop;
@@ -509,6 +511,25 @@ in
   environment.etc = mkLaptop {
     "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
     "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+
+    "fwupd/remotes.d/lvfs-testing.conf" = lib.mkForce ({
+      text = ''
+        [fwupd Remote]
+
+        # this remote provides metadata and firmware marked as 'testing' from the LVFS
+        Enabled=true
+        Title=Linux Vendor Firmware Service (testing)
+        MetadataURI=https://cdn.fwupd.org/downloads/firmware-testing.xml.gz
+        ReportURI=https://fwupd.org/lvfs/firmware/report
+        #Username=
+        #Password=
+        OrderBefore=lvfs,fwupd
+        AutomaticReports=false
+        ApprovalRequired=false
+      '';
+    });
+
+    "fwupd/uefi_capsule.conf" = lib.mkForce ({ text = "DisableCapsuleUpdateOnDisk=true"; });
   };
 
   security.pam.services = {

@@ -22,7 +22,7 @@ in
 
   home.packages = with pkgs; [
     ripgrep
-    nerdfonts
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     tldr
     imv
     tectonic
@@ -45,7 +45,7 @@ in
     jq
     file
     gh
-    xdg_utils
+    xdg-utils
     fd
     exa
     zip
@@ -178,8 +178,7 @@ in
       "${pkgs.nodePackages.typescript-language-server}"
       "${pkgs.nodePackages.typescript}"
       "${pkgs.ccls}"
-      # "${pkgs.python3Packages.python-lsp-server}"
-      ""
+      "${pkgs.python3Packages.python-lsp-server}"
     ]
       (builtins.readFile ./nvim/lsp.lua);
   };
