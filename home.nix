@@ -188,22 +188,13 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package =
-      if isLaptop then
-        (pkgs.firefox-wayland.override {
-          extraNativeMessagingHosts = [
-            cpkgs.robotmeshnative
-          ];
-        }) else
-        pkgs.firefox;
+    package = if isLaptop then pkgs.firefox-wayland else pkgs.firefox;
   };
 
   programs.neomutt.enable = true;
 
   programs.zathura = {
     enable = true;
-    # TODO: remove this when fixed
-    package = cpkgs.zathura;
     options = {
       font = "'JetBrains Mono NerdFont' 13";
       statusbar-home-tilde = true;

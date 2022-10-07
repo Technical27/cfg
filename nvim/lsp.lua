@@ -1,21 +1,56 @@
 local lspconfig = require('lspconfig')
 
 local function lsp_on_attach(client, bufnr)
-  local function buf_set_keymap(mode, key, cmd)
-    vim.api.nvim_buf_set_keymap(bufnr, mode, key, cmd, { noremap = true, silent = true })
+  local function keymap(mode, key, f)
+    vim.keymap.set(mode, key, f, { noremap = true, silent = true, buffer = bufnr })
   end
 
-  buf_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-  buf_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
-  buf_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
-  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
-  buf_set_keymap('n', 'gR', '<cmd>lua vim.lsp.buf.rename()<CR>')
-  buf_set_keymap('n', 'gC', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
-  buf_set_keymap('n', 'ge', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>')
-  buf_set_keymap('n', '[g', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
-  buf_set_keymap('n', ']g', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
+  local caps = client.server_capabilities;
+
+  -- keymap('n', '<space>D', vim.lsp.buf.type_definition)
+  if caps.declarationProvider then
+    keymap('n', 'gD', vim.lsp.buf.declaration)
+  end
+
+  if caps.definitionProvider then
+    keymap('n', 'gd', vim.lsp.buf.definition)
+  end
+
+  if caps.hoverProvider then
+    keymap('n', 'K', vim.lsp.buf.hover)
+  end
+
+  if caps.renameProvider then
+    keymap('n', 'gR', vim.lsp.buf.rename)
+  end
+
+  if caps.codeActionProvider then
+    keymap('n', 'gC', vim.lsp.buf.code_action)
+  end
+
+  if caps.referencesProvider then
+    keymap('n', 'gr', vim.lsp.buf.references)
+  end
+
+  if caps.implementationProvider then
+    keymap('n', 'gi', vim.lsp.buf.implementation)
+  end
+
+  keymap('n', '[g', vim.diagnostic.goto_prev)
+  keymap('n', ']g', vim.diagnostic.goto_next)
+
+  if caps.documentHighlightProvider then
+    vim.cmd([[
+      hi! link LspReferenceRead Visual
+      hi! link LspReferenceText Visual
+      hi! link LspReferenceWrite Visual
+      augroup lsp_document_highlight
+        autocmd! * <buffer>
+        autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+      augroup END
+    ]])
+  end
 end
 
 lspconfig.rnix.setup {

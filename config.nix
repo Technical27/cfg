@@ -418,9 +418,9 @@ in
   services.flatpak.enable = true;
 
   environment.systemPackages = with pkgs; mkLaptop [
-    cpkgs.robotmeshnative
+    # cpkgs.robotmeshnative
     # cpkgs.ancs4linux
-    config.boot.kernelPackages.turbostat
+    # config.boot.kernelPackages.turbostat
   ];
 
   programs.java.enable = true;
@@ -509,8 +509,8 @@ in
   services.xserver.videoDrivers = mkDesktop [ "nvidia" ];
 
   environment.etc = mkLaptop {
-    "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-    "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+    # "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
+    # "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
 
     "fwupd/remotes.d/lvfs-testing.conf" = lib.mkForce ({
       text = ''
@@ -569,7 +569,9 @@ in
   };
 
   services.udev = {
-    packages = [ ] ++ (lib.optionals isDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ]) ++ (lib.optionals isLaptop [ pkgs.cpkgs.robotmeshnative ]);
+    packages = [ ] ++ (lib.optionals isDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ])
+      # ++ (lib.optionals isLaptop [ pkgs.cpkgs.robotmeshnative ])
+    ;
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", TAG+="uaccess"

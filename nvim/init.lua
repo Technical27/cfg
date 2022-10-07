@@ -241,7 +241,7 @@ vim.api.nvim_exec([[
   augroup Buffer
     autocmd!
     autocmd BufWritePre * call v:lua.clear_whitespace()
-    autocmd BufWritePre * lua vim.lsp.buf.formatting_sync()
+    autocmd BufWritePre * lua vim.lsp.buf.format({ async = false })
     autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
 ]], false)
