@@ -105,6 +105,8 @@ in
     lm_sensors
     gnome.zenity
     gnome.simple-scan
+
+    google-cloud-sdk
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
