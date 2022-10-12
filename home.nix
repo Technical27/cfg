@@ -64,7 +64,6 @@ in
 
     texlive.combined.scheme-small
 
-    davinci-resolve
     ffmpeg
     hexyl
 

@@ -215,7 +215,7 @@ vim.o.incsearch = true
 vim.o.hlsearch = true
 
 vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<C-o>', '<cmd>Telescope buffers<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<C-d>', '<cmd>Telescope diagnostics<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-t>', '<cmd>TodoTelescope<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true })
 
@@ -227,7 +227,7 @@ function _G.clear_whitespace()
   end
 end
 
-vim.api.nvim_exec([[
+vim.cmd [[
   colorscheme gruvbox
   filetype plugin indent on
 
@@ -244,4 +244,4 @@ vim.api.nvim_exec([[
     autocmd BufWritePre * lua vim.lsp.buf.format({ async = false })
     autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
-]], false)
+]]

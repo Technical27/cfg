@@ -44,11 +44,6 @@ local function lsp_on_attach(client, bufnr)
       hi! link LspReferenceRead Visual
       hi! link LspReferenceText Visual
       hi! link LspReferenceWrite Visual
-      augroup lsp_document_highlight
-        autocmd! * <buffer>
-        autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-      augroup END
     ]])
   end
 end
@@ -91,7 +86,7 @@ lspconfig.jdtls.setup {
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
     "-Dlog.level=ALL",
-    "-Xms1g",
+    "-Xms1G",
     "-Xmx2G",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
