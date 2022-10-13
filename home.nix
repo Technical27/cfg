@@ -167,7 +167,7 @@ in
       "@CLOJURE_LSP_PATH@"
       "@SVELTE_LANGUAGE_SERVER_PATH@"
       "@TSSERVER_PATH@"
-      "@TYPESCIRPT_PATH@"
+      "@TYPESCRIPT_PATH@"
       "@CCLS_PATH@"
       "@PYLSP_PATH@"
     ] [

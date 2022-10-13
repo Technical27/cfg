@@ -65,11 +65,11 @@ require('packer').startup(function()
     config = function() require('todo-comments').setup {} end
   }
 
-  use {
-    'gbrlsnchs/telescope-lsp-handlers.nvim',
-    requires = 'nvim-telescope/telescope.nvim',
-    config = function() require('telescope').load_extension('lsp_handlers') end
-  }
+  -- use {
+  --   'gbrlsnchs/telescope-lsp-handlers.nvim',
+  --   requires = 'nvim-telescope/telescope.nvim',
+  --   config = function() require('telescope').load_extension('lsp_handlers') end
+  -- }
 
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-buffer'
@@ -214,10 +214,20 @@ vim.o.clipboard = 'unnamedplus'
 vim.o.incsearch = true
 vim.o.hlsearch = true
 
-vim.api.nvim_set_keymap('n', '<C-p>', '<cmd>Telescope find_files<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<C-d>', '<cmd>Telescope diagnostics<cr>', { noremap = true })
+local telescope = require('telescope.builtin')
+
+vim.keymap.set('n', '<C-p>', telescope.find_files, { noremap = true })
+vim.keymap.set('n', '<C-d>', telescope.diagnostics, { noremap = true })
+
 vim.api.nvim_set_keymap('n', '<C-t>', '<cmd>TodoTelescope<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true })
+
+vim.lsp.handlers["textDocument/definition"] = telescope.lsp_definitions
+vim.lsp.handlers["textDocument/implementation"] = telescope.lsp_implementation
+vim.lsp.handlers["textDocument/typeDefinition"] = telescope.lsp_type_definitions
+vim.lsp.handlers["textDocument/references"] = telescope.lsp_references
+vim.lsp.handlers["textDocument/documentSymbols"] = telescope.lsp_document_symbols
+vim.lsp.handlers["workspace/symbol"] = telescope.lsp_workspace_symbols
 
 function _G.clear_whitespace()
   if not vim.b.noclear then

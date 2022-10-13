@@ -543,6 +543,7 @@ in
     sddm.enableGnomeKeyring = mkDesktop true;
     i3lock.enableGnomeKeyring = mkDesktop true;
     i3lock-color.enableGnomeKeyring = mkDesktop true;
+    xscreensaver.enableGnomeKeyring = mkDesktop true;
   };
 
   security.sudo.extraConfig = ''
