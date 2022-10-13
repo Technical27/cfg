@@ -50,8 +50,15 @@ require('packer').startup(function()
 
   use 'guns/vim-sexp'
 
-  use 'ryanoasis/vim-devicons'
-  use 'vim-airline/vim-airline'
+  use {
+    'kyazdani42/nvim-web-devicons',
+    config = function() require('nvim-web-devicons').setup {} end
+  }
+  -- use 'vim-airline/vim-airline'
+  use {
+    'windwp/windline.nvim',
+    config = function() require('statusline') end
+  }
 
   use {
     'lewis6991/gitsigns.nvim',
@@ -64,12 +71,6 @@ require('packer').startup(function()
     requires = 'nvim-lua/plenary.nvim',
     config = function() require('todo-comments').setup {} end
   }
-
-  -- use {
-  --   'gbrlsnchs/telescope-lsp-handlers.nvim',
-  --   requires = 'nvim-telescope/telescope.nvim',
-  --   config = function() require('telescope').load_extension('lsp_handlers') end
-  -- }
 
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-buffer'
@@ -151,7 +152,7 @@ vim.g['airline#extensions#tabline#enabled'] = 1
 vim.g['airline#extensions#nvimlsp#enabled'] = 1
 vim.g['airline#extensions#tabline#tab_nr_type'] = 1
 vim.g['airline_powerline_fonts'] = 1
-vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
+-- vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
 
 vim.g.tex_flavor = 'latex'
 vim.g.vimtex_compiler_method = 'tectonic'
@@ -237,6 +238,20 @@ function _G.clear_whitespace()
   end
 end
 
+function _G.get_airline_icon(bufnr)
+  local filename, filetype
+  if not bufnr then
+    filename = vim.fn.expand('%:t')
+    filetype = vim.bo.filetype
+  else
+    filename = vim.fn.expand('#'.. bufnr .. ':t')
+    filetype = vim.bo[bufnr].filetype
+  end
+
+  local icon = require('nvim-web-devicons').get_icon(filename, filetype)
+  return icon
+end
+
 vim.cmd [[
   colorscheme gruvbox
   filetype plugin indent on
@@ -255,3 +270,23 @@ vim.cmd [[
     autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
 ]]
+-- TODO: fix this later
+-- function! AirlineDevIcons(...)
+--   let w:airline_section_x = get(w:, 'airline_section_x',
+--         \ get(g:, 'airline_section_x', ''))
+--   let w:airline_section_x .= ' %{v:lua.get_airline_icon()} '
+-- endfunction
+
+-- call airline#add_statusline_func('AirlineDevIcons')
+-- function! airline#extensions#tabline#formatters#nvimwebdevicons#format(bufnr, buffers) abort
+--   let originalFormatter = airline#extensions#tabline#formatters#unique_tail_improved#format(a:bufnr, a:buffers)
+--   return originalFormatter . ' ' .
+--     \ call v:lua.get_airline_icon(a:bufnr)
+-- endfunction
+
+-- let g:airline#extensions#tabline#formatter = 'nvimwebdevicons'
+
+-- let hasFileFormatEncodingPart = airline#parts#ffenc() !=? ''
+-- if hasFileFormatEncodingPart
+--   let w:airline_section_y = ' %{&fenc . " " . WebDevIconsGetFileFormatSymbol()} '
+-- endif
