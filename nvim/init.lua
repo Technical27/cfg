@@ -61,6 +61,11 @@ require('packer').startup(function()
   }
 
   use {
+    'noib3/nvim-cokeline',
+    config = function() require('bufferline') end
+  }
+
+  use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
     config = function() require('gitsigns').setup {} end

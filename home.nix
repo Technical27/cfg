@@ -160,6 +160,7 @@ in
   xdg.configFile = {
     "nvim/init.lua".source = ./nvim/init.lua;
     "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
+    "nvim/lua/bufferline.lua".source = ./nvim/bufferline.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
     "nvim/lua/lsp.lua".text = builtins.replaceStrings [
       "@RNIX_PATH@"
