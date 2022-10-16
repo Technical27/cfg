@@ -108,15 +108,15 @@ basic.section_c = {
 
 basic.section_x = {
     hl_colors = airline_colors.c,
-    text = function(_,_,width)
-        if width > width_breakpoint then
+    text = function(bufnr,_,width)
+        if width > width_breakpoint and vim.bo[bufnr].filetype ~= '' then
             return {
-            { sep.left_filled, state.mode[2] .. 'Sep' },
-            { ' ', state.mode[2] },
-            { b_components.file_encoding()},
-            { ' ' },
-            { b_components.file_format({ icon = true }) },
-            { ' ' },
+                { sep.left_filled, state.mode[2] .. 'Sep' },
+                { ' ', state.mode[2] },
+                { b_components.file_encoding() },
+                { ' ' },
+                { b_components.file_format({ icon = true }) },
+                { ' ' },
             }
         end
         return {
@@ -127,12 +127,15 @@ basic.section_x = {
 
 basic.section_y = {
     hl_colors = airline_colors.b,
-    text = function(_,_,width)
-        if width > width_breakpoint then
+    text = function(bufnr,_,width)
+        if width > width_breakpoint and vim.bo[bufnr].filetype ~= '' then
             return {
                 { sep.left_filled, state.mode[2] .. 'Sep' },
                 { ' ', state.mode[2] },
-                { b_components.cache_file_type({ icon = true }), state.mode[2] },
+                -- NOTE: can't cache to buffer because of state.mode highlight
+                b_components.file_icon({ default = "", hl_colors = airline_colors.b[state.mode[2]]})(bufnr),
+                { ' ' },
+                { b_components.cache_file_type(), state.mode[2] },
                 { ' ' },
             }
         end
@@ -261,6 +264,7 @@ local default = {
 }
 
 windline.setup({
+    theme = "gruvbox",
     colors_name = function(colors)
         local mod = function (c, value)
             if vim.o.background == 'light' then

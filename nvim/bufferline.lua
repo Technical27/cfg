@@ -1,18 +1,23 @@
 local get_hex = require('cokeline/utils').get_hex
 
+vim.cmd [[ hi! link TabLineFill GruvboxBg ]]
+
+local grey = "#c6c6c6"
+local black = "#282828"
+
 require('cokeline').setup({
   default_hl = {
     fg = function(buffer)
       return
         buffer.is_focused
-        and get_hex('ColorColumn', 'bg')
-         or get_hex('Normal', 'fg')
+        and black
+        or grey
     end,
     bg = function(buffer)
       return
         buffer.is_focused
-        and get_hex('Normal', 'fg')
-         or get_hex('ColorColumn', 'bg')
+        and grey
+        or black
     end,
   },
 
@@ -35,14 +40,14 @@ require('cokeline').setup({
       fg = function(buffer)
         return
           buffer.is_focused
-          and get_hex('ColorColumn', 'bg')
-           or get_hex('Normal', 'fg')
+          and black
+          or grey
       end,
       bg = function(buffer)
         return
           buffer.is_focused
-          and get_hex('Normal', 'fg')
-           or get_hex('ColorColumn', 'bg')
+          and grey
+          or black
       end,
     },
     {
@@ -67,14 +72,14 @@ require('cokeline').setup({
       bg = function(buffer)
         return
           buffer.is_focused
-          and get_hex('ColorColumn', 'bg')
-           or get_hex('Normal', 'fg')
+          and black
+          or grey
       end,
       fg = function(buffer)
         return
           buffer.is_focused
-          and get_hex('Normal', 'fg')
-           or get_hex('ColorColumn', 'bg')
+          and grey
+          or black
       end,
     }
   },
