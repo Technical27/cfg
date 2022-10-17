@@ -2,8 +2,9 @@ require('packer').startup(function()
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
 
-  use 'sheerun/vim-polyglot'
 
+  -- Syntax plugins
+  use 'sheerun/vim-polyglot'
   use {
    'nvim-treesitter/nvim-treesitter',
     requires = { 'JoosepAlviste/nvim-ts-context-commentstring' },
@@ -24,26 +25,24 @@ require('packer').startup(function()
       vim.cmd 'set foldexpr=nvim_treesitter#foldexpr()'
     end
   }
+  use 'gruvbox-community/gruvbox'
+  use {
+    'neovim/nvim-lspconfig',
+    config = function() require('lsp') end
+  }
 
   use {
     'nvim-telescope/telescope.nvim',
     requires = { { 'nvim-lua/popup.nvim' }, { 'nvim-lua/plenary.nvim' } }
   }
 
-  use 'gruvbox-community/gruvbox'
-
   use 'farmergreg/vim-lastplace'
-
+  use 'jghauser/mkdir.nvim'
   use {
     'windwp/nvim-autopairs',
     config = function()
       require('nvim-autopairs').setup()
     end,
-  }
-
-  use {
-    'neovim/nvim-lspconfig',
-    config = function() require('lsp') end
   }
 
   use 'tpope/vim-fugitive'
@@ -54,27 +53,24 @@ require('packer').startup(function()
 
   use 'guns/vim-sexp'
 
+  -- Visuals
   use {
     'kyazdani42/nvim-web-devicons',
     config = function() require('nvim-web-devicons').setup {} end
   }
-  -- use 'vim-airline/vim-airline'
   use {
     'windwp/windline.nvim',
     config = function() require('statusline') end
   }
-
   use {
     'noib3/nvim-cokeline',
     config = function() require('bufferline') end
   }
-
   use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
     config = function() require('gitsigns').setup {} end
   }
-
   use {
     'folke/todo-comments.nvim',
     requires = 'nvim-lua/plenary.nvim',
@@ -96,9 +92,9 @@ require('packer').startup(function()
     config = function() require('luasnip/loaders/from_vscode').lazy_load() end
   }
 
-  use 'mbbill/undotree'
-
   use 'saadparwaiz1/cmp_luasnip'
+
+  use 'mbbill/undotree'
 
   use 'ThePrimeagen/vim-be-good'
 
@@ -180,6 +176,13 @@ cmp.setup {
   },
 }
 
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local cmp = require('cmp')
+cmp.event:on(
+  'confirm_done',
+  cmp_autopairs.on_confirm_done()
+)
+
 vim.api.nvim_set_keymap('n', 'T', '<cmd>bprev<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'Y', '<cmd>bnext<cr>', { noremap = true })
 
@@ -250,7 +253,6 @@ end
 
 vim.cmd [[
   colorscheme gruvbox
-  filetype plugin indent on
 
   source /home/aamaruvi/.config/nvim/ts.vim
 

@@ -1,51 +1,53 @@
 fun! g:LoadColors()
-  hi! clear SignColumn
+  hi! link SignColumn GruvboxBg
   hi! link TabLineFill GruvboxBg
 
   " all the treesitter highlights
-  hi! link TSAnnotation GruvboxAqua
-  hi! link TSBoolean GruvboxPurple
-  hi! link TSCharacter GruvboxPurple
-  hi! TSComment gui=italic guifg=GruvboxGray
-  hi! link TSConstructor GruvboxOrange
-  hi! link TSConditional GruvboxRed
-  hi! link TSConstant GruvboxPurple
-  hi! link TSConstBuiltin GruvboxOrange
-  hi! link TSConstMacro GruvboxAqua
-  hi! link TSError GruvboxRed
-  hi! link TSException GruvboxRed
-  hi! link TSField GruvboxBlue
-  hi! link TSFloat GruvboxPurple
-  hi! link TSFunction GruvboxGreenBold
-  hi! link TSFuncBuiltin GruvboxOrange
-  hi! link TSFuncMacro GruvboxAqua
-  hi! link TSInclude GruvboxAqua
-  hi! link TSKeyword GruvboxRed
-  hi! link TSLabel GruvboxRed
-  hi! link TSMethod GruvboxGreenBold
-  hi! link TSNamespace GruvboxAqua
-  hi! link TSNumber GruvboxPurple
-  hi! link TSOperator GruvboxFg1
-  hi! link TSParamter GruvboxBlue
-  hi! link TSParameterReferance TSParameter
-  hi! link TSProperty GruvboxBlue
-  hi! link TSPunctDelimiter GruvboxFg
-  hi! link TSPunctBracket GruvboxFg
-  hi! link TSPunctSpecial GruvboxFg
-  hi! link TSTagDelimiter GruvboxFg
-  hi! link TSRepeat GruvboxRed
-  hi! link TSString GruvboxGreen
-  hi! link TSStringRegex GruvboxYellow
-  hi! link TSStringEscape GruvboxOrange
-  hi! link TSTag GruvboxRed
-  hi! link TSText TSNone
-  hi! link TSLiteral GruvboxGreen
-  hi! TSURI gui=underline guifg=GruvboxAqua
-  hi! link TSType GruvboxYellow
-  hi! link TSTypeBuiltin GruvboxYellow
-  hi! link TSVariable GruvboxFg
-  hi! TSEmphasis gui=italic
-  hi! TSUnderline gui=underline
+  hi! @annotation gui=italic guifg=#8ec07c
+  hi! @attribute gui=italic guifg=#8ec07c
+  hi! link @boolean GruvboxPurple
+  hi! link @character GruvboxPurple
+  hi! @comment gui=italic guifg=#928374
+  hi! link @constructor GruvboxOrange
+  hi! link @conditional GruvboxRed
+  hi! link @constant GruvboxPurple
+  hi! link @constant.builtin GruvboxOrange
+  hi! link @constant.macro GruvboxAqua
+  hi! link @error GruvboxRed
+  hi! link @exception GruvboxRed
+  hi! link @field GruvboxBlue
+  hi! link @float GruvboxPurple
+  hi! link @function GruvboxGreenBold
+  hi! link @function.builtin GruvboxOrangeBold
+  hi! link @function.macro GruvboxAquaBold
+  hi! link @include GruvboxAqua
+  hi! link @keyword GruvboxRed
+  hi! link @label GruvboxRed
+  hi! link @method GruvboxGreenBold
+  hi! link @namespace GruvboxAqua
+  hi! link @number GruvboxPurple
+  hi! link @operator GruvboxFg1
+  hi! link @parameter GruvboxBlue
+  hi! link @parameter.reference GruvboxBlue
+  hi! link @property GruvboxBlue
+  hi! link @punctuation.delimiter GruvboxFg
+  hi! link @punctuation.braket GruvboxFg
+  hi! link @punctuation.special GruvboxFg
+  hi! link @tag.delimter GruvboxFg
+  hi! link @repeat GruvboxRed
+  hi! link @string GruvboxGreen
+  hi! link @string.regex GruvboxYellow
+  hi! link @string.escape GruvboxOrange
+  hi! link @tag GruvboxRed
+  hi! link @text @none
+  hi! link @literal GruvboxGreen
+  hi! @uri gui=underline guifg=#8ec07c
+  hi! link @type GruvboxYellow
+  hi! link @type.builtin GruvboxYellow
+  hi! link @variable GruvboxFg
+  hi! link @variable.builtin GruvboxOrange
+  hi! @emphasis gui=italic
+  hi! @underline gui=underline
 endf
 
 call g:LoadColors()
