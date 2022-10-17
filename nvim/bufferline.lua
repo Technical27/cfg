@@ -1,7 +1,5 @@
 local get_hex = require('cokeline/utils').get_hex
 
-vim.cmd [[ hi! link TabLineFill GruvboxBg ]]
-
 local grey = "#c6c6c6"
 local black = "#282828"
 
@@ -37,18 +35,6 @@ require('cokeline').setup({
         end
         return ''
       end,
-      fg = function(buffer)
-        return
-          buffer.is_focused
-          and black
-          or grey
-      end,
-      bg = function(buffer)
-        return
-          buffer.is_focused
-          and grey
-          or black
-      end,
     },
     {
       text = function(buffer) return ' ' .. buffer.devicon.icon end,
@@ -61,6 +47,14 @@ require('cokeline').setup({
     },
     {
       text = function(buffer) return buffer.filename .. ' ' end,
+    },
+    {
+      text = function(buffer)
+        if buffer.is_modified then
+          return '+ '
+        end
+        return ''
+      end
     },
     {
       text = function(buffer)
@@ -81,6 +75,14 @@ require('cokeline').setup({
           and grey
           or black
       end,
+    },
+    {
+      text = function(buffer)
+        if buffer.is_last and not buffer.is_focused then
+          return ''
+        end
+        return ''
+      end
     }
   },
 })

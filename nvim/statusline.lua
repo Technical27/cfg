@@ -61,21 +61,26 @@ airline_colors.c = {
 
 basic.divider = { b_components.divider, hl_list.Normal }
 
-local width_breakpoint = 100
+local width_breakpoint_1 = 100
+local width_breakpoint_2 = 75
+local width_breakpoint_3 = 40
 
 basic.section_a = {
     hl_colors = airline_colors.a,
     text = function(_,_,width)
-        if width > width_breakpoint then
+        if width > width_breakpoint_2 then
             return {
                 { ' ' .. state.mode[1] .. ' ', state.mode[2] },
                 { sep.right_filled, state.mode[2] .. 'Sep' },
             }
         end
-        return {
-            { ' ' .. state.mode[1]:sub(1, 1) .. ' ', state.mode[2] },
-            { sep.right_filled, state.mode[2] .. 'Sep' },
-        }
+        if width > width_breakpoint_3 then
+            return {
+                { ' ' .. state.mode[1]:sub(1, 1) .. ' ', state.mode[2] },
+                { sep.right_filled, state.mode[2] .. 'Sep' },
+            }
+        end
+        return { { sep.right_filled, state.mode[2] .. 'Sep' } }
     end,
 }
 
@@ -83,7 +88,7 @@ basic.section_a = {
 basic.section_b = {
     hl_colors = airline_colors.b,
     text = function(bufnr,_, width)
-        if width > width_breakpoint and git_comps.is_git(bufnr) then
+        if width > width_breakpoint_2 and git_comps.is_git(bufnr) then
             return {
                 { git_comps.git_branch() , state.mode[2] },
                 { ' ', '' },
@@ -109,7 +114,7 @@ basic.section_c = {
 basic.section_x = {
     hl_colors = airline_colors.c,
     text = function(bufnr,_,width)
-        if width > width_breakpoint and vim.bo[bufnr].filetype ~= '' then
+        if width > width_breakpoint_1 and vim.fn.expand('%') ~= '' then
             return {
                 { sep.left_filled, state.mode[2] .. 'Sep' },
                 { ' ', state.mode[2] },
@@ -128,16 +133,27 @@ basic.section_x = {
 basic.section_y = {
     hl_colors = airline_colors.b,
     text = function(bufnr,_,width)
-        if width > width_breakpoint and vim.bo[bufnr].filetype ~= '' then
-            return {
-                { sep.left_filled, state.mode[2] .. 'Sep' },
-                { ' ', state.mode[2] },
-                -- NOTE: can't cache to buffer because of state.mode highlight
-                b_components.file_icon({ default = "", hl_colors = airline_colors.b[state.mode[2]]})(bufnr),
-                { ' ' },
-                { b_components.cache_file_type(), state.mode[2] },
-                { ' ' },
-            }
+        if vim.bo[bufnr].filetype ~= '' then
+            if width > width_breakpoint_1 then
+                return {
+                    { sep.left_filled, state.mode[2] .. 'Sep' },
+                    { ' ', state.mode[2] },
+                    -- NOTE: can't cache to buffer because of state.mode highlight
+                    b_components.file_icon({ default = "", hl_colors = airline_colors.b[state.mode[2]]})(bufnr),
+                    { ' ' },
+                    { b_components.cache_file_type(), state.mode[2] },
+                    { ' ' },
+                }
+            end
+            if width > width_breakpoint_3 then
+                return {
+                    { sep.left_filled, state.mode[2] .. 'Sep' },
+                    -- NOTE: see above
+                    { ' ', state.mode[2] },
+                    b_components.file_icon({ default = "", hl_colors = airline_colors.b[state.mode[2]]})(bufnr),
+                    { ' ' },
+                }
+            end
         end
         return { { sep.left_filled, state.mode[2] .. 'Sep' } }
     end,
@@ -146,7 +162,7 @@ basic.section_y = {
 basic.section_z = {
     hl_colors = airline_colors.a,
     text = function(_,_,width)
-        if width > width_breakpoint then
+        if width > width_breakpoint_2 then
             return {
                 { sep.left_filled, state.mode[2] .. 'Sep' },
                 { '  ', state.mode[2] },
@@ -155,9 +171,15 @@ basic.section_z = {
                 { b_components.line_col_lua },
             }
         end
+        if width > width_breakpoint_3 then
+            return {
+                { sep.left_filled, state.mode[2] .. 'Sep' },
+                { ' ', state.mode[2] },
+                { b_components.line_col_lua, state.mode[2] },
+            }
+        end
         return {
             { sep.left_filled, state.mode[2] .. 'Sep' },
-            { ' ', state.mode[2] },
             { b_components.line_col_lua, state.mode[2] },
         }
     end,
@@ -165,12 +187,13 @@ basic.section_z = {
 
 basic.lsp_diagnos = {
     name = 'diagnostic',
+    width = width_breakpoint_2,
     hl_colors = {
         red = { 'red', 'NormalBg' },
         yellow = { 'yellow', 'NormalBg' },
         blue = { 'blue', 'NormalBg' },
     },
-    text = function(bufnr)
+    text = function(bufnr,_,width)
         if lsp_comps.check_lsp(bufnr) then
             return {
                 { ' ' },
@@ -181,13 +204,13 @@ basic.lsp_diagnos = {
                 { lsp_comps.lsp_hint({ format = ' %s', show_zero = true }), 'blue' },
             }
         end
-        return { ' ', 'red' }
+        return ''
     end,
 }
 
 basic.git = {
     name = 'git',
-    width = width_breakpoint,
+    width = width_breakpoint_1,
     hl_colors = {
         green = { 'green', 'NormalBg' },
         red = { 'red', 'NormalBg' },
@@ -196,11 +219,11 @@ basic.git = {
     text = function(bufnr)
         if git_comps.is_git(bufnr) then
             return {
-                { git_comps.diff_added({ format = ' %s' }), 'green' },
+                { git_comps.diff_added({ format = ' %s', show_zero = true }), 'green' },
                 { ' ' },
-                { git_comps.diff_removed({ format = ' %s' }), 'red' },
+                { git_comps.diff_removed({ format = ' %s', show_zero = true }), 'red' },
                 { ' ' },
-                { git_comps.diff_changed({ format = '柳%s' }), 'blue' },
+                { git_comps.diff_changed({ format = '柳%s', show_zero = true }), 'blue' },
                 { ' ' },
             }
         end

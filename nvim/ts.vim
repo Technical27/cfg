@@ -1,5 +1,6 @@
 fun! g:LoadColors()
   hi! clear SignColumn
+  hi! link TabLineFill GruvboxBg
 
   " all the treesitter highlights
   hi! link TSAnnotation GruvboxAqua
