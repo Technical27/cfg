@@ -6,12 +6,16 @@ require('packer').startup(function()
 
   use {
    'nvim-treesitter/nvim-treesitter',
+    requires = { 'JoosepAlviste/nvim-ts-context-commentstring' },
     config = function()
       require('nvim-treesitter.configs').setup {
         indent = {
           enable = true
         },
         highlight = {
+          enable = true
+        },
+        context_commentstring = {
           enable = true
         }
       }
@@ -98,9 +102,33 @@ require('packer').startup(function()
 
   use 'ThePrimeagen/vim-be-good'
 
-  use 'leafOfTree/vim-svelte-plugin'
+  use {
+    'leafOfTree/vim-svelte-plugin',
+    ft = 'svelte',
+    config = function()
+      vim.g.vim_svelte_plugin_load_full_syntax = 1
+    end
+  }
 
-  use 'lervag/vimtex'
+  use {
+    'lervag/vimtex',
+    ft = {'tex', 'latex'},
+    requires = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      vim.g.tex_flavor = 'latex'
+      vim.g.vimtex_compiler_method = 'tectonic'
+      vim.g.vimtex_quickfix_mode = 0
+      vim.g.vimtex_view_method = 'zathura'
+
+      vim.opt_local.spell = true
+      require('cmp').setup.buffer {
+        sources = {
+          { name = 'luasnip' },
+          { name = 'spell' },
+        },
+      }
+    end
+  }
 
   use 'vimwiki/vimwiki'
 end)
@@ -152,32 +180,9 @@ cmp.setup {
   },
 }
 
-
-vim.g['airline#extensions#tabline#enabled'] = 1
-vim.g['airline#extensions#nvimlsp#enabled'] = 1
-vim.g['airline#extensions#tabline#tab_nr_type'] = 1
-vim.g['airline_powerline_fonts'] = 1
--- vim.g['airline#extensions#tabline#formatter'] = 'unique_tail_improved'
-
-vim.g.tex_flavor = 'latex'
-vim.g.vimtex_compiler_method = 'tectonic'
-vim.g.vimtex_quickfix_mode = 0
-vim.g.vimtex_view_method = 'zathura'
-
-function _G.tex_settings()
-  vim.opt_local.spell = true
-  cmp.setup.buffer {
-    sources = {
-      { name = 'luasnip' },
-      { name = 'spell' },
-    },
-  }
-end
-
 vim.api.nvim_set_keymap('n', 'T', '<cmd>bprev<cr>', { noremap = true })
 vim.api.nvim_set_keymap('n', 'Y', '<cmd>bnext<cr>', { noremap = true })
 
-vim.g.vim_svelte_plugin_load_full_syntax = 1
 
 vim.o.termguicolors = true
 vim.o.showmode = false
@@ -243,30 +248,11 @@ function _G.clear_whitespace()
   end
 end
 
-function _G.get_airline_icon(bufnr)
-  local filename, filetype
-  if not bufnr then
-    filename = vim.fn.expand('%:t')
-    filetype = vim.bo.filetype
-  else
-    filename = vim.fn.expand('#'.. bufnr .. ':t')
-    filetype = vim.bo[bufnr].filetype
-  end
-
-  local icon = require('nvim-web-devicons').get_icon(filename, filetype)
-  return icon
-end
-
 vim.cmd [[
   colorscheme gruvbox
   filetype plugin indent on
 
   source /home/aamaruvi/.config/nvim/ts.vim
-
-  augroup Latex
-    autocmd!
-    autocmd FileType tex call v:lua.tex_settings()
-  augroup END
 
   augroup Buffer
     autocmd!
@@ -275,23 +261,3 @@ vim.cmd [[
     autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
 ]]
--- TODO: fix this later
--- function! AirlineDevIcons(...)
---   let w:airline_section_x = get(w:, 'airline_section_x',
---         \ get(g:, 'airline_section_x', ''))
---   let w:airline_section_x .= ' %{v:lua.get_airline_icon()} '
--- endfunction
-
--- call airline#add_statusline_func('AirlineDevIcons')
--- function! airline#extensions#tabline#formatters#nvimwebdevicons#format(bufnr, buffers) abort
---   let originalFormatter = airline#extensions#tabline#formatters#unique_tail_improved#format(a:bufnr, a:buffers)
---   return originalFormatter . ' ' .
---     \ call v:lua.get_airline_icon(a:bufnr)
--- endfunction
-
--- let g:airline#extensions#tabline#formatter = 'nvimwebdevicons'
-
--- let hasFileFormatEncodingPart = airline#parts#ffenc() !=? ''
--- if hasFileFormatEncodingPart
---   let w:airline_section_y = ' %{&fenc . " " . WebDevIconsGetFileFormatSymbol()} '
--- endif
