@@ -218,7 +218,7 @@ in
 
   services.upower.enable = isLaptop;
   services.tlp = mkLaptop {
-    # enable = true;
+    enable = true;
     settings = {
       DISK_DEVICES = "nvme0n1";
       PCIE_ASPM_ON_BAT = "powersupersave";
