@@ -82,7 +82,9 @@ in
     libreoffice
     openscad
 
-    polymc
+    # TODO: complete shitshow on github, original maintainers are making a replacemnt.
+    # Currently the metadata server is no longer safe
+    # polymc
     mangohud
 
     kdenlive
