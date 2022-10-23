@@ -375,7 +375,7 @@ in
   systemd.network.networks."10-wg0" = {
     name = "wg0";
     DHCP = "no";
-    address = if isLaptop then [ "10.200.200.2/24" "fd37:994c:6708:de39::2/64" ] else [ "10.200.200.7/24" "fd37:994c:6708:de39::7/64" ];
+    address = if isLaptop then [ "10.200.200.2/24" "fd37:994c:6708:de39::2/64" ] else [ "10.200.200.4/24" "fd37:994c:6708:de39::4/64" ];
     dns = mkLaptop [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
     routes = [
       {
