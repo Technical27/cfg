@@ -57,7 +57,7 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      "resume_offset=14313573"
+      "resume_offset=14315900"
       "i915.enable_guc=2"
       "i915.enable_fbc=1"
       "i915.enable_psr=1"
@@ -264,7 +264,7 @@ in
       Network.EnableIPv6 = true;
     };
   };
-  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
+  networking.hosts."10.200.200.1" = [ "yogs.tech" ];
 
   # systemd.services.autovpn = mkLaptop {
   #   description = "Automatic WireGuard VPN Activation";
@@ -322,6 +322,7 @@ in
       timelineConfig = ''
         TIMELINE_CREATE=yes
         TIMELINE_CLEANUP=yes
+        TIMELINE_LIMIT_MONTHLY=2
       '';
     in
     mkLaptop {
@@ -358,12 +359,13 @@ in
     wireguardConfig = {
       PrivateKeyFile = "/etc/wireguard/${device}.key";
       FirewallMark = mkLaptop 51000;
+      ListenPort = mkDesktop 50000;
     };
     wireguardPeers = [
       {
         wireguardPeerConfig = {
           PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
-          Endpoint = "${if isLaptop then "aamaruvi.ddns.net" else "192.168.0.2"}:51820";
+          Endpoint = "aamaruvi.ddns.net:51820";
           AllowedIPs = if isLaptop then "0.0.0.0/0, ::/0" else "10.200.200.0/24, fd37:994c:6708:de39::/64";
         };
       }
@@ -373,7 +375,7 @@ in
   systemd.network.networks."10-wg0" = {
     name = "wg0";
     DHCP = "no";
-    address = if isLaptop then [ "10.200.200.2/32" "fd37:994c:6708:de39::2/128" ] else [ "10.200.200.7/32" "fd37:994c:6708:de39::7/128" ];
+    address = if isLaptop then [ "10.200.200.2/24" "fd37:994c:6708:de39::2/64" ] else [ "10.200.200.7/24" "fd37:994c:6708:de39::7/64" ];
     dns = mkLaptop [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
     routes = [
       {
@@ -384,13 +386,13 @@ in
           Table = 1000;
         };
       }
-      {
-        routeConfig = {
-          Gateway = "10.200.200.1";
-          Destination = "10.200.200.0/24";
-          GatewayOnLink = true;
-        };
-      }
+      # {
+      #   routeConfig = {
+      #     Gateway = "10.200.200.1";
+      #     Destination = "10.200.200.0/24";
+      #     GatewayOnLink = true;
+      #   };
+      # }
       {
         routeConfig = mkLaptop {
           Gateway = "fd37:994c:6708:de39::1";
@@ -399,13 +401,13 @@ in
           Table = 1000;
         };
       }
-      {
-        routeConfig = {
-          Gateway = "fd37:994c:6708:de39::1";
-          Destination = "fd37:994c:6708:de39::/64";
-          GatewayOnLink = true;
-        };
-      }
+      # {
+      #   routeConfig = {
+      #     Gateway = "fd37:994c:6708:de39::1";
+      #     Destination = "fd37:994c:6708:de39::/64";
+      #     GatewayOnLink = true;
+      #   };
+      # }
     ];
     networkConfig = {
       DNSDefaultRoute = "no";
@@ -434,8 +436,8 @@ in
         chain input {
           type filter hook input priority 0;
 
-          # accept any localhost traffic
-          iifname lo accept
+          # accept any localhost/vpn traffic
+          iifname { lo, wg0 } accept
 
           # accept traffic originated from us
           ct state {established, related} accept
@@ -459,6 +461,8 @@ in
 
             tcp dport 22 accept
             tcp dport 5100 accept
+
+            udp dport 50000 accept
           '' else ""}
 
           counter drop

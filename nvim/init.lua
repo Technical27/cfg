@@ -38,6 +38,8 @@ require('packer').startup(function()
 
   use 'farmergreg/vim-lastplace'
   use 'jghauser/mkdir.nvim'
+  use 'gpanders/editorconfig.nvim'
+  use 'ggandor/lightspeed.nvim'
   use {
     'windwp/nvim-autopairs',
     config = function()
@@ -183,8 +185,8 @@ cmp.event:on(
   cmp_autopairs.on_confirm_done()
 )
 
-vim.api.nvim_set_keymap('n', 'T', '<cmd>bprev<cr>', { noremap = true })
-vim.api.nvim_set_keymap('n', 'Y', '<cmd>bnext<cr>', { noremap = true })
+vim.api.nvim_set_keymap('n', 'T', '<Plug>(cokeline-focus-prev)', { noremap = true })
+vim.api.nvim_set_keymap('n', 'Y', '<Plug>(cokeline-focus-next)', { noremap = true })
 
 
 vim.o.termguicolors = true

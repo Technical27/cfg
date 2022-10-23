@@ -1,7 +1,8 @@
 local get_hex = require('cokeline/utils').get_hex
+local get_visible = require('cokeline/buffers').get_visible
 
 local grey = "#c6c6c6"
-local black = "#282828"
+local black = get_hex("GruvboxBg0", "fg")
 
 require('cokeline').setup({
   default_hl = {
@@ -19,6 +20,15 @@ require('cokeline').setup({
     end,
   },
 
+  buffers = {
+    filter_valid = function(buffer)
+      if vim.bo[buffer.number].filetype == 'qf' then
+        return false
+      end
+      return true
+    end
+  },
+
   components = {
     {
       text = function(buffer)
@@ -27,9 +37,9 @@ require('cokeline').setup({
             return ''
           end
 
-          local info = vim.fn.getbufinfo({ buflisted = true })
+          local info = get_visible()
 
-          if info[buffer.index - 1].bufnr ~= vim.fn.bufnr('%') then
+          if not info[buffer.index - 1].is_focused then
             return ''
           end
         end
@@ -42,8 +52,6 @@ require('cokeline').setup({
     },
     {
       text = function(buffer) return buffer.unique_prefix end,
-      fg = get_hex('Comment', 'fg'),
-      style = 'italic',
     },
     {
       text = function(buffer) return buffer.filename .. ' ' end,

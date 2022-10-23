@@ -230,27 +230,6 @@ basic.git = {
         return ''
     end,
 }
-local quickfix = {
-    filetypes = { 'qf', 'Trouble' },
-    active = {
-        { '🚦 Quickfix ', { 'white', 'black' } },
-        { helper.separators.slant_right, { 'black', 'black_light' } },
-        {
-            function()
-                return vim.fn.getqflist({ title = 0 }).title
-            end,
-            { 'cyan', 'black_light' },
-        },
-        { ' Total : %L ', { 'cyan', 'black_light' } },
-        { helper.separators.slant_right, { 'black_light', 'InactiveBg' } },
-        { ' ', { 'InactiveFg', 'InactiveBg' } },
-        basic.divider,
-        { helper.separators.slant_right, { 'InactiveBg', 'black' } },
-        { '🧛 ', { 'white', 'black' } },
-    },
-    always_active = true,
-    show_last_status = true
-}
 
 local explorer = {
     filetypes = { 'fern', 'NvimTree', 'lir' },
@@ -320,29 +299,6 @@ windline.setup({
     end,
     statuslines = {
         default,
-        quickfix,
         explorer,
     },
-    tabline = {
-        template = {
-            -- this use a highlight color a text will replace by tab name
-            select        = {''                           , {'TabSelectionFg' , 'TabSelectionBg'}},
-            select_start  = {''                           , {'TabLineBg'      , 'TabSelectionBg'}},
-            select_end    = {helper.separators.right_filled .. ' ' , {'TabSelectionBg' , 'TabLineBg'}},
-
-            -- select_last display if select tab is a last tab
-            select_last   = {helper.separators.right_filled        , {'TabSelectionBg' , 'TabLineFillBg'}},
-
-
-            -- this only use a highlight color a text will replace by tab name
-            normal        = {''                           , {'TabLineFg'      , 'TabLineBg'}},
-            normal_start  = {' '                          , {'TabLineFg'      , 'TabLineBg'}},
-            normal_end    = {helper.separators.right_filled   , {'TabLineFg'      , 'TabLineBg'}},
-
-            -- normal_select display if a next tab is select
-            normal_select = {helper.separators.right_filled .. ' ' , {'TabLineBg','TabSelectionBg' }},
-            -- normal_last display if tab is the last tab
-            normal_last   = {helper.separators.right_filled        , {'TabLineBg', 'TabLineFillBg' }},
-        }
-    }
 })
