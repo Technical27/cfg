@@ -89,6 +89,7 @@ in
 
     kdenlive
     # cpkgs.olive
+    prismlauncher
 
     cpkgs.n-link
 

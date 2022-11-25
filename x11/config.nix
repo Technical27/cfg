@@ -26,7 +26,6 @@
   services.picom = {
     enable = true;
     backend = "glx";
-    experimentalBackends = true;
     settings = {
       vsync = true;
       unredir-if-possible = false;

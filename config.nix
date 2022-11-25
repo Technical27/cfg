@@ -482,7 +482,16 @@ in
   };
 
   # Desktop specific things
-  services.sshd.enable = isDesktop;
+  services.openssh = mkDesktop {
+    enable = true;
+    banner = ''
+          _        _   _              _              _
+       __| |___ __| |_| |_ ___ _ __  | |___  __ __ _| |
+      / _` / -_|_-< / /  _/ _ \ '_ \_| / _ \/ _/ _` | |
+      \__,_\___/__/_\_\\__\___/ .__(_)_\___/\__\__,_|_|
+                              |_|
+    '';
+  };
   services.fstrim.enable = isDesktop;
   hardware.openrazer.enable = isDesktop;
 
