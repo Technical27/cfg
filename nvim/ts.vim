@@ -44,6 +44,7 @@ fun! g:LoadColors()
   hi! @uri gui=underline guifg=#8ec07c
   hi! link @type GruvboxYellow
   hi! link @type.builtin GruvboxYellow
+  hi! link @type.qualifier GruvboxRed
   hi! link @variable GruvboxFg
   hi! link @variable.builtin GruvboxOrange
   hi! @emphasis gui=italic

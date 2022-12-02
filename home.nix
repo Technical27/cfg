@@ -109,6 +109,7 @@ in
     gnome.simple-scan
 
     google-cloud-sdk
+    rcon
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
@@ -340,26 +341,26 @@ in
       echo "$dir: $argv"
     '';
 
-    plugins = [
-      {
-        name = "fenv";
-        src = pkgs.fetchFromGitHub {
-          owner = "oh-my-fish";
-          repo = "plugin-foreign-env";
-          rev = "master";
-          sha256 = "sha256-er1KI2xSUtTlQd9jZl1AjqeArrfBxrgBLcw5OqinuAM=";
-        };
-      }
-      {
-        name = "bass";
-        src = pkgs.fetchFromGitHub {
-          owner = "edc";
-          repo = "bass";
-          rev = "master";
-          sha256 = "sha256-fl4/Pgtkojk5AE52wpGDnuLajQxHoVqyphE90IIPYFU=";
-        };
-      }
-    ];
+    # plugins = [
+    #   {
+    #     name = "fenv";
+    #     src = pkgs.fetchFromGitHub {
+    #       owner = "oh-my-fish";
+    #       repo = "plugin-foreign-env";
+    #       rev = "master";
+    #       sha256 = "sha256-er1KI2xSUtTlQd9jZl1AjqeArrfBxrgBLcw5OqinuAM=";
+    #     };
+    #   }
+    #   {
+    #     name = "bass";
+    #     src = pkgs.fetchFromGitHub {
+    #       owner = "edc";
+    #       repo = "bass";
+    #       rev = "master";
+    #       sha256 = "sha256-fl4/Pgtkojk5AE52wpGDnuLajQxHoVqyphE90IIPYFU=";
+    #     };
+    #   }
+    # ];
   };
 
   gtk = {
