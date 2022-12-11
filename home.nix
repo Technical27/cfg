@@ -80,7 +80,8 @@ in
     easyeffects
     # cpkgs.soundux
     libreoffice
-    openscad
+    # TODO: broken right now
+    # openscad
 
     # TODO: complete shitshow on github, original maintainers are making a replacemnt.
     # Currently the metadata server is no longer safe

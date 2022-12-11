@@ -422,7 +422,7 @@ in
   environment.systemPackages = with pkgs; mkLaptop [
     # cpkgs.robotmeshnative
     # cpkgs.ancs4linux
-    # config.boot.kernelPackages.turbostat
+    config.boot.kernelPackages.turbostat
   ];
 
   programs.java.enable = true;
