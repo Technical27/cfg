@@ -15,10 +15,13 @@ in
 
   home.username = "aamaruvi";
   home.homeDirectory = toString /home/aamaruvi;
-  home.sessionVariablesExtra = ''
-    export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:$XDG_DATA_DIRS"
-  '';
-  home.sessionVariables.XDG_PICTURES_DIR = "${config.home.homeDirectory}/Pictures";
+  xdg.userDirs.enable = true;
+
+  xdg.systemDirs.data = [
+    "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+    # TODO: remove when gtk3 gets an update
+    "${config.home.homeDirectory}/.local/share"
+  ];
 
   home.packages = with pkgs; [
     ripgrep
@@ -80,12 +83,8 @@ in
     easyeffects
     # cpkgs.soundux
     libreoffice
-    # TODO: broken right now
-    # openscad
+    openscad
 
-    # TODO: complete shitshow on github, original maintainers are making a replacemnt.
-    # Currently the metadata server is no longer safe
-    # polymc
     mangohud
 
     kdenlive
@@ -341,27 +340,6 @@ in
       set -l dir (string replace -r '^'"$realhome"'($|/)' '~$1' $PWD)
       echo "$dir: $argv"
     '';
-
-    # plugins = [
-    #   {
-    #     name = "fenv";
-    #     src = pkgs.fetchFromGitHub {
-    #       owner = "oh-my-fish";
-    #       repo = "plugin-foreign-env";
-    #       rev = "master";
-    #       sha256 = "sha256-er1KI2xSUtTlQd9jZl1AjqeArrfBxrgBLcw5OqinuAM=";
-    #     };
-    #   }
-    #   {
-    #     name = "bass";
-    #     src = pkgs.fetchFromGitHub {
-    #       owner = "edc";
-    #       repo = "bass";
-    #       rev = "master";
-    #       sha256 = "sha256-fl4/Pgtkojk5AE52wpGDnuLajQxHoVqyphE90IIPYFU=";
-    #     };
-    #   }
-    # ];
   };
 
   gtk = {

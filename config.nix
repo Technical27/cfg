@@ -20,10 +20,10 @@ in
       dates = "weekly";
       automatic = true;
     };
-    settings = {
-      # substituters = [ "http://yogs.tech:9000/" ];
-      trusted-public-keys = [ "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA=" ];
-    };
+    # settings = {
+    #   substituters = [ "http://yogs.tech:9000/" ];
+    #   trusted-public-keys = [ "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA=" ];
+    # };
   };
 
   fileSystems =
@@ -78,10 +78,14 @@ in
 
   networking.dhcpcd.enable = false;
   systemd.network.enable = true;
+
+  # NOTE: this shouldn't be required
+  # hope more things support systemd-resolved for this
   services.avahi = {
     enable = true;
     nssmdns = true;
   };
+
   services.resolved = {
     enable = true;
     dnssec = "allow-downgrade";
@@ -160,7 +164,6 @@ in
     };
     jack.enable = true;
     wireplumber.enable = true;
-    media-session.enable = false;
   };
   security.pam.loginLimits = [
     {
@@ -202,6 +205,10 @@ in
   nixpkgs.overlays = mkLaptop [
     (self: super: {
       steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
+
+      # TODO: so cursors and wayland are the cause of half my problems.
+      # remove when programs aren't this broken
+      sway = super.cpkgs.sway;
 
       eclipse = super.writeScriptBin "eclipse" ''
         #!${super.runtimeShell}
@@ -247,12 +254,10 @@ in
   services.blueman.enable = isLaptop;
   services.fwupd = mkLaptop {
     enable = true;
+    extraRemotes = [ "lvfs-testing" ];
   };
 
   hardware.bluetooth.enable = isLaptop;
-  hardware.bluetooth.hsphfpd.enable = isLaptop;
-  # This is an example service that always fails
-  systemd.user.services.telephony_client.enable = false;
 
   powerManagement.enable = isLaptop;
   hardware.sensor.iio.enable = isLaptop;
@@ -492,7 +497,7 @@ in
                               |_|
     '';
   };
-  services.fstrim.enable = isDesktop;
+  services.fstrim.enable = true;
   hardware.openrazer.enable = isDesktop;
 
   networking.firewall = {
@@ -525,24 +530,13 @@ in
     # "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
     # "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
 
-    "fwupd/remotes.d/lvfs-testing.conf" = lib.mkForce ({
+    "fwupd/uefi_capsule.conf" = lib.mkForce ({
       text = ''
-        [fwupd Remote]
-
-        # this remote provides metadata and firmware marked as 'testing' from the LVFS
-        Enabled=true
-        Title=Linux Vendor Firmware Service (testing)
-        MetadataURI=https://cdn.fwupd.org/downloads/firmware-testing.xml.gz
-        ReportURI=https://fwupd.org/lvfs/firmware/report
-        #Username=
-        #Password=
-        OrderBefore=lvfs,fwupd
-        AutomaticReports=false
-        ApprovalRequired=false
+        [uefi_capsule]
+        OverrideESPMountPoint=${config.boot.loader.efi.efiSysMountPoint}
+        DisableCapsuleUpdateOnDisk=true
       '';
     });
-
-    "fwupd/uefi_capsule.conf" = lib.mkForce ({ text = "DisableCapsuleUpdateOnDisk=true"; });
   };
 
   security.pam.services = {

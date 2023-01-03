@@ -54,6 +54,7 @@
     shell_integration disabled
     confirm_os_window_close -1
 
+    # linux_display_server x11
     wayland_titlebar_color background
   '';
 }

@@ -38,7 +38,7 @@ in
       ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''
-      seat seat0 xcursor_theme WhiteSur-cursors 24
+      # seat seat0 xcursor_theme WhiteSur-cursors 24
       default_border none
     '' + (if isDesktop then
       ''workspace 1 output DP-3
