@@ -110,6 +110,7 @@ in
 
     google-cloud-sdk
     rcon
+    lynx
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
