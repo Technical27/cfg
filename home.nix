@@ -59,7 +59,8 @@ in
     bitwarden-cli
     ffmpeg
 
-    neovim-nightly
+    # neovim-nightly
+    neovim
     killall
     nix-index
     neofetch
@@ -196,7 +197,7 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = if isLaptop then pkgs.firefox-wayland else pkgs.firefox;
+    package = if isLaptop then pkgs.firefox-nightly else pkgs.firefox;
   };
 
   programs.neomutt.enable = true;
