@@ -51,6 +51,7 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
+  boot.initrd.systemd.enable = true;
   boot.loader.timeout = mkLaptop 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;

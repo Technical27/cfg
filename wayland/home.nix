@@ -92,7 +92,10 @@ in
           xkb_options = "compose:ralt,caps:escape";
         };
       };
-      gaps.inner = 10;
+      gaps = {
+        inner = 10;
+        smartGaps = true;
+      };
       terminal = "kitty";
       modifier = "Mod4";
       menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
@@ -105,9 +108,12 @@ in
         { instance = "origin.exe"; }
         { title = "^Zoom Cloud Meetings$"; }
       ];
-      window.commands = [
-        { command = "kill"; criteria = { app_id = "firefox"; title = "Firefox — Sharing Indicator"; }; }
-      ];
+      window = {
+        border = 0;
+        commands = [
+          { command = "kill"; criteria = { app_id = "firefox"; title = "Firefox — Sharing Indicator"; }; }
+        ];
+      };
       startup =
         let
           swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
