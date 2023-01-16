@@ -14,7 +14,6 @@ in
 
   xsession.windowManager.i3 = {
     enable = true;
-    package = pkgs.i3-gaps;
     extraConfig = "default_border none";
     config = {
       modifier = "Mod4";
@@ -23,12 +22,17 @@ in
       startup = [
         {
           command =
-            "${pkgs.xss-lock}/bin/xss-lock --transfer-sleep-lock -- ${pkgs.i3lock}/bin/i3lock --nofork -i ~/Documents/wallpaper.png";
+            "${pkgs.dbus}/bin/dbus-update-activation-environment --systemd DISPLAY XAUTHORITY";
           notification = false;
         }
         {
           command =
-            "${pkgs.feh}/bin/feh --no-fehbg --bg-fill ~/Documents/wallpaper.png";
+            "${pkgs.xss-lock}/bin/xss-lock --transfer-sleep-lock -- ${pkgs.i3lock}/bin/i3lock --nofork -i ~/Pictures/wallpaper.png";
+          notification = false;
+        }
+        {
+          command =
+            "${pkgs.feh}/bin/feh --no-fehbg --bg-fill ~/Pictures/wallpaper.png";
           notification = false;
         }
         {
@@ -40,7 +44,7 @@ in
           notification = false;
         }
         {
-          command = "${pkgs.cpkgs.polybar}/bin/polybar main";
+          command = "${cpkgs.polybar}/bin/polybar main";
           notification = false;
         }
       ];
@@ -80,7 +84,7 @@ in
         "Escape" = "mode default";
         "Return" = "mode default";
       };
-      bars = [{ command = "${cpkgs.polybar}/bin/polybar main"; colors.background = "#bada55"; }];
+      bars = [ ];
       floating.criteria = [
         { title = "^Firefox — Sharing Indicator$"; }
         { instance = "origin.exe"; }

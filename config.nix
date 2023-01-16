@@ -52,10 +52,10 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.initrd.systemd.enable = true;
-  boot.loader.timeout = mkLaptop 0;
+  boot.loader.timeout = 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
-  boot.extraModulePackages = [ pkgs.cpkgs.rtl88xxau ];
+  boot.extraModulePackages = mkLaptop [ pkgs.cpkgs.rtl88xxau ];
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
@@ -551,6 +551,7 @@ in
     cups.fprintAuth = mkLaptop false;
 
     sddm.enableGnomeKeyring = mkDesktop true;
+    login.enableGnomeKeyring = true;
     i3lock.enableGnomeKeyring = mkDesktop true;
     i3lock-color.enableGnomeKeyring = mkDesktop true;
     xscreensaver.enableGnomeKeyring = mkDesktop true;
@@ -569,14 +570,25 @@ in
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";
     wants = [ "dbus.service" "openrazer-daemon.service" ];
-    after = [ "dbus.service" "openrazer-daemon.service" "graphical-session.target" ];
+    after = [ "dbus.service" "openrazer-daemon.service" ];
     serviceConfig = {
       Type = "oneshot";
       ExecStart = [
-        "${pkgs.openrgb}/bin/openrgb -d 0 -m breathing -c FF0000"
-        "${pkgs.openrgb}/bin/openrgb -d 1 -m breathing -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 0 -d 1 -m static -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 2 -m static -c FF0000"
+        "${pkgs.openrgb}/bin/openrgb -d 3 -m breathing -c FF0000"
+        "${pkgs.liquidctl}/bin/liquidctl initialize all"
+        "${pkgs.liquidctl}/bin/liquidctl --match smart set led color breathing ff0000"
+        "${pkgs.liquidctl}/bin/liquidctl --match smart set fan1 speed 50"
+        "${pkgs.liquidctl}/bin/liquidctl --match smart set fan2 speed 50"
+        "${pkgs.liquidctl}/bin/liquidctl --match kraken set ring color breathing ff0000"
+        "${pkgs.liquidctl}/bin/liquidctl --match kraken set logo color breathing ff0000"
+        "${pkgs.liquidctl}/bin/liquidctl --match kraken set fan speed 20 10 30 30 40 50"
+        "${pkgs.liquidctl}/bin/liquidctl --match kraken set pump speed 20 30 30 50 40 80"
       ];
     };
+
+    wantedBy = [ "default.target" ];
   };
 
   services.udev = {

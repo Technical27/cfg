@@ -112,6 +112,8 @@ in
     google-cloud-sdk
     rcon
     lynx
+    chromium
+    gnome.seahorse
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
@@ -134,7 +136,6 @@ in
     # cpkgs.pcem
 
     gnumake
-    chromium
     cpkgs.vscodium
     python3
 
@@ -197,7 +198,7 @@ in
   programs.bat.enable = true;
   programs.firefox = {
     enable = true;
-    package = if isLaptop then pkgs.firefox-nightly else pkgs.firefox;
+    package = pkgs.firefox-nightly;
   };
 
   programs.neomutt.enable = true;
