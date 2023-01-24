@@ -129,7 +129,7 @@ in
     iw
     hcxdumptool
     hcxtools
-    metasploit
+    # metasploit
 
     # zoom-us
     # teams
@@ -348,16 +348,22 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = "gruvbox-dark";
-      package = cpkgs.gruvbox.theme;
+      name = "Fluent";
+      package = pkgs.fluent-gtk-theme;
     };
     iconTheme = {
-      name = "gruvbox-dark";
-      package = cpkgs.gruvbox.icons;
+      name = "Fluent-dark";
+      package = pkgs.fluent-icon-theme;
+    };
+    cursorTheme = {
+      name = "WhiteSur-cursors";
+      size = 24;
     };
     gtk3.extraConfig = {
-      gtk-cursor-theme-name = "WhiteSur-cursors";
-      gtk-cursor-theme-size = 24;
+      gtk-application-prefer-dark-theme = 1;
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
     };
   };
 

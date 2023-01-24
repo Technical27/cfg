@@ -51,7 +51,8 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  boot.initrd.systemd.enable = true;
+  # TODO: resume_offset is not supported yet.
+  boot.initrd.systemd.enable = isDesktop;
   boot.loader.timeout = 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
@@ -105,7 +106,7 @@ in
     allowUnfree = true;
   };
 
-  hardware.pulseaudio.enable = lib.mkForce false;
+  # hardware.pulseaudio.enable = lib.mkForce false;
 
   hardware.opengl = {
     enable = true;
@@ -212,6 +213,15 @@ in
       # remove when programs aren't this broken
       sway = super.cpkgs.sway;
 
+      swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
+        src = super.fetchFromGitHub {
+          owner = "jirutka";
+          repo = "swaylock-effects";
+          rev = "cd07dd1082a2fc1093f1e6f2541811e446f4d114";
+          sha256 = "sha256-aK/PvFjZoF8R0llXO+P650vHYLSoGS6dYSk5Pw8DBNY=";
+        };
+      });
+
       eclipse = super.writeScriptBin "eclipse" ''
         #!${super.runtimeShell}
         export GDK_BACKEND=x11
@@ -221,7 +231,7 @@ in
   ];
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=2h
+    HibernateDelaySec=1h
   '';
 
 
@@ -316,21 +326,22 @@ in
     wantedBy = [ "graphical-session.target" ];
   };
 
-  # services.beesd.filesystems = {
-  #   root = {
-  #     spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
-  #     hashTableSizeMB = 4096;
-  #     verbosity = "crit";
-  #     # extraOptions = [ "--loadavg-target" "5.0" ];
-  #   };
-  # };
+  services.beesd.filesystems = {
+    root = {
+      spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
+      hashTableSizeMB = 512;
+      verbosity = "crit";
+      extraOptions = [ "--loadavg-target" "2.0" ];
+    };
+  };
 
   services.snapper.configs =
     let
       timelineConfig = ''
         TIMELINE_CREATE=yes
         TIMELINE_CLEANUP=yes
-        TIMELINE_LIMIT_MONTHLY=2
+        TIMELINE_LIMIT_MONTHLY=1
+        TIMELINE_LIMIT_YEARLY=0
       '';
     in
     mkLaptop {
@@ -503,10 +514,7 @@ in
   services.fstrim.enable = true;
   hardware.openrazer.enable = isDesktop;
 
-  networking.firewall = {
-    enable = false;
-    allowedTCPPorts = mkDesktop [ 22 5100 ];
-  };
+  networking.firewall.enable = false;
 
   systemd.network.networks."00-ethernet" = {
     matchConfig.Type = "ether";

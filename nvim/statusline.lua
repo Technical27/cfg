@@ -62,8 +62,8 @@ airline_colors.c = {
 basic.divider = { b_components.divider, hl_list.Normal }
 
 local width_breakpoint_1 = 100
-local width_breakpoint_2 = 75
-local width_breakpoint_3 = 40
+local width_breakpoint_2 = 70
+local width_breakpoint_3 = 50
 
 basic.section_a = {
     hl_colors = airline_colors.a,

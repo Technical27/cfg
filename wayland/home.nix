@@ -13,7 +13,7 @@ in
     sway-contrib.grimshot
     swaylock-effects
     swayidle
-    wofi
+    rofi-wayland
     brightnessctl
     playerctl
     pulsemixer
@@ -98,7 +98,8 @@ in
       };
       terminal = "kitty";
       modifier = "Mod4";
-      menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
+      # menu = "wofi --show drun | sed 's/%.//g' | xargs swaymsg exec --";
+      menu = "rofi -show drun";
       bars = [
         {
           command = "${pkgs.waybar}/bin/waybar";
