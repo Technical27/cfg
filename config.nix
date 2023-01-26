@@ -209,10 +209,6 @@ in
     (self: super: {
       steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
 
-      # TODO: so cursors and wayland are the cause of half my problems.
-      # remove when programs aren't this broken
-      sway = super.cpkgs.sway;
-
       swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
         src = super.fetchFromGitHub {
           owner = "jirutka";
