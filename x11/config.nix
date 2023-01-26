@@ -28,8 +28,6 @@
     backend = "glx";
     settings = {
       vsync = true;
-      unredir-if-possible = false;
-      xrender-sync-fence = true;
       refresh-rate = "144";
     };
   };
