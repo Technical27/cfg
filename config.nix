@@ -60,7 +60,7 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      "resume_offset=14315900"
+      "resume_offset=14316493"
       "i915.enable_guc=2"
       "i915.enable_fbc=1"
       "i915.enable_psr=1"
