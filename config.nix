@@ -56,7 +56,7 @@ in
   boot.loader.timeout = 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
-  boot.extraModulePackages = mkLaptop [ pkgs.cpkgs.rtl88xxau ];
+  boot.extraModulePackages = mkLaptop [ config.boot.kernelPackages.rtl88xxau-aircrack ];
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
@@ -66,6 +66,9 @@ in
       "i915.enable_psr=1"
       "workqueue.power_efficient=1"
       "nvme.noacpi=1"
+      "iwlwifi.power_save=1"
+      "iwlmvm.power_scheme=3"
+      "snd_hda_intel.power_save=1"
     ]
   );
 
@@ -106,8 +109,6 @@ in
     allowUnfree = true;
   };
 
-  # hardware.pulseaudio.enable = lib.mkForce false;
-
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -121,7 +122,7 @@ in
     ]);
   };
   programs.steam.enable = true;
-  programs.steam.remotePlay.openFirewall = isDesktop;
+  # programs.steam.remotePlay.openFirewall = isDesktop;
 
   hardware.enableRedistributableFirmware = true;
   hardware.wirelessRegulatoryDatabase = true;
@@ -135,19 +136,18 @@ in
 
   services.gnome.gnome-keyring.enable = true;
   services.printing.enable = true;
+  # NOTE: this dumb thing pulls in every single shared printer
+  # from every macbook on a network that has "share this printer" enabled.
   systemd.services.cups-browsed.enable = false;
 
   services.usbmuxd.enable = true;
 
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # users.groups.ancs4linux = mkLaptop { };
   users.users.aamaruvi = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "input" ]
-      ++ lib.optionals isDesktop [ "openrazer" ]
-      # "ancs4linux"
-      ++ lib.optionals isLaptop [ "dialout" ];
+      ++ lib.optionals isDesktop [ "openrazer" ];
     shell = pkgs.fish;
   };
 
@@ -230,7 +230,6 @@ in
     HibernateDelaySec=1h
   '';
 
-
   services.upower.enable = isLaptop;
   services.tlp = mkLaptop {
     enable = true;
@@ -277,39 +276,6 @@ in
       Network.EnableIPv6 = true;
     };
   };
-  networking.hosts."10.200.200.1" = [ "yogs.tech" ];
-
-  # TODO: add/remove this for current setup
-  # systemd.services.autovpn = mkLaptop {
-  #   description = "Automatic WireGuard VPN Activation";
-  #   after = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
-  #   wants = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
-  #   environment.RUST_LOG = "warn";
-  #   serviceConfig = {
-  #     PrivateTmp = true;
-  #     NoNewPrivileges = true;
-  #     RestrictSUIDSGID = true;
-  #     SystemCallArchitectures = "native";
-  #     RestrictAddressFamilies = [ "AF_NETLINK" "AF_UNIX" ];
-  #     ProtectHostname = true;
-  #     ProtectKernelLogs = true;
-  #     ProtectKernelModules = true;
-  #     ProtectKernelTunables = true;
-  #     ProtectControlGroups = true;
-  #     RestrictNamespaces = true;
-  #     ProtectHome = true;
-  #     ProtectSystem = true;
-  #     RestrictRealtime = true;
-  #     ProtectClock = true;
-  #     MemoryDenyWriteExecute = true;
-  #     LockPersonality = true;
-  #     CapabilityBoundingSet = "CAP_NET_ADMIN";
-  #     SystemCallFilter = [ "@system-service" "~@mount" "~@cpu-emulation" "~@debug" "~@keyring" "~@obsolete" "~@privileged" "~@setuid" ];
-  #     Type = "simple";
-  #     ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
-  #   };
-  #   wantedBy = [ "multi-user.target" ];
-  # };
 
   systemd.user.services.mpris-proxy = mkLaptop {
     description = "bluez mpris-proxy";
@@ -322,14 +288,15 @@ in
     wantedBy = [ "graphical-session.target" ];
   };
 
-  services.beesd.filesystems = {
-    root = {
-      spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
-      hashTableSizeMB = 512;
-      verbosity = "crit";
-      extraOptions = [ "--loadavg-target" "2.0" ];
-    };
-  };
+  # NOTE: just uses too much cpu for a laptop
+  # services.beesd.filesystems = {
+  #   root = {
+  #     spec = "UUID=8e823de4-e182-41d0-8793-8f3fe59932da";
+  #     hashTableSizeMB = 512;
+  #     verbosity = "crit";
+  #     extraOptions = [ "--loadavg-target" "2.0" ];
+  #   };
+  # };
 
   services.snapper.configs =
     let
@@ -365,78 +332,10 @@ in
     };
   };
 
-  systemd.network.netdevs."10-wg0" = {
-    netdevConfig = {
-      Name = "wg0";
-      Kind = "wireguard";
-      Description = "WireGuard Tunnel wg0";
-    };
-    wireguardConfig = {
-      PrivateKeyFile = "/etc/wireguard/${device}.key";
-      FirewallMark = mkLaptop 51000;
-      ListenPort = mkDesktop 50000;
-    };
-    wireguardPeers = [
-      {
-        wireguardPeerConfig = {
-          PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
-          Endpoint = "aamaruvi.ddns.net:51820";
-          AllowedIPs = if isLaptop then "0.0.0.0/0, ::/0" else "10.200.200.0/24, fd37:994c:6708:de39::/64";
-        };
-      }
-    ];
-  };
-
-  systemd.network.networks."10-wg0" = {
-    name = "wg0";
-    DHCP = "no";
-    address = if isLaptop then [ "10.200.200.2/24" "fd37:994c:6708:de39::2/64" ] else [ "10.200.200.4/24" "fd37:994c:6708:de39::4/64" ];
-    dns = mkLaptop [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
-    routes = [
-      {
-        routeConfig = mkLaptop {
-          Gateway = "10.200.200.1";
-          Destination = "0.0.0.0/0";
-          GatewayOnLink = true;
-          Table = 1000;
-        };
-      }
-      # {
-      #   routeConfig = {
-      #     Gateway = "10.200.200.1";
-      #     Destination = "10.200.200.0/24";
-      #     GatewayOnLink = true;
-      #   };
-      # }
-      {
-        routeConfig = mkLaptop {
-          Gateway = "fd37:994c:6708:de39::1";
-          Destination = "::/0";
-          GatewayOnLink = true;
-          Table = 1000;
-        };
-      }
-      # {
-      #   routeConfig = {
-      #     Gateway = "fd37:994c:6708:de39::1";
-      #     Destination = "fd37:994c:6708:de39::/64";
-      #     GatewayOnLink = true;
-      #   };
-      # }
-    ];
-    networkConfig = {
-      DNSDefaultRoute = "no";
-      LLMNR = "yes";
-      MulticastDNS = "yes";
-    };
-  };
-
   xdg.portal.enable = true;
   services.flatpak.enable = true;
 
   environment.systemPackages = with pkgs; mkLaptop [
-    # cpkgs.robotmeshnative
-    # cpkgs.ancs4linux
     config.boot.kernelPackages.turbostat
   ];
 
@@ -534,9 +433,6 @@ in
   services.xserver.videoDrivers = mkDesktop [ "nvidia" ];
 
   environment.etc = mkLaptop {
-    # "chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/chromium/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-    # "opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json".source = "${pkgs.cpkgs.robotmeshnative}/etc/opt/chrome/native-messaging-hosts/com.robotmesh.robotmeshconnect.json";
-
     "fwupd/uefi_capsule.conf" = lib.mkForce ({
       text = ''
         [uefi_capsule]
@@ -577,28 +473,31 @@ in
     after = [ "dbus.service" "openrazer-daemon.service" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = [
-        "${pkgs.openrgb}/bin/openrgb -d 0 -d 1 -m static -c FF0000"
-        "${pkgs.openrgb}/bin/openrgb -d 2 -m static -c FF0000"
-        "${pkgs.openrgb}/bin/openrgb -d 3 -m breathing -c FF0000"
-        "${pkgs.liquidctl}/bin/liquidctl initialize all"
-        "${pkgs.liquidctl}/bin/liquidctl --match smart set led color breathing ff0000"
-        "${pkgs.liquidctl}/bin/liquidctl --match smart set fan1 speed 50"
-        "${pkgs.liquidctl}/bin/liquidctl --match smart set fan2 speed 50"
-        "${pkgs.liquidctl}/bin/liquidctl --match kraken set ring color breathing ff0000"
-        "${pkgs.liquidctl}/bin/liquidctl --match kraken set logo color breathing ff0000"
-        "${pkgs.liquidctl}/bin/liquidctl --match kraken set fan speed 20 10 30 30 40 50"
-        "${pkgs.liquidctl}/bin/liquidctl --match kraken set pump speed 20 30 30 50 40 80"
-      ];
+      ExecStart =
+        let
+          openrgb = cmd: "${pkgs.openrgb}/bin/openrgb ${cmd}";
+          liquidctl = cmd: "${pkgs.liquidctl}/bin/liquidctl ${cmd}";
+        in
+        [
+          (openrgb "-d 0 -d 1 -m static -c FF0000")
+          (openrgb "-d 2 -m static -c FF0000")
+          (openrgb "-d 3 -m breathing -c FF0000")
+          (liquidctl "initialize all")
+          (liquidctl "--match smart set led color breathing ff0000")
+          (liquidctl "--match smart set fan1 speed 50")
+          (liquidctl "--match smart set fan2 speed 50")
+          (liquidctl "--match kraken set ring color breathing ff0000")
+          (liquidctl "--match kraken set logo color breathing ff0000")
+          (liquidctl "--match kraken set fan speed 20 10 30 30 40 50")
+          (liquidctl "--match kraken set pump speed 20 30 30 50 40 80")
+        ];
     };
 
     wantedBy = [ "default.target" ];
   };
 
   services.udev = {
-    packages = [ ] ++ (lib.optionals isDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ])
-      # ++ (lib.optionals isLaptop [ pkgs.cpkgs.robotmeshnative ])
-    ;
+    packages = mkDesktop [ pkgs.qmk-udev-rules pkgs.openrgb ];
     extraRules = mkLaptop ''
       // Allows user access so that nspireconnect.ti.com can access the calculator
       ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e022", TAG+="uaccess"
@@ -606,10 +505,4 @@ in
       KERNEL=="rfkill", MODE=664, TAG+="uaccess"
     '';
   };
-
-  # systemd.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
-  # systemd.services.ancs4linux-advertising.wantedBy = mkLaptop [ "default.target" ];
-  # systemd.services.ancs4linux-observer.wantedBy = mkLaptop [ "default.target" ];
-  # systemd.user.services.ancs4linux-desktop-integration.wantedBy = mkLaptop [ "graphical-session.target" ];
-  # services.dbus.packages = mkLaptop [ pkgs.cpkgs.ancs4linux ];
 }

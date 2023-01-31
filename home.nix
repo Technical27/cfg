@@ -39,6 +39,7 @@ in
     binutils
     virtualenv
     python3Packages.ipython
+    sage
     rustup
     zig
     (lib.setPrio (20) llvmPackages.bintools)
@@ -141,9 +142,6 @@ in
 
     mindustry # -wayland
 
-    # eclipse for comp sci and weird workaround
-    eclipses.eclipse-java
-    (lib.setPrio (-10) eclipse)
     gradle
   ] ++ lib.optionals isDesktop [
     razergenie
@@ -227,6 +225,7 @@ in
 
   xsession.preferStatusNotifierItems = true;
   services.lorri.enable = true;
+  services.poweralertd.enable = true;
 
   programs.starship = {
     enable = true;
