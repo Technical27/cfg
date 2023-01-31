@@ -39,7 +39,7 @@ in
     binutils
     virtualenv
     python3Packages.ipython
-    sage
+    sageWithDoc
     rustup
     zig
     (lib.setPrio (20) llvmPackages.bintools)
