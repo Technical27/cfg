@@ -55,7 +55,7 @@ in
     zip
     unzip
     p7zip
-    cpkgs.neo
+    neo
     qmk
     bitwarden-cli
     ffmpeg
@@ -137,7 +137,7 @@ in
     # cpkgs.pcem
 
     gnumake
-    cpkgs.vscodium
+    vscodium
     python3
 
     mindustry # -wayland

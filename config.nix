@@ -227,7 +227,7 @@ in
   ];
 
   systemd.sleep.extraConfig = mkLaptop ''
-    HibernateDelaySec=1h
+    HibernateDelaySec=30m
   '';
 
   services.upower.enable = isLaptop;
