@@ -158,6 +158,14 @@ in
   services.udisks2.enable = true;
 
   security.rtkit.enable = true;
+  security.wrappers.gamescope = {
+    source = "${pkgs.gamescope}/bin/gamescope";
+    program = "gamescope";
+    capabilities = "cap_sys_nice+ep";
+    owner = "root";
+    group = "root";
+  };
+
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -335,7 +343,7 @@ in
   xdg.portal.enable = true;
   services.flatpak.enable = true;
 
-  environment.systemPackages = with pkgs; mkLaptop [
+  environment.systemPackages = [
     config.boot.kernelPackages.turbostat
   ];
 

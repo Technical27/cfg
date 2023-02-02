@@ -64,6 +64,7 @@ in
     neovim
     killall
     nix-index
+    nurl
     neofetch
     bpytop
 
