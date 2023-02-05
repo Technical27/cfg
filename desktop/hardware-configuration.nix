@@ -25,8 +25,7 @@
     fsType = "btrfs";
     options = [
       "noatime"
-      "compress-force=zstd:5"
-      "space_cache"
+      "compress=zstd:5"
     ];
   };
 
@@ -36,8 +35,7 @@
     options = [
       "ssd"
       "noatime"
-      "compress-force=zstd:5"
-      "discard=async"
+      "compress=zstd:5"
     ];
   };
 
