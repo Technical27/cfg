@@ -68,7 +68,7 @@ in
     neofetch
     bpytop
 
-    texlive.combined.scheme-small
+    texlive.combined.scheme-medium
 
     ffmpeg
     hexyl
@@ -116,13 +116,18 @@ in
     lynx
     chromium
     gnome.seahorse
-  ] ++ lib.optionals isLaptop [
-    cpkgs.wgvpn
-    intel-gpu-tools
+
     traceroute
     nvme-cli
     pciutils
     usbutils
+
+    chocolateDoom
+    gzdoom
+    mindustry
+  ] ++ lib.optionals isLaptop [
+    cpkgs.wgvpn
+    intel-gpu-tools
     powertop
     libqalculate
     qalculate-gtk
@@ -131,17 +136,11 @@ in
     iw
     hcxdumptool
     hcxtools
-    # metasploit
-
-    # zoom-us
-    # teams
-    # cpkgs.pcem
+    metasploit
 
     gnumake
     vscodium
     python3
-
-    mindustry # -wayland
 
     gradle
   ] ++ lib.optionals isDesktop [
@@ -151,7 +150,6 @@ in
     obs-studio
     mumble
     scrot
-    mindustry
 
     lutris
     # cpkgs.badlion-client
@@ -257,9 +255,25 @@ in
     };
   };
 
-  programs.kitty = with import ./kitty.nix; {
+  programs.kitty = {
     enable = true;
-    inherit keybindings extraConfig;
+
+    keybindings = {
+      "ctrl+shift+c" = "copy_to_clipboard";
+      "ctrl+shift+v" = "paste_from_clipboard";
+    };
+
+    extraConfig = ''
+      font_size 13.0
+      disable_ligatures cursor
+      cursor_blink_interval 0
+      enable_audio_bell no
+      shell_integration enabled
+      confirm_os_window_close -1
+      wayland_titlebar_color background
+
+      ${import ./themes/kitty.nix}
+    '';
   };
 
   programs.git =
@@ -321,8 +335,7 @@ in
       fish_vi_key_bindings
     ''
     + (if config.wayland.windowManager.sway.enable then ''
-      set TTY1 (tty)
-      if test -z "$WAYLAND_DISPLAY"; and test $TTY1 = "/dev/tty1"
+      if test -z "$WAYLAND_DISPLAY"; and test (tty) = "/dev/tty1"
         exec sway
       end
     '' else "")
@@ -333,8 +346,8 @@ in
       icat = "kitty +kitten icat";
       cat = "bat";
       grep = "rg";
-      ls = "exa --git --git-ignore --icons";
-      tree = "exa --git --git-ignore --icons --tree";
+      ls = "exa --git --icons";
+      tree = "exa --git --icons --tree";
     };
 
     functions.fish_title.body = ''

@@ -114,7 +114,7 @@ require('packer').startup(function()
     requires = { 'hrsh7th/nvim-cmp' },
     config = function()
       vim.g.tex_flavor = 'latex'
-      vim.g.vimtex_compiler_method = 'tectonic'
+      vim.g.vimtex_compiler_method = 'latexmk'
       vim.g.vimtex_quickfix_mode = 0
       vim.g.vimtex_view_method = 'zathura'
 
@@ -200,10 +200,10 @@ vim.o.number = true
 vim.o.hidden = true
 vim.o.backup = false
 vim.o.writebackup = false
-vim.o.updatetime = 200
+vim.o.updatetime = 2000
 vim.opt.shortmess:append('c')
 vim.o.inccommand = 'nosplit'
-vim.o.completeopt='menu,menuone,noselect'
+vim.o.completeopt='menuone,preview,noselect'
 vim.o.signcolumn = 'yes'
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -253,6 +253,8 @@ function _G.clear_whitespace()
   end
 end
 
+-- autocmd BufWritePre * call v:lua.clear_whitespace()
+
 vim.cmd [[
   colorscheme gruvbox
 
@@ -260,7 +262,6 @@ vim.cmd [[
 
   augroup Buffer
     autocmd!
-    autocmd BufWritePre * call v:lua.clear_whitespace()
     autocmd BufWritePre * lua vim.lsp.buf.format({ async = false })
     autocmd BufRead,BufNewfile flake.lock,project.pros set filetype=json
   augroup END
