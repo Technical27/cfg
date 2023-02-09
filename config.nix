@@ -60,10 +60,8 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      "resume_offset=14316493"
+      "resume_offset=18093312"
       "i915.enable_guc=2"
-      "i915.enable_fbc=1"
-      "i915.enable_psr=1"
       "workqueue.power_efficient=1"
       "nvme.noacpi=1"
       "iwlwifi.power_save=1"
@@ -209,6 +207,7 @@ in
       HandlePowerKey=hibernate
       IdleActionSec=300
       HandleLidSwitch=suspend-then-hibernate
+      HandleLidSwitchDocked=suspend-then-hibernate
       HandleLidSwitchExternalPower=suspend-then-hibernate
     '';
   };
