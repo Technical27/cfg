@@ -55,7 +55,7 @@ in
   boot.initrd.systemd.enable = isDesktop;
   boot.loader.timeout = 0;
   boot.cleanTmpDir = true;
-  boot.kernelPackages = pkgs.linuxKernel.packageAliases.linux_latest;
+  boot.kernelPackages = if isLaptop then pkgs.linuxKernel.packageAliases.linux_latest else pkgs.linuxKernel.packages.linux_zen;
   boot.extraModulePackages = mkLaptop [ config.boot.kernelPackages.rtl88xxau-aircrack ];
   boot.kernelParams = [ ]
     ++ (
@@ -457,11 +457,7 @@ in
     # times out waiting for fingerprint with no feedback
     cups.fprintAuth = mkLaptop false;
 
-    sddm.enableGnomeKeyring = mkDesktop true;
     login.enableGnomeKeyring = true;
-    i3lock.enableGnomeKeyring = mkDesktop true;
-    i3lock-color.enableGnomeKeyring = mkDesktop true;
-    xscreensaver.enableGnomeKeyring = mkDesktop true;
   };
 
   security.sudo.extraConfig = ''
@@ -470,9 +466,9 @@ in
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
 
-  boot.kernelPatches = mkDesktop [
-    (mkPatch "openrgb")
-  ];
+  # boot.kernelPatches = mkDesktop [
+  #   (mkPatch "openrgb")
+  # ];
 
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";

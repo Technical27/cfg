@@ -31,4 +31,11 @@
       refresh-rate = "144";
     };
   };
+
+  security.pam.services = {
+    sddm.enableGnomeKeyring = true;
+    i3lock.enableGnomeKeyring = true;
+    i3lock-color.enableGnomeKeyring = true;
+    xscreensaver.enableGnomeKeyring = true;
+  };
 }
