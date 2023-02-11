@@ -39,6 +39,7 @@ in
     binutils
     virtualenv
     python3Packages.ipython
+    python3
     sageWithDoc
     rustup
     zig
@@ -118,6 +119,7 @@ in
     gnome.seahorse
 
     traceroute
+    whois
     nvme-cli
     pciutils
     usbutils
@@ -125,12 +127,15 @@ in
     chocolateDoom
     gzdoom
     mindustry
+
+    libqalculate
+    qalculate-gtk
+
+    freecad
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
     powertop
-    libqalculate
-    qalculate-gtk
 
     aircrack-ng
     iw
@@ -139,8 +144,6 @@ in
     metasploit
 
     gnumake
-    vscodium
-    python3
 
     gradle
   ] ++ lib.optionals isDesktop [
@@ -153,7 +156,6 @@ in
 
     lutris
     # cpkgs.badlion-client
-    # freecad
   ];
 
   # xdg.dataFile."fusion360/wine" = {
