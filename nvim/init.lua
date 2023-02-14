@@ -30,7 +30,7 @@ require('packer').startup(function()
     'neovim/nvim-lspconfig',
     config = function() require('lsp') end
   }
-
+ 
   use {
     'nvim-telescope/telescope.nvim',
     requires = { { 'nvim-lua/popup.nvim' }, { 'nvim-lua/plenary.nvim' } }
@@ -68,16 +68,19 @@ require('packer').startup(function()
     'noib3/nvim-cokeline',
     config = function() require('bufferline') end
   }
+
   use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
     config = function() require('gitsigns').setup {} end
   }
-  use {
-    'folke/todo-comments.nvim',
-    requires = 'nvim-lua/plenary.nvim',
-    config = function() require('todo-comments').setup {} end
-  }
+  
+  -- this is it
+  -- use {
+  --   'folke/todo-comments.nvim',
+  --   requires = 'nvim-lua/plenary.nvim',
+  --   config = function() require('todo-comments').setup {} end
+  -- }
 
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-buffer'
@@ -254,10 +257,8 @@ function _G.clear_whitespace()
 end
 
 -- autocmd BufWritePre * call v:lua.clear_whitespace()
-
 vim.cmd [[
   colorscheme gruvbox
-
   source /home/aamaruvi/.config/nvim/ts.vim
 
   augroup Buffer

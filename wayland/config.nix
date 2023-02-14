@@ -32,6 +32,7 @@
     )
   ];
 
+  # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
   security.pam.services.swaylock.text = ''
     # Account management.
     account required pam_unix.so

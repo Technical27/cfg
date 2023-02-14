@@ -5,7 +5,6 @@ let
   isDesktop = device == "desktop";
   mkLaptop = obj: lib.mkIf (isLaptop) obj;
   mkDesktop = obj: lib.mkIf (isDesktop) obj;
-  mkPatch = name: { inherit name; patch = ./desktop + "/${name}.patch"; };
 in
 {
 
@@ -215,21 +214,6 @@ in
   nixpkgs.overlays = mkLaptop [
     (self: super: {
       steam = super.steam.override { extraPkgs = p: [ p.cups ]; };
-
-      swaylock-effects = super.swaylock-effects.overrideAttrs (old: rec {
-        src = super.fetchFromGitHub {
-          owner = "jirutka";
-          repo = "swaylock-effects";
-          rev = "cd07dd1082a2fc1093f1e6f2541811e446f4d114";
-          sha256 = "sha256-aK/PvFjZoF8R0llXO+P650vHYLSoGS6dYSk5Pw8DBNY=";
-        };
-      });
-
-      eclipse = super.writeScriptBin "eclipse" ''
-        #!${super.runtimeShell}
-        export GDK_BACKEND=x11
-        exec ${super.eclipses.eclipse-java}/bin/eclipse "$@"
-      '';
     })
   ];
 
@@ -271,7 +255,16 @@ in
     extraRemotes = [ "lvfs-testing" ];
   };
 
-  hardware.bluetooth.enable = isLaptop;
+  hardware.bluetooth = mkLaptop {
+    enable = true;
+    settings = {
+      General = {
+        FastConnectable = true;
+        Experimental = true;
+        KernelExperimental = "6fbaf188-05e0-496a-9885-d6ddfdb4e03e";
+      };
+    };
+  };
 
   powerManagement.enable = isLaptop;
   hardware.sensor.iio.enable = isLaptop;
@@ -452,7 +445,6 @@ in
   security.pam.services = {
     # get gnome-keyring to unlock on boot
     login.fprintAuth = mkLaptop (lib.mkForce false);
-    # correctly order pam_fprintd.so and pam_unix.so so password and fignerprint works
     sudo.fprintAuth = mkLaptop true;
     # times out waiting for fingerprint with no feedback
     cups.fprintAuth = mkLaptop false;
@@ -465,10 +457,6 @@ in
   '';
 
   boot.kernelModules = mkDesktop [ "i2c-dev" "i2c-i801" "i2c-nct6775" ];
-
-  # boot.kernelPatches = mkDesktop [
-  #   (mkPatch "openrgb")
-  # ];
 
   systemd.user.services.rgb-restore = mkDesktop {
     description = "restore rgb effects";
