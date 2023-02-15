@@ -94,3 +94,6 @@ require('cokeline').setup({
     }
   },
 })
+
+vim.api.nvim_set_keymap('n', 'T', '<Plug>(cokeline-focus-prev)', { noremap = true })
+vim.api.nvim_set_keymap('n', 'Y', '<Plug>(cokeline-focus-next)', { noremap = true })

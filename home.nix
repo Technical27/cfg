@@ -165,10 +165,11 @@ in
 
   xdg.configFile = {
     "nvim/init.lua".source = ./nvim/init.lua;
-    "nvim/lua/statusline.lua".source = ./nvim/statusline.lua;
-    "nvim/lua/bufferline.lua".source = ./nvim/bufferline.lua;
+    "nvim/lua/config/statusline.lua".source = ./nvim/statusline.lua;
+    "nvim/lua/config/bufferline.lua".source = ./nvim/bufferline.lua;
+    "nvim/lua/config/cmp.lua".source = ./nvim/cmp.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
-    "nvim/lua/lsp.lua".text = builtins.replaceStrings [
+    "nvim/lua/config/lsp.lua".text = builtins.replaceStrings [
       "@RNIX_PATH@"
       "@RUST_ANALYZER_PATH@"
       "@HLS_PATH@"

@@ -1,6 +1,7 @@
 fun! g:LoadColors()
   hi! link SignColumn GruvboxBg
   hi! link TabLineFill GruvboxBg
+  hi! link CursorLineNr GruvboxYellow
 
   " all the treesitter highlights
   hi! @annotation gui=italic guifg=#8ec07c
@@ -41,7 +42,7 @@ fun! g:LoadColors()
   hi! link @tag GruvboxRed
   hi! link @text @none
   hi! link @literal GruvboxGreen
-  hi! @uri gui=underline guifg=#8ec07c
+  hi! link @uri GruvboxBlueUnderline
   hi! link @type GruvboxYellow
   hi! link @type.builtin GruvboxYellow
   hi! link @type.qualifier GruvboxRed
@@ -51,9 +52,7 @@ fun! g:LoadColors()
   hi! @underline gui=underline
 endf
 
-call g:LoadColors()
-
 augroup Color
   autocmd!
-  autocmd ColorScheme * call g:LoadColors()
+  autocmd ColorScheme gruvbox call g:LoadColors()
 augroup end

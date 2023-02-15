@@ -108,13 +108,9 @@ in
       floating.criteria = [
         { instance = "origin.exe"; }
         { title = "^Zoom Cloud Meetings$"; }
+        { title = " — Sharing Indicator$"; }
       ];
-      window = {
-        border = 0;
-        commands = [
-          { command = "kill"; criteria = { app_id = "firefox"; title = "Firefox — Sharing Indicator"; }; }
-        ];
-      };
+      window.border = 0;
       startup =
         let
           swaylock = "swaylock --daemonize --screenshots --indicator --clock --fade-in 0.2 --effect-blur 7x5";
