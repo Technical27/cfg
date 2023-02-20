@@ -33,13 +33,17 @@ in
         "ssd"
         "space_cache"
       ];
+      # NOTE: this is here to workaround a nixos/systemd bug.
+      root_opts = default_opts ++ [
+        "x-systemd.after=local-fs-pre.target"
+      ];
       swap_opts = [
         "noatime"
         "ssd"
       ];
     in
     mkLaptop {
-      "/".options = default_opts;
+      "/".options = root_opts;
       "/nix".options = default_opts;
       "/home".options = default_opts;
       "/swap".options = swap_opts;
@@ -50,8 +54,7 @@ in
   networking.hostName = device;
 
   boot.loader.systemd-boot.enable = true;
-  # TODO: resume_offset is not supported yet.
-  boot.initrd.systemd.enable = isDesktop;
+  boot.initrd.systemd.enable = true;
   boot.loader.timeout = 0;
   boot.cleanTmpDir = true;
   boot.kernelPackages = if isLaptop then pkgs.linuxKernel.packageAliases.linux_latest else pkgs.linuxKernel.packages.linux_zen;
@@ -196,8 +199,17 @@ in
 
   # Laptop specific things
   boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
-  boot.plymouth.enable = isLaptop;
+  boot.plymouth.enable = !config.boot.initrd.systemd.enable && isLaptop;
   services.fprintd.enable = isLaptop;
+
+  # TODO: make this later for a windows vm for bmw tools
+  # virtualisation.libvirtd = {
+  #   enable = true;
+  #   onBoot = ignore;
+  #   qemu = {
+  #     package = pkgs.qemu_kvm;
+  #   };
+  # };
 
   services.logind = mkLaptop {
     lidSwitch = "suspend";
