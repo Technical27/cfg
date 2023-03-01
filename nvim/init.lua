@@ -43,7 +43,6 @@ require('packer').startup(function()
       vim.keymap.set('n', '<C-d>', telescope.diagnostics, { noremap = true })
 
       vim.keymap.set('n', '<C-t>', '<cmd>TodoTelescope<cr>', { noremap = true })
-      vim.keymap.set('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true })
 
       vim.lsp.handlers["textDocument/definition"] = telescope.lsp_definitions
       vim.lsp.handlers["textDocument/implementation"] = telescope.lsp_implementation
@@ -129,7 +128,10 @@ require('packer').startup(function()
     config = function() require('luasnip/loaders/from_vscode').lazy_load() end
   }
 
-  use 'mbbill/undotree'
+  use {
+    'mbbill/undotree',
+    config = function() vim.keymap.set('n', '<C-u>', '<cmd>UndotreeToggle<cr>', { noremap = true }) end
+  }
 
   use 'ThePrimeagen/vim-be-good'
 

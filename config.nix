@@ -19,35 +19,7 @@ in
       dates = "weekly";
       automatic = true;
     };
-    # settings = {
-    #   substituters = [ "http://yogs.tech:9000/" ];
-    #   trusted-public-keys = [ "yogs.tech-1:1GiyAEtYCGV5v2Towsp4P5h4mREIIg+/6f3oDLotDyA=" ];
-    # };
   };
-
-  fileSystems =
-    let
-      default_opts = [
-        "noatime"
-        "compress=zstd:5"
-        "ssd"
-        "space_cache"
-      ];
-      # NOTE: this is here to workaround a nixos/systemd bug.
-      root_opts = default_opts ++ [
-        "x-systemd.after=local-fs-pre.target"
-      ];
-      swap_opts = [
-        "noatime"
-        "ssd"
-      ];
-    in
-    mkLaptop {
-      "/".options = root_opts;
-      "/nix".options = default_opts;
-      "/home".options = default_opts;
-      "/swap".options = swap_opts;
-    };
 
   swapDevices = [{ device = "/swap/file"; }];
 
@@ -62,7 +34,6 @@ in
   boot.kernelParams = [ ]
     ++ (
     lib.optionals isLaptop [
-      "resume_offset=18093312"
       "i915.enable_guc=2"
       "workqueue.power_efficient=1"
       "nvme.noacpi=1"
@@ -198,7 +169,6 @@ in
   # };
 
   # Laptop specific things
-  boot.resumeDevice = mkLaptop "/dev/disk/by-uuid/8e823de4-e182-41d0-8793-8f3fe59932da";
   boot.plymouth.enable = !config.boot.initrd.systemd.enable && isLaptop;
   services.fprintd.enable = isLaptop;
 

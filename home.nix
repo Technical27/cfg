@@ -67,7 +67,7 @@ in
     nix-index
     nurl
     neofetch
-    bpytop
+    btop
 
     texlive.combined.scheme-medium
 
@@ -131,7 +131,10 @@ in
     libqalculate
     qalculate-gtk
 
-    freecad
+    ranger
+
+    # NOTE: broken again
+    # freecad
   ] ++ lib.optionals isLaptop [
     cpkgs.wgvpn
     intel-gpu-tools
