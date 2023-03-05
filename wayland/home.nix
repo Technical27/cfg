@@ -38,8 +38,11 @@ in
       ${if isDesktop then "export WLR_NO_HARDWARE_CURSORS=1" else ""}
     '';
     extraConfig = ''
-      # seat seat0 xcursor_theme WhiteSur-cursors 24
+      seat seat0 xcursor_theme WhiteSur-cursors 24
       default_border none
+
+      bindgesture swipe:3:right workspace prev
+      bindgesture swipe:3:left workspace next
     '' + (if isDesktop then
       ''workspace 1 output DP-3
         workspace 2 output DP-3
@@ -231,7 +234,7 @@ in
     temperature.night = 4500;
   };
 
-  programs.mako = {
+  services.mako = {
     enable = true;
     borderSize = 5;
     defaultTimeout = 3000;

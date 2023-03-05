@@ -69,7 +69,7 @@ in
     neofetch
     btop
 
-    texlive.combined.scheme-medium
+    texlive.combined.scheme-full
 
     ffmpeg
     hexyl
@@ -172,6 +172,7 @@ in
     "nvim/lua/config/bufferline.lua".source = ./nvim/bufferline.lua;
     "nvim/lua/config/cmp.lua".source = ./nvim/cmp.lua;
     "nvim/ts.vim".source = ./nvim/ts.vim;
+    "nvim/after/ftplugin/tex.lua".source = ./nvim/tex.lua;
     "nvim/lua/config/lsp.lua".text = builtins.replaceStrings [
       "@RNIX_PATH@"
       "@RUST_ANALYZER_PATH@"

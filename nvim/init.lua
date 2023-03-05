@@ -15,7 +15,8 @@ require('packer').startup(function()
           enable = true
         },
         highlight = {
-          enable = true
+          enable = true,
+          disable = { "tex", "latex" }
         },
         context_commentstring = {
           enable = true
@@ -145,21 +146,14 @@ require('packer').startup(function()
 
   use {
     'lervag/vimtex',
-    ft = {'tex', 'latex'},
+    -- can't use for inverse search to work
+    -- ft = {'tex', 'latex'},
     requires = { 'hrsh7th/nvim-cmp' },
     config = function()
       vim.g.tex_flavor = 'latex'
       vim.g.vimtex_compiler_method = 'latexmk'
       vim.g.vimtex_quickfix_mode = 0
       vim.g.vimtex_view_method = 'zathura'
-
-      vim.opt_local.spell = true
-      require('cmp').setup.buffer {
-        sources = {
-          { name = 'luasnip' },
-          { name = 'spell' },
-        },
-      }
     end
   }
 
@@ -211,15 +205,6 @@ vim.o.clipboard = 'unnamedplus'
 vim.o.incsearch = true
 vim.o.hlsearch = true
 
-function _G.clear_whitespace()
-  if not vim.b.noclear then
-    local save = vim.fn.winsaveview()
-    vim.cmd [[%s/\\\@<!\s\+$//e]]
-    vim.fn.winrestview(save)
-  end
-end
-
--- autocmd BufWritePre * call v:lua.clear_whitespace()
 vim.cmd [[
   source /home/aamaruvi/.config/nvim/ts.vim
   filetype plugin indent on

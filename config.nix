@@ -361,7 +361,9 @@ in
             udp dport 50000 accept
           '' else ""}
 
-          counter drop
+          # TODO: broken for now
+          # counter drop
+          drop
         }
 
         chain output {
@@ -371,7 +373,9 @@ in
 
         chain forward {
           type filter hook forward priority 0;
-          counter drop
+          # TODO: see above
+          # counter drop
+          drop
         }
       }
     '';
