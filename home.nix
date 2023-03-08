@@ -40,7 +40,7 @@ in
     virtualenv
     python3Packages.ipython
     python3
-    sageWithDoc
+    # sageWithDoc
     rustup
     zig
     (lib.setPrio (20) llvmPackages.bintools)
@@ -144,6 +144,7 @@ in
     iw
     hcxdumptool
     hcxtools
+    tcpdump
     metasploit
 
     gnumake

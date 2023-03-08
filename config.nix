@@ -397,6 +397,111 @@ in
 
   networking.firewall.enable = false;
 
+  systemd.network.netdevs."10-wg0" = {
+    netdevConfig = {
+      Name = "wg0";
+      Kind = "wireguard";
+      Description = "WireGuard Tunnel wg0";
+    };
+    wireguardConfig = {
+      PrivateKeyFile = "/etc/wireguard/${device}.key";
+      FirewallMark = mkLaptop 51000;
+    };
+    wireguardPeers = [
+      {
+        wireguardPeerConfig = {
+          PublicKey = "CqrwDIxsSYFJ+xHFkDotn38wvOMC32qBpcrZHvacsF0=";
+          Endpoint = "${if isLaptop then "aamaruvi.ddns.net" else "192.168.0.2"}:51820";
+          AllowedIPs = if isLaptop then "0.0.0.0/0, ::/0" else "10.200.200.0/24, fd37:994c:6708:de39::/64";
+        };
+      }
+    ];
+  };
+
+  systemd.network.networks."10-wg0" = {
+    name = "wg0";
+    DHCP = "no";
+    address =
+      if isLaptop then [
+        "10.200.200.2/32"
+        "fd37:994c:6708:de39::2/128"
+      ] else [
+        "10.200.200.7/32"
+        "fd37:994c:6708:de39::7/128"
+      ];
+    dns = mkLaptop [ "10.200.200.1" "fd37:994c:6708:de39::1" ];
+    routes = [
+      {
+        routeConfig = mkLaptop {
+          Gateway = "10.200.200.1";
+          Destination = "0.0.0.0/0";
+          GatewayOnLink = true;
+          Table = 1000;
+        };
+      }
+      {
+        routeConfig = {
+          Gateway = "10.200.200.1";
+          Destination = "10.200.200.0/24";
+          GatewayOnLink = true;
+        };
+      }
+      {
+        routeConfig = mkLaptop {
+          Gateway = "fd37:994c:6708:de39::1";
+          Destination = "::/0";
+          GatewayOnLink = true;
+          Table = 1000;
+        };
+      }
+      {
+        routeConfig = {
+          Gateway = "fd37:994c:6708:de39::1";
+          Destination = "fd37:994c:6708:de39::/64";
+          GatewayOnLink = true;
+        };
+      }
+    ];
+    networkConfig = {
+      DNSDefaultRoute = "no";
+      LLMNR = "yes";
+      MulticastDNS = "yes";
+    };
+  };
+
+  networking.hosts."${if isLaptop then "10.200.200.1" else "192.168.0.2"}" = [ "yogs.tech" ];
+
+  systemd.services.autovpn = mkLaptop {
+    description = "Automatic WireGuard VPN Activation";
+    after = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+    wants = [ "iwd.service" "systemd-networkd.socket" "dbus.socket" ];
+    environment.RUST_LOG = "warn";
+    serviceConfig = {
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+      RestrictSUIDSGID = true;
+      SystemCallArchitectures = "native";
+      RestrictAddressFamilies = [ "AF_NETLINK" "AF_UNIX" ];
+      ProtectHostname = true;
+      ProtectKernelLogs = true;
+      ProtectKernelModules = true;
+      ProtectKernelTunables = true;
+      ProtectControlGroups = true;
+      RestrictNamespaces = true;
+      ProtectHome = true;
+      ProtectSystem = true;
+      RestrictRealtime = true;
+      ProtectClock = true;
+      MemoryDenyWriteExecute = true;
+      LockPersonality = true;
+      CapabilityBoundingSet = "CAP_NET_ADMIN";
+      SystemCallFilter = [ "@system-service" "~@mount" "~@cpu-emulation" "~@debug" "~@keyring" "~@obsolete" "~@privileged" "~@setuid" ];
+      Type = "simple";
+      ExecStart = "${pkgs.cpkgs.autovpn}/bin/autovpn";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
+
   systemd.network.networks."00-ethernet" = {
     matchConfig.Type = "ether";
     DHCP = "yes";
